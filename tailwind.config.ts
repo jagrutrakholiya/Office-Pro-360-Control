@@ -1,0 +1,22 @@
+import type { Config } from 'tailwindcss'
+
+export default {
+  darkMode: 'class',
+  content: [
+    './app/**/*.{js,ts,jsx,tsx}',
+    './components/**/*.{js,ts,jsx,tsx}'
+  ],
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          DEFAULT: '#3b82f6',
+          600: '#2563eb',
+          700: '#1d4ed8'
+        }
+      }
+    },
+  },
+  plugins: [],
+} satisfies Config
+
