@@ -223,16 +223,19 @@ export default function DashboardPage() {
         <StatCard
           title="Monthly Revenue"
           value={formatCurrency(stats?.earnings.monthly || 0)}
-          subtitle={`MRR from ${stats?.companies.active || 0} active companies`}
+          subtitle={`MRR from ${stats?.companies.active || 0} active ${
+            stats?.companies.active === 1 ? "company" : "companies"
+          }`}
           icon="💰"
-          gradient="from-green-500 to-green-600"
+          gradient="from-green-500 to-emerald-600"
+          onClick={() => router.push("/earnings")}
         />
         <StatCard
           title="Total Users"
           value={stats?.users.total || 0}
-          subtitle={`~${Math.round(
+          subtitle={`Avg ${Math.round(
             stats?.users.avgPerCompany || 0
-          )} per company`}
+          )} users per company`}
           icon="👥"
           gradient="from-purple-500 to-purple-600"
         />

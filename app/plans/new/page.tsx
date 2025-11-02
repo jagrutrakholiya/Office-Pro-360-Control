@@ -1,50 +1,55 @@
-'use client'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Layout from '../../../components/Layout'
-import api from '../../../lib/api'
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Layout from "../../../components/Layout";
+import api from "../../../lib/api";
 
 export default function NewPlanPage() {
-  const router = useRouter()
-  const [form, setForm] = useState({ 
-    name: '', 
-    code: '', 
-    priceMonthly: 0, 
-    priceYearly: 0 
-  })
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string>('')
-  const [success, setSuccess] = useState(false)
+  const router = useRouter();
+  const [form, setForm] = useState({
+    name: "",
+    code: "",
+    description: "",
+    priceMonthly: 0,
+    priceYearly: 0,
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
-    setSuccess(false)
-    
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setSuccess(false);
+
     try {
-      await api.post('/admin/plans', form)
-      setSuccess(true)
+      await api.post("/admin/plans", form);
+      setSuccess(true);
       setTimeout(() => {
-        router.push('/plans')
-      }, 1500)
+        router.push("/plans");
+      }, 1500);
     } catch (err: any) {
-      setError(err?.response?.data?.message || 'Failed to create plan')
+      setError(err?.response?.data?.message || "Failed to create plan");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <Layout>
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold text-slate-900 mb-2">Create New Plan</h2>
-            <p className="text-slate-600">Add a new subscription plan and configure pricing</p>
+            <h2 className="text-3xl font-bold text-slate-900 mb-2">
+              Create New Plan
+            </h2>
+            <p className="text-slate-600">
+              Add a new subscription plan and configure pricing
+            </p>
           </div>
-          <button 
-            onClick={() => router.push('/plans')}
+          <button
+            onClick={() => router.push("/plans")}
             className="btn-secondary"
           >
             ← Back to Plans
@@ -59,24 +64,29 @@ export default function NewPlanPage() {
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 Plan Name *
               </label>
-              <input 
-                placeholder="e.g. Starter" 
-                value={form.name} 
-                onChange={e => setForm({ ...form, name: e.target.value })} 
-                className="input" 
-                required 
+              <input
+                placeholder="e.g. Starter"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                className="input"
+                required
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 Plan Code *
               </label>
-              <input 
-                placeholder="e.g. starter" 
-                value={form.code} 
-                onChange={e => setForm({ ...form, code: e.target.value.trim().toLowerCase() })} 
-                className="input" 
-                required 
+              <input
+                placeholder="e.g. starter"
+                value={form.code}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    code: e.target.value.trim().toLowerCase(),
+                  })
+                }
+                className="input"
+                required
               />
               <p className="mt-1 text-xs text-slate-500">
                 Short, unique identifier. Lowercase letters only.
@@ -84,33 +94,58 @@ export default function NewPlanPage() {
             </div>
           </div>
 
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Description
+            </label>
+            <textarea
+              placeholder="Brief description of the plan features and benefits"
+              value={form.description}
+              onChange={(e) =>
+                setForm({ ...form, description: e.target.value })
+              }
+              className="input min-h-[100px] resize-y"
+              rows={4}
+            />
+            <p className="mt-1 text-xs text-slate-500">
+              Optional. Describe what's included in this plan.
+            </p>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 Monthly Price (₹)
               </label>
-              <input 
-                type="number" 
-                min={0} 
+              <input
+                type="number"
+                min={0}
                 step="0.01"
-                placeholder="0" 
-                value={form.priceMonthly || ''} 
-                onChange={e => setForm({ ...form, priceMonthly: Number(e.target.value) || 0 })} 
-                className="input" 
+                placeholder="0"
+                value={form.priceMonthly || ""}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    priceMonthly: Number(e.target.value) || 0,
+                  })
+                }
+                className="input"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 Yearly Price (₹)
               </label>
-              <input 
-                type="number" 
-                min={0} 
+              <input
+                type="number"
+                min={0}
                 step="0.01"
-                placeholder="0" 
-                value={form.priceYearly || ''} 
-                onChange={e => setForm({ ...form, priceYearly: Number(e.target.value) || 0 })} 
-                className="input" 
+                placeholder="0"
+                value={form.priceYearly || ""}
+                onChange={(e) =>
+                  setForm({ ...form, priceYearly: Number(e.target.value) || 0 })
+                }
+                className="input"
               />
               <p className="mt-1 text-xs text-slate-500">
                 Keep 0 if not applicable.
@@ -123,7 +158,7 @@ export default function NewPlanPage() {
               {error}
             </div>
           )}
-          
+
           {success && (
             <div className="p-3 bg-green-50 border border-green-200 rounded-md text-green-700 text-sm">
               Plan created successfully! Redirecting...
@@ -131,16 +166,16 @@ export default function NewPlanPage() {
           )}
 
           <div className="flex gap-3 pt-4 border-t">
-            <button 
-              type="submit" 
-              disabled={loading || success} 
+            <button
+              type="submit"
+              disabled={loading || success}
               className="btn-primary"
             >
-              {loading ? 'Creating...' : success ? 'Created!' : 'Create Plan'}
+              {loading ? "Creating..." : success ? "Created!" : "Create Plan"}
             </button>
-            <button 
+            <button
               type="button"
-              onClick={() => router.push('/plans')}
+              onClick={() => router.push("/plans")}
               className="btn-secondary"
             >
               Cancel
@@ -149,6 +184,5 @@ export default function NewPlanPage() {
         </form>
       </section>
     </Layout>
-  )
+  );
 }
-

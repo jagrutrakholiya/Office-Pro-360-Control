@@ -48,6 +48,12 @@ export default function Layout({ children }: { children: ReactNode }) {
       description: "Subscription plans",
     },
     {
+      href: "/marketing-stats",
+      label: "Marketing Stats",
+      icon: "📈",
+      description: "Website content & stats",
+    },
+    {
       href: "/inquiries",
       label: "Inquiries",
       icon: "📬",
