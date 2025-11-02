@@ -13,9 +13,19 @@ export default function NewPlanPage() {
     priceMonthly: 0,
     priceYearly: 0,
   });
+  const [features, setFeatures] = useState<string[]>([""]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState(false);
+
+  const addFeature = () => setFeatures([...features, ""]);
+  const removeFeature = (index: number) =>
+    setFeatures(features.filter((_, i) => i !== index));
+  const updateFeature = (index: number, value: string) => {
+    const updated = [...features];
+    updated[index] = value;
+    setFeatures(updated);
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +34,9 @@ export default function NewPlanPage() {
     setSuccess(false);
 
     try {
-      await api.post("/admin/plans", form);
+      // Filter out empty features
+      const filteredFeatures = features.filter((f) => f.trim() !== "");
+      await api.post("/admin/plans", { ...form, features: filteredFeatures });
       setSuccess(true);
       setTimeout(() => {
         router.push("/plans");
@@ -109,6 +121,46 @@ export default function NewPlanPage() {
             />
             <p className="mt-1 text-xs text-slate-500">
               Optional. Describe what's included in this plan.
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Features
+            </label>
+            <div className="space-y-3">
+              {features.map((feature, index) => (
+                <div key={index} className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder={`Feature ${index + 1} (e.g., Unlimited users)`}
+                    value={feature}
+                    onChange={(e) => updateFeature(index, e.target.value)}
+                    className="input flex-1"
+                  />
+                  {features.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeFeature(index)}
+                      className="px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
+                      title="Remove feature"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={addFeature}
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              >
+                + Add Feature
+              </button>
+            </div>
+            <p className="mt-2 text-xs text-slate-500">
+              List the key features and benefits of this plan. Each feature will
+              be displayed as a bullet point on the marketing website.
             </p>
           </div>
 
