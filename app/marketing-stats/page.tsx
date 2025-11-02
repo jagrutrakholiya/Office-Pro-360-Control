@@ -81,7 +81,14 @@ export default function MarketingStatsPage() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch("/api/marketing/admin/stats");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/marketing/admin/stats`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
       if (response.ok) {
         const data = await response.json();
         setStats(data.stats);
@@ -96,11 +103,17 @@ export default function MarketingStatsPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const response = await fetch("/api/marketing/admin/stats", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(stats),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/marketing/admin/stats`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(stats),
+        }
+      );
 
       if (response.ok) {
         showToast("Stats updated successfully!", "success");
@@ -118,9 +131,15 @@ export default function MarketingStatsPage() {
   const handleRefresh = async () => {
     setRefreshing(true);
     try {
-      const response = await fetch("/api/marketing/admin/stats/refresh", {
-        method: "POST",
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/marketing/admin/stats/refresh`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
       if (response.ok) {
         showToast("Stats refreshed from database!", "success");
