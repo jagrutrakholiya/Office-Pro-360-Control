@@ -15,7 +15,9 @@ export default function Layout({ children }: { children: ReactNode }) {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50">
         <div className="flex flex-col items-center gap-4">
           <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-          <div className="text-slate-600 font-medium">Checking authentication...</div>
+          <div className="text-slate-600 font-medium">
+            Checking authentication...
+          </div>
         </div>
       </div>
     );
@@ -27,12 +29,42 @@ export default function Layout({ children }: { children: ReactNode }) {
   }
 
   const nav = [
-    { href: "/", label: "Dashboard", icon: "📊", description: "Overview & analytics" },
-    { href: "/companies", label: "Companies", icon: "🏢", description: "Manage organizations" },
-    { href: "/plans", label: "Plans", icon: "💎", description: "Subscription plans" },
-    { href: "/inquiries", label: "Inquiries", icon: "📬", description: "Customer inquiries" },
-    { href: "/reviews", label: "Reviews", icon: "⭐", description: "Customer feedback" },
-    { href: "/earnings", label: "Earnings", icon: "💰", description: "Revenue analytics" },
+    {
+      href: "/",
+      label: "Dashboard",
+      icon: "📊",
+      description: "Overview & analytics",
+    },
+    {
+      href: "/companies",
+      label: "Companies",
+      icon: "🏢",
+      description: "Manage organizations",
+    },
+    {
+      href: "/plans",
+      label: "Plans",
+      icon: "💎",
+      description: "Subscription plans",
+    },
+    {
+      href: "/inquiries",
+      label: "Inquiries",
+      icon: "📬",
+      description: "Customer inquiries",
+    },
+    {
+      href: "/reviews",
+      label: "Reviews",
+      icon: "⭐",
+      description: "Customer feedback",
+    },
+    {
+      href: "/earnings",
+      label: "Earnings",
+      icon: "💰",
+      description: "Revenue analytics",
+    },
   ];
 
   const NavContent = () => (
@@ -58,9 +90,13 @@ export default function Layout({ children }: { children: ReactNode }) {
             <span className="text-lg">{n.icon}</span>
             <div className="flex-1 min-w-0">
               <div className="font-medium">{n.label}</div>
-              <div className={`text-xs truncate transition-colors ${
-                pathname === n.href ? "text-blue-100" : "text-slate-400 group-hover:text-slate-300"
-              }`}>
+              <div
+                className={`text-xs truncate transition-colors ${
+                  pathname === n.href
+                    ? "text-blue-100"
+                    : "text-slate-400 group-hover:text-slate-300"
+                }`}
+              >
                 {n.description}
               </div>
             </div>
@@ -70,10 +106,12 @@ export default function Layout({ children }: { children: ReactNode }) {
       <div className="border-t border-slate-700 pt-6 mt-6">
         <div className="flex items-center gap-3 mb-4 p-3 bg-slate-800/50 rounded-lg">
           <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
-            {user?.name?.charAt(0) || user?.email?.charAt(0) || 'A'}
+            {user?.name?.charAt(0) || user?.email?.charAt(0) || "A"}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-sm font-medium text-white truncate">{user?.name || 'Admin'}</div>
+            <div className="text-sm font-medium text-white truncate">
+              {user?.name || "Admin"}
+            </div>
             <div className="text-xs text-slate-400 truncate">{user.email}</div>
           </div>
         </div>
@@ -100,15 +138,25 @@ export default function Layout({ children }: { children: ReactNode }) {
         onClick={() => setIsMobileMenuOpen(true)}
         className="lg:hidden fixed top-4 left-4 z-50 p-3 bg-slate-900 text-white rounded-xl shadow-lg transition-all duration-200 hover:bg-slate-800"
       >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        <svg
+          className="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 6h16M4 12h16M4 18h16"
+          />
         </svg>
       </button>
 
       {/* Mobile Sidebar Overlay */}
       {isMobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 z-40 flex">
-          <div 
+          <div
             className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
             onClick={() => setIsMobileMenuOpen(false)}
           />
@@ -117,8 +165,18 @@ export default function Layout({ children }: { children: ReactNode }) {
               onClick={() => setIsMobileMenuOpen(false)}
               className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white transition-colors"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
             <NavContent />
@@ -128,9 +186,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 
       {/* Main Content */}
       <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
-        <div className="max-w-7xl mx-auto">
-          {children}
-        </div>
+        <div className="max-w-7xl mx-auto">{children}</div>
       </main>
     </div>
   );
