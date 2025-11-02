@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import Layout from '../../components/Layout'
 import api from '../../lib/api'
 
-type Plan = { _id: string; name: string; code: string; priceMonthly: number; priceYearly: number; status: string }
+type Plan = { _id: string; name: string; code: string; description?: string; priceMonthly: number; priceYearly: number; status: string }
 
 export default function PlansPage() {
   const router = useRouter()
