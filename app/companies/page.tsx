@@ -106,7 +106,29 @@ export default function CompaniesPage() {
 
   async function changeStatus(id: string, status: string) {
     await api.patch(`/admin/companies/${id}/status`, { status });
-    await loadCompanies();
+    loadCompanies();
+  }
+
+  async function deleteCompany(id: string, name: string) {
+    if (
+      !confirm(
+        `Are you sure you want to delete "${name}"?\n\nThis will permanently delete:\n• The company\n• All users in this company\n• All company data (tasks, projects, attendance, etc.)\n\nThis action cannot be undone!`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const res = await api.delete(`/admin/companies/${id}`);
+      alert(`Successfully deleted company and ${res.data.deleted.users} users`);
+      loadCompanies();
+    } catch (err: any) {
+      alert(
+        `Failed to delete company: ${
+          err.response?.data?.message || err.message
+        }`
+      );
+    }
   }
 
   async function changePlan(id: string, plan: string) {
@@ -235,12 +257,20 @@ export default function CompaniesPage() {
                     </select>
                   </td>
                   <td className="px-6 py-4">
-                    <button
-                      onClick={() => openEditServices(c)}
-                      className="btn-primary-small"
-                    >
-                      ⚙️ Edit Services
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => openEditServices(c)}
+                        className="btn-primary-small"
+                      >
+                        ⚙️ Edit Services
+                      </button>
+                      <button
+                        onClick={() => deleteCompany(c._id, c.name)}
+                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+                      >
+                        🗑️ Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -319,12 +349,18 @@ export default function CompaniesPage() {
                     features
                   </span>
                 </div>
-                <div className="mt-3 pt-3 border-t border-slate-100">
+                <div className="mt-3 pt-3 border-t border-slate-100 space-y-2">
                   <button
                     onClick={() => openEditServices(c)}
                     className="w-full btn-primary-small"
                   >
                     ⚙️ Edit Services
+                  </button>
+                  <button
+                    onClick={() => deleteCompany(c._id, c.name)}
+                    className="w-full bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    🗑️ Delete Company
                   </button>
                 </div>
               </div>
