@@ -8,24 +8,28 @@
   }
 
   body {
-    @apply bg-slate-50 text-slate-900;
+    @apply bg-gradient-to-br from-slate-50 via-blue-50/20 to-slate-50 text-slate-900;
   }
 
-  /* Custom scrollbar */
+  /* Custom scrollbar - Enhanced */
   ::-webkit-scrollbar {
-    @apply w-2;
+    @apply w-3 h-3;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-slate-100;
+    @apply bg-slate-100 rounded-full;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-slate-300 rounded-full;
+    @apply bg-gradient-to-b from-slate-300 to-slate-400 rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-slate-400;
+    @apply bg-gradient-to-b from-slate-400 to-slate-500;
+  }
+
+  ::-webkit-scrollbar-corner {
+    @apply bg-slate-100;
   }
 }
 
@@ -75,26 +79,26 @@
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
   }
 
-  /* Enhanced Card Styles */
+  /* Enhanced Card Styles with better shadows and hover effects */
   .card {
-    @apply bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-200/50 p-6 transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/60;
+    @apply bg-white rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-100 p-6 transition-all duration-300 hover:shadow-2xl hover:shadow-slate-300/50 hover:-translate-y-0.5;
   }
 
   .card-interactive {
-    @apply card cursor-pointer hover:-translate-y-1 hover:shadow-2xl;
+    @apply card cursor-pointer hover:-translate-y-1 hover:shadow-2xl hover:border-blue-200 active:scale-[0.98];
   }
 
   .card-gradient {
-    @apply bg-gradient-to-br text-white shadow-2xl border-0 backdrop-blur-sm;
+    @apply bg-gradient-to-br text-white shadow-2xl border-0 backdrop-blur-sm p-6 rounded-2xl;
   }
 
   .card-small {
-    @apply bg-white rounded-xl shadow-md shadow-slate-200/40 border border-slate-200/50 p-4 transition-all duration-200;
+    @apply bg-white rounded-xl shadow-lg shadow-slate-200/50 border border-slate-100 p-4 transition-all duration-200 hover:shadow-xl hover:shadow-slate-300/40;
   }
 
-  /* Enhanced Table Styles */
+  /* Enhanced Table Styles with better visual hierarchy */
   .table-wrapper {
-    @apply bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-200/50 overflow-hidden;
+    @apply bg-white rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden;
   }
 
   .table-responsive {
@@ -106,49 +110,75 @@
   }
 
   .table-header {
-    @apply bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200;
+    @apply bg-gradient-to-r from-slate-50 via-slate-100 to-slate-50 border-b-2 border-slate-200;
   }
 
   .table-row {
-    @apply hover:bg-slate-50/80 transition-colors duration-200 border-b border-slate-100 last:border-b-0;
+    @apply hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-transparent transition-all duration-200 border-b border-slate-100 last:border-b-0 cursor-pointer;
   }
 
-  /* Enhanced Badge Styles */
+  /* Enhanced Badge Styles with better gradients and shadows */
   .badge {
-    @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm;
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shadow-md transition-all duration-200 hover:shadow-lg;
   }
 
   .badge-active {
-    @apply bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200;
+    @apply bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200/80 shadow-green-200/50;
   }
 
   .badge-view-only {
-    @apply bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-800 border border-amber-200;
+    @apply bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-800 border border-amber-200/80 shadow-amber-200/50;
   }
 
   .badge-suspended {
-    @apply bg-gradient-to-r from-red-100 to-rose-100 text-red-800 border border-red-200;
+    @apply bg-gradient-to-r from-red-100 to-rose-100 text-red-800 border border-red-200/80 shadow-red-200/50;
   }
 
   .badge-pending {
-    @apply bg-gradient-to-r from-blue-100 to-sky-100 text-blue-800 border border-blue-200;
+    @apply bg-gradient-to-r from-blue-100 to-sky-100 text-blue-800 border border-blue-200/80 shadow-blue-200/50;
   }
 
-  /* Status Indicators */
+  /* Status Indicators with pulsing animation */
   .status-dot {
-    @apply w-2 h-2 rounded-full;
+    @apply w-2 h-2 rounded-full relative;
   }
 
   .status-dot-active {
-    @apply status-dot bg-green-500 shadow-sm shadow-green-500/50;
+    @apply status-dot bg-green-500 shadow-md shadow-green-500/60;
+    animation: pulse-green 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 
   .status-dot-suspended {
-    @apply status-dot bg-red-500 shadow-sm shadow-red-500/50;
+    @apply status-dot bg-red-500 shadow-md shadow-red-500/60;
   }
 
   .status-dot-pending {
-    @apply status-dot bg-amber-500 shadow-sm shadow-amber-500/50;
+    @apply status-dot bg-amber-500 shadow-md shadow-amber-500/60;
+    animation: pulse-amber 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse-green {
+
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+    }
+
+    50% {
+      box-shadow: 0 0 0 6px rgba(34, 197, 94, 0);
+    }
+  }
+
+  @keyframes pulse-amber {
+
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+    }
+
+    50% {
+      box-shadow: 0 0 0 6px rgba(245, 158, 11, 0);
+    }
   }
 
   /* Loading States */
@@ -160,29 +190,29 @@
     @apply animate-spin rounded-full border-2 border-slate-200 border-t-blue-600;
   }
 
-  /* Mobile Card Layout for Tables */
+  /* Mobile Card Layout for Tables - Enhanced */
   .mobile-card {
-    @apply block sm:hidden bg-white p-4 rounded-xl shadow-md border border-slate-200 mb-4;
+    @apply block sm:hidden bg-white p-5 rounded-xl shadow-lg shadow-slate-200/60 border border-slate-100 mb-4 transition-all duration-200 hover:shadow-xl hover:shadow-slate-300/50 hover:-translate-y-0.5;
   }
 
   .mobile-card-header {
-    @apply flex items-center justify-between mb-3 pb-3 border-b border-slate-100;
+    @apply flex items-center justify-between mb-4 pb-4 border-b-2 border-slate-100;
   }
 
   .mobile-card-content {
-    @apply space-y-2;
+    @apply space-y-3;
   }
 
   .mobile-card-row {
-    @apply flex items-center justify-between text-sm;
+    @apply flex items-center justify-between text-sm py-2 px-3 rounded-lg bg-slate-50/50 hover:bg-slate-100/50 transition-colors;
   }
 
   .mobile-card-label {
-    @apply text-slate-500 font-medium;
+    @apply text-slate-600 font-semibold;
   }
 
   .mobile-card-value {
-    @apply text-slate-900 font-semibold;
+    @apply text-slate-900 font-bold;
   }
 
   /* Responsive Grid */
@@ -234,5 +264,61 @@
 
   .border-gradient {
     @apply border-transparent bg-gradient-to-r from-blue-500 to-purple-500 bg-origin-border;
+  }
+}
+
+/* Additional Enhanced Utility Classes */
+@layer utilities {
+  .focus-ring {
+    @apply focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200;
+  }
+
+  .glass {
+    @apply bg-white/80 backdrop-blur-xl border border-white/20 shadow-2xl;
+  }
+
+  .transition-smooth {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  .hover-scale {
+    @apply hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200;
+  }
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+
+  .shimmer {
+    animation: shimmer 2s infinite linear;
+    background: linear-gradient(to right, #f1f5f9 4%, #e2e8f0 25%, #f1f5f9 36%);
+    background-size: 1000px 100%;
+  }
+
+  .grid-pattern {
+    background-image: radial-gradient(circle at 1px 1px, rgb(203 213 225 / 0.15) 1px, transparent 0);
+    background-size: 40px 40px;
   }
 }
