@@ -22,6 +22,12 @@ type DashboardStats = {
   inquiries: {
     pending: number;
   };
+  queries: {
+    new: number;
+    in_progress: number;
+    resolved: number;
+    closed: number;
+  };
   earnings: {
     monthly: number;
     byPlan: Record<string, { count: number; mrr: number }>;
@@ -240,12 +246,12 @@ export default function DashboardPage() {
           gradient="from-purple-500 to-purple-600"
         />
         <StatCard
-          title="Pending Inquiries"
-          value={stats?.inquiries.pending || 0}
-          subtitle="Awaiting response"
-          icon="📬"
-          gradient="from-orange-500 to-orange-600"
-          onClick={() => router.push("/inquiries")}
+          title="Pending Issues"
+          value={stats?.queries?.new || 0}
+          subtitle="User-reported issues"
+          icon="�"
+          gradient="from-red-500 to-red-600"
+          onClick={() => router.push("/queries")}
         />
       </div>
 
