@@ -418,8 +418,8 @@ export default function CompaniesPage() {
                     Company Users
                   </h3>
                   <p className="text-sm text-slate-600 mt-1">
-                    {companies.find((c) => c._id === viewingUsers)?.name || ""} -{" "}
-                    {companyUsers.length} users
+                    {companies.find((c) => c._id === viewingUsers)?.name || ""}{" "}
+                    - {companyUsers.length} users
                   </p>
                 </div>
                 <button
@@ -529,109 +529,108 @@ export default function CompaniesPage() {
 
       {/* Edit Services Section */}
       {editingId && (
-          <div className="p-6 border-t border-slate-200 bg-gradient-to-r from-slate-50 to-blue-50">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-              <div>
-                <h4 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                  <span>⚙️</span>
-                  Edit Services / Features
-                </h4>
-                <p className="text-sm text-slate-600 mt-1">
-                  {selectedCount} of {availableServices.length} services
-                  selected
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const allEnabled = Object.fromEntries(
-                      availableServices.map((s) => [s.key, true])
-                    );
-                    setEditServices(allEnabled);
-                  }}
-                  className="btn-secondary-small"
-                >
-                  Select All
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEditServices({})}
-                  className="btn-secondary-small"
-                >
-                  Clear All
-                </button>
-              </div>
+        <div className="p-6 border-t border-slate-200 bg-gradient-to-r from-slate-50 to-blue-50">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <h4 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span>⚙️</span>
+                Edit Services / Features
+              </h4>
+              <p className="text-sm text-slate-600 mt-1">
+                {selectedCount} of {availableServices.length} services selected
+              </p>
             </div>
-
-            <div className="bg-white rounded-xl border border-slate-200 p-6 max-h-96 overflow-y-auto">
-              <div className="space-y-6">
-                {Object.entries(categorizedServices).map(
-                  ([category, services]) => (
-                    <div key={category} className="space-y-3">
-                      <div className="flex items-center gap-2 pb-2 border-b border-slate-200">
-                        <div className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></div>
-                        <h5 className="text-sm font-bold text-slate-900">
-                          {category}
-                        </h5>
-                        <span className="badge badge-pending text-2xs">
-                          {services.length} services
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                        {services.map((svc) => (
-                          <label
-                            key={svc.key}
-                            className="group flex items-start gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition-all duration-200 has-[:checked]:bg-blue-50 has-[:checked]:border-blue-300"
-                          >
-                            <input
-                              type="checkbox"
-                              checked={!!editServices[svc.key]}
-                              onChange={(e) =>
-                                setEditServices({
-                                  ...editServices,
-                                  [svc.key]: e.target.checked,
-                                })
-                              }
-                              className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500 mt-0.5"
-                            />
-                            <div className="flex-1 min-w-0">
-                              <div className="font-medium text-sm text-slate-900 group-hover:text-blue-900">
-                                {svc.label || svc.key}
-                              </div>
-                              {svc.description && (
-                                <div className="text-xs text-slate-500 mt-1 leading-relaxed">
-                                  {svc.description}
-                                </div>
-                              )}
-                            </div>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  )
-                )}
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 mt-6">
-              <button onClick={saveEditServices} className="btn-primary">
-                <span className="mr-2">💾</span>
-                Save Changes
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const allEnabled = Object.fromEntries(
+                    availableServices.map((s) => [s.key, true])
+                  );
+                  setEditServices(allEnabled);
+                }}
+                className="btn-secondary-small"
+              >
+                Select All
               </button>
               <button
-                onClick={() => {
-                  setEditingId(null);
-                  setEditServices({});
-                }}
-                className="btn-secondary"
+                type="button"
+                onClick={() => setEditServices({})}
+                className="btn-secondary-small"
               >
-                <span className="mr-2">❌</span>
-                Cancel
+                Clear All
               </button>
             </div>
           </div>
-        )}
+
+          <div className="bg-white rounded-xl border border-slate-200 p-6 max-h-96 overflow-y-auto">
+            <div className="space-y-6">
+              {Object.entries(categorizedServices).map(
+                ([category, services]) => (
+                  <div key={category} className="space-y-3">
+                    <div className="flex items-center gap-2 pb-2 border-b border-slate-200">
+                      <div className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></div>
+                      <h5 className="text-sm font-bold text-slate-900">
+                        {category}
+                      </h5>
+                      <span className="badge badge-pending text-2xs">
+                        {services.length} services
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {services.map((svc) => (
+                        <label
+                          key={svc.key}
+                          className="group flex items-start gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition-all duration-200 has-[:checked]:bg-blue-50 has-[:checked]:border-blue-300"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={!!editServices[svc.key]}
+                            onChange={(e) =>
+                              setEditServices({
+                                ...editServices,
+                                [svc.key]: e.target.checked,
+                              })
+                            }
+                            className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500 mt-0.5"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-sm text-slate-900 group-hover:text-blue-900">
+                              {svc.label || svc.key}
+                            </div>
+                            {svc.description && (
+                              <div className="text-xs text-slate-500 mt-1 leading-relaxed">
+                                {svc.description}
+                              </div>
+                            )}
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 mt-6">
+            <button onClick={saveEditServices} className="btn-primary">
+              <span className="mr-2">💾</span>
+              Save Changes
+            </button>
+            <button
+              onClick={() => {
+                setEditingId(null);
+                setEditServices({});
+              }}
+              className="btn-secondary"
+            >
+              <span className="mr-2">❌</span>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 }
