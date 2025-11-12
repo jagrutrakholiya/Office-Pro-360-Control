@@ -21,7 +21,8 @@ export default function NewCompanyPage() {
   const [availableServices, setAvailableServices] = useState<Service[]>([])
   const [form, setForm] = useState({ 
     name: '', 
-    code: '', 
+    code: '',
+    domain: '', // Custom login domain for this company
     plan: 'starter', 
     adminEmail: '', 
     adminPassword: '', 
@@ -105,6 +106,7 @@ export default function NewCompanyPage() {
       const payload: any = {
         name: form.name,
         code: form.code,
+        domain: form.domain || undefined, // Include domain if provided
         plan: form.plan,
         admin: { email: form.adminEmail },
         features: Object.fromEntries(Object.entries(form.services).filter(([_, v]) => v))
@@ -242,6 +244,23 @@ export default function NewCompanyPage() {
               />
               <p className="mt-1 text-xs text-slate-500">Unique identifier (lowercase, no spaces)</p>
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Custom Login Domain
+              <span className="ml-2 text-xs font-normal text-slate-500">(Optional)</span>
+            </label>
+            <input 
+              placeholder="e.g. acme.employee.com or acme.yourdomain.com" 
+              value={form.domain} 
+              onChange={e => setForm({ ...form, domain: e.target.value.toLowerCase().trim() })} 
+              className="input" 
+              type="text"
+            />
+            <p className="mt-1 text-xs text-slate-500">
+              Custom subdomain for employee login portal. If set, all emails will include this domain instead of the default login URL.
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
