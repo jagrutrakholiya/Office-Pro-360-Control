@@ -187,7 +187,7 @@
   }
 
   .loading-spinner {
-    @apply animate-spin rounded-full border-2 border-slate-200 border-t-blue-600;
+    @apply animate-spin rounded-full border-1 border-slate-200 border-t-blue-600;
   }
 
   /* Mobile Card Layout for Tables - Enhanced */

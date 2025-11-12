@@ -205,7 +205,7 @@ export default function DashboardPage() {
             >
               {loading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-1 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
                   Refreshing...
                 </>
               ) : (

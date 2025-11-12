@@ -487,7 +487,7 @@ export default function QueriesPage() {
                         className={`px-4 py-3 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                           selectedQuery.status === status
                             ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
-                            : "bg-white border-2 border-slate-200 text-slate-700 hover:border-blue-300"
+                            : "bg-white border-1 border-slate-200 text-slate-700 hover:border-blue-300"
                         }`}
                       >
                         {status.replace("_", " ").toUpperCase()}
