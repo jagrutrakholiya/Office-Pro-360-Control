@@ -18,5 +18,11 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// Helper function for making API requests
+export async function apiRequest(url: string, options?: any) {
+  const response = await api.get(url, options);
+  return response.data;
+}
+
 export default api;
 

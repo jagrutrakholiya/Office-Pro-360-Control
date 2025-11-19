@@ -11,6 +11,42 @@
     @apply bg-gradient-to-br from-slate-50 via-blue-50/20 to-slate-50 text-slate-900;
   }
 
+  /* Mobile responsiveness */
+  @supports (padding: max(0px)) {
+    body {
+      padding-left: max(0px, env(safe-area-inset-left));
+      padding-right: max(0px, env(safe-area-inset-right));
+    }
+  }
+
+  /* Mobile bottom padding for navigation */
+  .pb-safe {
+    padding-bottom: max(env(safe-area-inset-bottom), 4rem);
+  }
+
+  /* Prevent overscroll on mobile */
+  html {
+    overscroll-behavior: none;
+  }
+
+  /* Touch optimization */
+  * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+
+  button, a {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Viewport height for mobile (handles address bar) */
+  :root {
+    --vh: 1vh;
+  }
+
   /* Custom scrollbar - Enhanced */
   ::-webkit-scrollbar {
     @apply w-3 h-3;
