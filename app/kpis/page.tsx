@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Layout from "../../components/Layout";
 
 interface KPI {
   _id: string;
@@ -104,9 +105,10 @@ export default function KPIDashboard() {
   const filteredKpis = kpis;
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
+    <Layout>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">KPI Dashboard</h1>
           <p className="text-gray-600 mt-1">
@@ -304,6 +306,7 @@ export default function KPIDashboard() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </Layout>
   );
 }
