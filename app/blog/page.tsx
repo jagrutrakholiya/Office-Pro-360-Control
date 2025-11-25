@@ -50,7 +50,7 @@ export default function BlogManagement() {
     try {
       const params: any = {};
       if (filter !== "all") params.status = filter;
-      const response = await api.get("/api/blog", { params });
+      const response = await api.get("/blog", { params });
       setPosts(response.data.posts);
     } catch (error) {
       console.error("Error fetching posts:", error);
@@ -63,7 +63,7 @@ export default function BlogManagement() {
     if (!confirm("Are you sure you want to delete this blog post?")) return;
 
     try {
-      await api.delete(`/api/blog/${id}`);
+      await api.delete(`/blog/${id}`);
       fetchPosts();
     } catch (error) {
       console.error("Error deleting post:", error);

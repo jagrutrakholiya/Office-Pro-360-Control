@@ -61,18 +61,52 @@ type DashboardStats = {
   }>;
 };
 
+type RevenueTrendData = {
+  trend: Array<{ month: string; revenue: number }>;
+  totalLast6Months: number;
+  growthRate: number;
+};
+
+type CompanyStatusData = {
+  statuses: {
+    active: number;
+    view_only: number;
+    suspended: number;
+    pending: number;
+  };
+  total: number;
+};
+
+type EarningsData = {
+  byPlan: Record<string, { count: number; mrr: number }>;
+  totalMRR: number;
+  totalCompanies: number;
+};
+
 export default function DashboardPage() {
   const router = useRouter();
   const { user } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [revenueTrend, setRevenueTrend] = useState<RevenueTrendData | null>(null);
+  const [companyStatus, setCompanyStatus] = useState<CompanyStatusData | null>(null);
+  const [earningsData, setEarningsData] = useState<EarningsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
 
   const loadStats = async () => {
     try {
-      const { data } = await api.get("/admin/dashboard/stats");
-      setStats(data);
+      const [statsRes, revenueRes, statusRes, earningsRes] = await Promise.all([
+        api.get("/admin/dashboard/stats"),
+        api.get("/admin/metrics/revenue-trend"),
+        api.get("/admin/metrics/company-status-distribution"),
+        api.get("/admin/metrics/earnings")
+      ]);
+      
+      setStats(statsRes.data);
+      setRevenueTrend(revenueRes.data);
+      setCompanyStatus(statusRes.data);
+      setEarningsData(earningsRes.data);
       setLastUpdated(new Date());
     } catch (err) {
       console.error("Failed to load dashboard stats:", err);
@@ -383,35 +417,149 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Recent Companies */}
+      {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         {/* Revenue Chart */}
         <div className="card">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-8 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></div>
+              <div>
+                <h3 className="text-xl font-bold text-slate-900">
+                  Revenue Trend (Last 6 Months)
+                </h3>
+                {revenueTrend && (
+                  <p className="text-sm text-slate-600 mt-1">
+                    Total: {formatCurrency(revenueTrend.totalLast6Months)} | Growth: {revenueTrend.growthRate.toFixed(1)}%
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+          {revenueTrend ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <AreaChart
+                data={revenueTrend.trend.map(item => ({
+                  month: new Date(item.month).toLocaleDateString('en-US', { month: 'short' }),
+                  revenue: item.revenue
+                }))}
+              >
+                <defs>
+                  <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="month" stroke="#64748b" />
+                <YAxis stroke="#64748b" />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#1e293b",
+                    border: "none",
+                    borderRadius: "8px",
+                    color: "#fff",
+                  }}
+                  formatter={(value: number) => formatCurrency(value)}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke="#10b981"
+                  strokeWidth={3}
+                  fillOpacity={1}
+                  fill="url(#colorRevenue)"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="h-[300px] flex items-center justify-center text-slate-400">
+              Loading revenue data...
+            </div>
+          )}
+        </div>
+
+        {/* Company Distribution Chart */}
+        <div className="card">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-8 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full"></div>
+              <div>
+                <h3 className="text-xl font-bold text-slate-900">
+                  Company Status Distribution
+                </h3>
+                {companyStatus && (
+                  <p className="text-sm text-slate-600 mt-1">
+                    Total: {companyStatus.total} companies
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+          {companyStatus ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={[
+                    { name: "Active", value: companyStatus.statuses.active },
+                    { name: "View Only", value: companyStatus.statuses.view_only },
+                    { name: "Suspended", value: companyStatus.statuses.suspended },
+                    { name: "Pending", value: companyStatus.statuses.pending },
+                  ].filter(item => item.value > 0)}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, value, percent }) =>
+                    `${name}: ${value} (${((percent || 0) * 100).toFixed(0)}%)`
+                  }
+                  outerRadius={100}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {[0, 1, 2, 3].map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="h-[300px] flex items-center justify-center text-slate-400">
+              Loading company data...
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Revenue by Plan */}
+      {earningsData && earningsData.totalMRR > 0 && (
+        <div className="card mb-8">
           <div className="flex items-center gap-2 mb-6">
-            <div className="w-2 h-8 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></div>
-            <h3 className="text-xl font-bold text-slate-900">
-              Revenue Trend (Last 6 Months)
-            </h3>
+            <div className="w-2 h-8 bg-gradient-to-b from-purple-500 to-purple-600 rounded-full"></div>
+            <div>
+              <h3 className="text-xl font-bold text-slate-900">
+                Revenue by Plan
+              </h3>
+              <p className="text-sm text-slate-600 mt-1">
+                Total MRR: {formatCurrency(earningsData.totalMRR)} from {earningsData.totalCompanies} companies
+              </p>
+            </div>
           </div>
           <ResponsiveContainer width="100%" height={300}>
-            <AreaChart
-              data={[
-                { month: "Jun", revenue: 85000 },
-                { month: "Jul", revenue: 92000 },
-                { month: "Aug", revenue: 88000 },
-                { month: "Sep", revenue: 105000 },
-                { month: "Oct", revenue: 118000 },
-                { month: "Nov", revenue: stats?.earnings.monthly || 125000 },
-              ]}
+            <BarChart
+              data={Object.entries(earningsData.byPlan)
+                .filter(([_, data]) => data.count > 0)
+                .map(([plan, data]) => ({
+                  plan: plan.charAt(0).toUpperCase() + plan.slice(1),
+                  mrr: data.mrr,
+                  companies: data.count
+                }))}
             >
-              <defs>
-                <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                </linearGradient>
-              </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-              <XAxis dataKey="month" stroke="#64748b" />
+              <XAxis dataKey="plan" stroke="#64748b" />
               <YAxis stroke="#64748b" />
               <Tooltip
                 contentStyle={{
@@ -420,64 +568,18 @@ export default function DashboardPage() {
                   borderRadius: "8px",
                   color: "#fff",
                 }}
-                formatter={(value: number) => formatCurrency(value)}
-              />
-              <Area
-                type="monotone"
-                dataKey="revenue"
-                stroke="#10b981"
-                strokeWidth={3}
-                fillOpacity={1}
-                fill="url(#colorRevenue)"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Company Distribution Chart */}
-        <div className="card">
-          <div className="flex items-center gap-2 mb-6">
-            <div className="w-2 h-8 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full"></div>
-            <h3 className="text-xl font-bold text-slate-900">
-              Company Status Distribution
-            </h3>
-          </div>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={[
-                  { name: "Active", value: stats?.companies.active || 0 },
-                  { name: "Suspended", value: stats?.companies.suspended || 0 },
-                  {
-                    name: "Others",
-                    value:
-                      (stats?.companies.total || 0) -
-                      (stats?.companies.active || 0) -
-                      (stats?.companies.suspended || 0),
-                  },
+                formatter={(value: number, name: string) => [
+                  name === "mrr" ? formatCurrency(value) : value,
+                  name === "mrr" ? "Monthly Revenue" : "Companies"
                 ]}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, percent }) =>
-                  `${name}: ${((percent || 0) * 100).toFixed(0)}%`
-                }
-                outerRadius={100}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {[0, 1, 2].map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
+              />
+              <Legend />
+              <Bar dataKey="mrr" fill="#8b5cf6" name="Monthly Revenue" />
+              <Bar dataKey="companies" fill="#3b82f6" name="Companies" />
+            </BarChart>
           </ResponsiveContainer>
         </div>
-      </div>
+      )}
 
       {/* Marketing Content Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

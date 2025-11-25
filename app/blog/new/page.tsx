@@ -60,7 +60,7 @@ export default function NewBlogPost() {
     setSaving(true);
 
     try {
-      await api.post("/api/blog", formData);
+      await api.post("/blog", formData);
       router.push("/blog");
     } catch (error) {
       console.error("Error saving post:", error);
