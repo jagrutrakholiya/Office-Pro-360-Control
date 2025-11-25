@@ -52,7 +52,7 @@ export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <aside className={`hidden lg:flex ${collapsed ? 'w-20' : 'w-72'} transition-all duration-300 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-800 text-white flex-col border-r border-slate-800/50`}>      
+    <aside className={`hidden lg:flex ${collapsed ? 'w-20' : 'w-72'} h-screen sticky top-0 transition-all duration-300 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-800 text-white flex-col border-r border-slate-800/50`}>      
       {/* Brand / Collapse */}
       <div className="flex items-center justify-between px-5 py-6 border-b border-slate-800/60">
         {!collapsed && (
@@ -67,7 +67,7 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6 custom-scrollbar">
+      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6 custom-scrollbar min-h-0">
         {groups.map(group => (
           <div key={group.label}>
             {!collapsed && <div className="px-2 mb-2 text-[11px] font-semibold tracking-wide text-slate-400 uppercase">{group.label}</div>}

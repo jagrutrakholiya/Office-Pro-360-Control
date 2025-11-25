@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Layout from "../../components/Layout";
+import api from "../../lib/api";
 
 interface KPI {
   _id: string;
@@ -50,27 +51,18 @@ export default function KPIDashboard() {
 
   const fetchKPIs = async () => {
     try {
-      const token = localStorage.getItem("token");
-      let url = `${process.env.NEXT_PUBLIC_API_URL}/analytics/kpis?`;
+      const params: any = {};
       
       if (selectedCategory !== "all") {
-        url += `category=${selectedCategory}&`;
+        params.category = selectedCategory;
       }
       
       if (selectedPeriod !== "all") {
-        url += `period=${selectedPeriod}&`;
+        params.period = selectedPeriod;
       }
 
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setKpis(data.data || []);
-      }
+      const response = await api.get("/analytics/kpis", { params });
+      setKpis(response.data.data || []);
     } catch (error) {
       console.error("Error fetching KPIs:", error);
     } finally {

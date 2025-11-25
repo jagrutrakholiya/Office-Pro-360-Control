@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FiSave, FiArrowLeft } from "react-icons/fi";
 import api from "@/lib/api";
-import Layout from "../../components/Layout";
+import Layout from "../../../components/Layout";
 
 export default function NewBlogPost() {
   const router = useRouter();

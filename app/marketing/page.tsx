@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Layout from "../components/Layout";
+import Layout from "../../components/Layout";
 import {
   pageContentAPI,
   caseStudyAPI,
@@ -161,123 +161,124 @@ export default function MarketingDashboard() {
   }
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Marketing Content Management
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Manage all marketing website content from one place
-          </p>
+    <Layout>
+      <div className="space-y-6">
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Marketing Content Management
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">
+              Manage all marketing website content from one place
+            </p>
+          </div>
+          <Link
+            href="/marketing-stats"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            View Analytics
+          </Link>
         </div>
-        <Link
-          href="/marketing-stats"
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          View Analytics
-        </Link>
-      </div>
 
-      {/* Quick Actions */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mb-8">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-          Quick Actions
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {quickActions.map((action) => {
-            const Icon = action.icon;
+        {/* Quick Actions */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            Quick Actions
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {quickActions.map((action) => {
+              const Icon = action.icon;
+              return (
+                <Link
+                  key={action.href}
+                  href={action.href}
+                  className="flex items-center gap-3 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-colors group"
+                >
+                  <Icon className="w-5 h-5 text-gray-400 group-hover:text-blue-500" />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                    {action.label}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Content Types Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {contentTypes.map((type) => {
+            const Icon = type.icon;
             return (
               <Link
-                key={action.href}
-                href={action.href}
-                className="flex items-center gap-3 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-colors group"
+                key={type.name}
+                href={type.href}
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden group"
               >
-                <Icon className="w-5 h-5 text-gray-400 group-hover:text-blue-500" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                  {action.label}
-                </span>
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className={`${type.color} p-3 rounded-lg`}>
+                      <Icon className="w-6 h-6 text-white" />
+                    </div>
+                    <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                      {type.count}
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    {type.name}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {type.description}
+                  </p>
+                </div>
+                <div className="px-6 py-3 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700">
+                  <span className="text-sm text-blue-600 dark:text-blue-400 font-medium group-hover:underline">
+                    Manage →
+                  </span>
+                </div>
               </Link>
             );
           })}
         </div>
-      </div>
 
-      {/* Content Types Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {contentTypes.map((type) => {
-          const Icon = type.icon;
-          return (
-            <Link
-              key={type.name}
-              href={type.href}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden group"
-            >
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className={`${type.color} p-3 rounded-lg`}>
-                    <Icon className="w-6 h-6 text-white" />
-                  </div>
-                  <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                    {type.count}
-                  </span>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                  {type.name}
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {type.description}
-                </p>
-              </div>
-              <div className="px-6 py-3 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700">
-                <span className="text-sm text-blue-600 dark:text-blue-400 font-medium group-hover:underline">
-                  Manage →
-                </span>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
-
-      {/* Info Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-sm p-6 text-white">
+        {/* Info Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-sm p-6 text-white">
           <div className="flex items-center gap-3 mb-3">
-            <FaStar className="w-6 h-6" />
-            <h3 className="text-lg font-semibold">Featured Content</h3>
+              <FaStar className="w-6 h-6" />
+              <h3 className="text-lg font-semibold">Featured Content</h3>
+            </div>
+            <p className="text-blue-100 text-sm mb-4">
+              Highlight important content on your marketing pages by marking items as featured
+            </p>
+            <div className="text-2xl font-bold">
+              {stats.caseStudies + stats.tutorials + stats.whitepapers} items
+            </div>
           </div>
-          <p className="text-blue-100 text-sm mb-4">
-            Highlight important content on your marketing pages by marking items as featured
-          </p>
-          <div className="text-2xl font-bold">
-            {stats.caseStudies + stats.tutorials + stats.whitepapers} items
+
+          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-sm p-6 text-white">
+          <div className="flex items-center gap-3 mb-3">
+              <FaEye className="w-6 h-6" />
+              <h3 className="text-lg font-semibold">Published</h3>
+            </div>
+            <p className="text-green-100 text-sm mb-4">
+              Total published content items visible on the marketing website
+            </p>
+            <div className="text-2xl font-bold">
+              {Object.values(stats).reduce((a, b) => a + b, 0)} items
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-sm p-6 text-white">
+          <div className="flex items-center gap-3 mb-3">
+              <FaDownload className="w-6 h-6" />
+              <h3 className="text-lg font-semibold">Resources</h3>
+            </div>
+            <p className="text-purple-100 text-sm mb-4">
+              Downloadable resources like whitepapers and guides
+            </p>
+            <div className="text-2xl font-bold">{stats.whitepapers} items</div>
           </div>
         </div>
-
-        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-sm p-6 text-white">
-          <div className="flex items-center gap-3 mb-3">
-            <FaEye className="w-6 h-6" />
-            <h3 className="text-lg font-semibold">Published</h3>
-          </div>
-          <p className="text-green-100 text-sm mb-4">
-            Total published content items visible on the marketing website
-          </p>
-          <div className="text-2xl font-bold">
-            {Object.values(stats).reduce((a, b) => a + b, 0)} items
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-sm p-6 text-white">
-          <div className="flex items-center gap-3 mb-3">
-            <FaDownload className="w-6 h-6" />
-            <h3 className="text-lg font-semibold">Resources</h3>
-          </div>
-          <p className="text-purple-100 text-sm mb-4">
-            Downloadable resources like whitepapers and guides
-          </p>
-          <div className="text-2xl font-bold">{stats.whitepapers} items</div>
-        </div>
-      </div>
       </div>
     </Layout>
   );

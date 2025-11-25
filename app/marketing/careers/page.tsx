@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Layout from "../../components/Layout";
+import Layout from "../../../components/Layout";
 import { careerAPI, JobOpening } from "@/lib/marketingAPI";
 import { FaPlus, FaEdit, FaTrash, FaBriefcase, FaMapMarkerAlt, FaClock, FaStar } from "react-icons/fa";
 

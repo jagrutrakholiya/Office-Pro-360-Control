@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Layout from "../../components/Layout";
+import api from "../../lib/api";
 import {
   BarChart,
   Bar,
@@ -99,18 +100,8 @@ export default function MarketingStatsPage() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/marketing/admin/stats`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setStats(data.stats);
-      }
+      const response = await api.get("/marketing/admin/stats");
+      setStats(response.data.stats);
     } catch (error) {
       showToast("Failed to load stats", "error");
     } finally {
@@ -121,24 +112,9 @@ export default function MarketingStatsPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/marketing/admin/stats`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify(stats),
-        }
-      );
-
-      if (response.ok) {
-        showToast("Stats updated successfully!", "success");
-        fetchStats();
-      } else {
-        showToast("Failed to update stats", "error");
-      }
+      await api.put("/marketing/admin/stats", stats);
+      showToast("Stats updated successfully!", "success");
+      fetchStats();
     } catch (error) {
       showToast("Error updating stats", "error");
     } finally {
@@ -149,22 +125,9 @@ export default function MarketingStatsPage() {
   const handleRefresh = async () => {
     setRefreshing(true);
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/marketing/admin/stats/refresh`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        showToast("Stats refreshed from database!", "success");
-        fetchStats();
-      } else {
-        showToast("Failed to refresh stats", "error");
-      }
+      await api.post("/marketing/admin/stats/refresh");
+      showToast("Stats refreshed from database!", "success");
+      fetchStats();
     } catch (error) {
       showToast("Error refreshing stats", "error");
     } finally {
