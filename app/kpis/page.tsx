@@ -51,7 +51,7 @@ export default function KPIDashboard() {
   const fetchKPIs = async () => {
     try {
       const token = localStorage.getItem("token");
-      let url = `${process.env.NEXT_PUBLIC_API_URL}/api/analytics/kpis?`;
+      let url = `${process.env.NEXT_PUBLIC_API_URL}/analytics/kpis?`;
       
       if (selectedCategory !== "all") {
         url += `category=${selectedCategory}&`;
