@@ -2,6 +2,8 @@
 import { useEffect, useState } from 'react'
 import Layout from '../../components/Layout'
 import api from '../../lib/api'
+import RevenueTrendChart from '../../components/RevenueTrendChart'
+import CompanyStatusDistribution from '../../components/CompanyStatusDistribution'
 
 type EarningsData = { totalMRR: number; byPlan: Record<string, { count: number; mrr: number }> }
 
@@ -27,6 +29,15 @@ export default function EarningsPage() {
         <div className="text-sm opacity-90 mb-2">Total Monthly Recurring Revenue</div>
         <div className="text-5xl font-bold">₹{data?.totalMRR || 0}</div>
       </section>
+      {/* Dynamic Charts */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-10">
+        <div className="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6 shadow-sm">
+          <RevenueTrendChart editable />
+        </div>
+        <div className="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6 shadow-sm">
+          <CompanyStatusDistribution />
+        </div>
+      </div>
       <section className="table-wrapper">
         <div className="px-6 py-4 border-b border-slate-200">
           <h3 className="text-lg font-semibold text-slate-900">Revenue by Plan</h3>
