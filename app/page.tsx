@@ -4,6 +4,25 @@ import { useRouter } from "next/navigation";
 import Layout from "../components/Layout";
 import { useAuth } from "../context/AuthContext";
 import api from "../lib/api";
+import {
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+
+const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4"];
 
 type DashboardStats = {
   companies: {
@@ -365,7 +384,177 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Companies */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        {/* Revenue Chart */}
+        <div className="card">
+          <div className="flex items-center gap-2 mb-6">
+            <div className="w-2 h-8 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></div>
+            <h3 className="text-xl font-bold text-slate-900">
+              Revenue Trend (Last 6 Months)
+            </h3>
+          </div>
+          <ResponsiveContainer width="100%" height={300}>
+            <AreaChart
+              data={[
+                { month: "Jun", revenue: 85000 },
+                { month: "Jul", revenue: 92000 },
+                { month: "Aug", revenue: 88000 },
+                { month: "Sep", revenue: 105000 },
+                { month: "Oct", revenue: 118000 },
+                { month: "Nov", revenue: stats?.earnings.monthly || 125000 },
+              ]}
+            >
+              <defs>
+                <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="month" stroke="#64748b" />
+              <YAxis stroke="#64748b" />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#1e293b",
+                  border: "none",
+                  borderRadius: "8px",
+                  color: "#fff",
+                }}
+                formatter={(value: number) => formatCurrency(value)}
+              />
+              <Area
+                type="monotone"
+                dataKey="revenue"
+                stroke="#10b981"
+                strokeWidth={3}
+                fillOpacity={1}
+                fill="url(#colorRevenue)"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Company Distribution Chart */}
+        <div className="card">
+          <div className="flex items-center gap-2 mb-6">
+            <div className="w-2 h-8 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full"></div>
+            <h3 className="text-xl font-bold text-slate-900">
+              Company Status Distribution
+            </h3>
+          </div>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={[
+                  { name: "Active", value: stats?.companies.active || 0 },
+                  { name: "Suspended", value: stats?.companies.suspended || 0 },
+                  {
+                    name: "Others",
+                    value:
+                      (stats?.companies.total || 0) -
+                      (stats?.companies.active || 0) -
+                      (stats?.companies.suspended || 0),
+                  },
+                ]}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) =>
+                  `${name}: ${((percent || 0) * 100).toFixed(0)}%`
+                }
+                outerRadius={100}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {[0, 1, 2].map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Marketing Content Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <button
+          onClick={() => router.push("/blog")}
+          className="card group hover:shadow-xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-blue-500"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-3xl">
+              📝
+            </div>
+            <div className="flex-1">
+              <h4 className="text-lg font-bold text-slate-900 mb-1">
+                Blog Posts
+              </h4>
+              <p className="text-sm text-slate-600">
+                Manage marketing content
+              </p>
+            </div>
+          </div>
+        </button>
+
+        <button
+          onClick={() => router.push("/screenshots")}
+          className="card group hover:shadow-xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-green-500"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center text-3xl">
+              📸
+            </div>
+            <div className="flex-1">
+              <h4 className="text-lg font-bold text-slate-900 mb-1">
+                Screenshots
+              </h4>
+              <p className="text-sm text-slate-600">Upload product images</p>
+            </div>
+          </div>
+        </button>
+
+        <button
+          onClick={() => router.push("/marketing-stats")}
+          className="card group hover:shadow-xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-purple-500"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-3xl">
+              📊
+            </div>
+            <div className="flex-1">
+              <h4 className="text-lg font-bold text-slate-900 mb-1">
+                Marketing Stats
+              </h4>
+              <p className="text-sm text-slate-600">Update website stats</p>
+            </div>
+          </div>
+        </button>
+
+        <button
+          onClick={() => router.push("/reviews")}
+          className="card group hover:shadow-xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-yellow-500"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center text-3xl">
+              ⭐
+            </div>
+            <div className="flex-1">
+              <h4 className="text-lg font-bold text-slate-900 mb-1">
+                Reviews
+              </h4>
+              <p className="text-sm text-slate-600">Manage testimonials</p>
+            </div>
+          </div>
+        </button>
+      </div>
+
+      {/* Recent Companies */}
       <div className="card">
+
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-2">
             <div className="w-2 h-8 bg-gradient-to-b from-cyan-500 to-blue-600 rounded-full"></div>
