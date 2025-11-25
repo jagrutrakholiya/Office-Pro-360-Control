@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Layout from "../components/Layout";
 import {
   pageContentAPI,
   caseStudyAPI,
@@ -277,6 +278,7 @@ export default function MarketingDashboard() {
           <div className="text-2xl font-bold">{stats.whitepapers} items</div>
         </div>
       </div>
-    </div>
+      </div>
+    </Layout>
   );
 }

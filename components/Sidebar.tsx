@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { FiBarChart2, FiDollarSign, FiHome, FiLayers, FiStar, FiBriefcase, FiHelpCircle, FiPieChart, FiUsers } from 'react-icons/fi';
+import { FiBarChart2, FiDollarSign, FiHome, FiLayers, FiStar, FiBriefcase, FiHelpCircle, FiPieChart, FiUsers, FiFileText, FiTrendingUp } from 'react-icons/fi';
 
 interface NavItem {
   href: string;
@@ -31,6 +31,8 @@ const groups: NavGroup[] = [
     items: [
       { href: '/companies', label: 'Companies', icon: <FiBriefcase /> },
       { href: '/plans', label: 'Plans', icon: <FiLayers /> },
+      { href: '/blog', label: 'Blog', icon: <FiFileText /> },
+      { href: '/marketing', label: 'Marketing', icon: <FiTrendingUp /> },
       { href: '/marketing-stats', label: 'Marketing Stats', icon: <FiPieChart /> },
       { href: '/reviews', label: 'Reviews', icon: <FiStar /> }
     ]

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FiPlus, FiEdit2, FiTrash2, FiEye, FiSearch, FiTrendingUp } from "react-icons/fi";
 import api from "@/lib/api";
+import Layout from "../../components/Layout";
 import {
   BarChart,
   Bar,
@@ -102,14 +103,17 @@ export default function BlogManagement() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
+      <Layout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <Layout>
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -345,6 +349,7 @@ export default function BlogManagement() {
           ))
         )}
       </div>
-    </div>
+      </div>
+    </Layout>
   );
 }

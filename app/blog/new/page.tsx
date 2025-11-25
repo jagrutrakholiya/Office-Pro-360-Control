@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FiSave, FiArrowLeft } from "react-icons/fi";
 import api from "@/lib/api";
+import Layout from "../../components/Layout";
 
 export default function NewBlogPost() {
   const router = useRouter();
@@ -70,7 +71,8 @@ export default function NewBlogPost() {
   };
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <Layout>
+      <div className="max-w-5xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
         <button
@@ -308,6 +310,7 @@ export default function NewBlogPost() {
           </button>
         </div>
       </form>
-    </div>
+      </div>
+    </Layout>
   );
 }

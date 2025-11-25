@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Layout from "../../components/Layout";
 import { careerAPI, JobOpening } from "@/lib/marketingAPI";
 import { FaPlus, FaEdit, FaTrash, FaBriefcase, FaMapMarkerAlt, FaClock, FaStar } from "react-icons/fa";
 
@@ -56,8 +57,8 @@ export default function CareersManagement() {
 
   if (loading) {
     return (
-      <div className="p-8">
-        <div className="animate-pulse">
+      <Layout>
+        <div className="animate-pulse space-y-4">
           <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-64 mb-8"></div>
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
@@ -65,13 +66,13 @@ export default function CareersManagement() {
             ))}
           </div>
         </div>
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="p-8">
-      {/* Header */}
+    <Layout>
+      <div className="space-y-6">{/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
@@ -281,6 +282,7 @@ export default function CareersManagement() {
           ))}
         </div>
       )}
-    </div>
+      </div>
+    </Layout>
   );
 }
