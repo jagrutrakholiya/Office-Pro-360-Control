@@ -7,8 +7,59 @@
     @apply antialiased;
   }
 
+  html {
+    scroll-behavior: smooth;
+    overscroll-behavior: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
   body {
-    @apply bg-gradient-to-br from-slate-50 via-blue-50/20 to-slate-50 text-slate-900;
+    @apply bg-slate-50 text-slate-900;
+  }
+
+  /* Modern gradient animations */
+  @keyframes gradient-shift {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-fadeInUp {
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  .animate-scaleIn {
+    animation: scaleIn 0.4s ease-out;
   }
 
   /* Mobile responsiveness */
@@ -84,17 +135,17 @@
 
 @layer components {
 
-  /* Enhanced Button Styles */
+  /* Enhanced Button Styles - Enterprise */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none hover:shadow-blue-500/40 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:ring-offset-2;
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-lg shadow-sm transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-white hover:bg-slate-50 text-slate-700 font-semibold rounded-xl border border-slate-200 shadow-lg shadow-slate-200/50 transition-all duration-300 hover:shadow-slate-200/80 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-slate-500/40 focus:ring-offset-2;
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-900 font-semibold rounded-lg border border-slate-300 shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2;
   }
 
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-lg shadow-lg shadow-red-500/25 transition-all duration-300 text-sm hover:shadow-red-500/40 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-red-500/40 focus:ring-offset-2;
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow-sm transition-all duration-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2;
   }
 
   .btn-small {
@@ -128,21 +179,17 @@
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
   }
 
-  /* Enhanced Card Styles with better shadows and hover effects */
+  /* Enhanced Card Styles - Enterprise */
   .card {
-    @apply bg-white rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-100 p-6 transition-all duration-300 hover:shadow-2xl hover:shadow-slate-300/50 hover:-translate-y-0.5;
+    @apply bg-white rounded-lg shadow-sm border border-slate-200 p-6 transition-all duration-200 hover:shadow-md;
   }
 
   .card-interactive {
-    @apply card cursor-pointer hover:-translate-y-1 hover:shadow-2xl hover:border-blue-200 active:scale-[0.98];
-  }
-
-  .card-gradient {
-    @apply bg-gradient-to-br text-white shadow-2xl border-0 backdrop-blur-sm p-6 rounded-2xl;
+    @apply card cursor-pointer hover:border-slate-300 active:scale-[0.99];
   }
 
   .card-small {
-    @apply bg-white rounded-xl shadow-lg shadow-slate-200/50 border border-slate-100 p-4 transition-all duration-200 hover:shadow-xl hover:shadow-slate-300/40;
+    @apply bg-white rounded-lg shadow-sm border border-slate-200 p-4 transition-all duration-200 hover:shadow-md;
   }
 
   /* Enhanced Table Styles with better visual hierarchy */
@@ -166,25 +213,25 @@
     @apply hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-transparent transition-all duration-200 border-b border-slate-100 last:border-b-0 cursor-pointer;
   }
 
-  /* Enhanced Badge Styles with better gradients and shadows */
+  /* Enhanced Badge Styles - Enterprise */
   .badge {
-    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shadow-md transition-all duration-200 hover:shadow-lg;
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all duration-200;
   }
 
   .badge-active {
-    @apply bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200/80 shadow-green-200/50;
+    @apply bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400;
   }
 
   .badge-view-only {
-    @apply bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-800 border border-amber-200/80 shadow-amber-200/50;
+    @apply bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400;
   }
 
   .badge-suspended {
-    @apply bg-gradient-to-r from-red-100 to-rose-100 text-red-800 border border-red-200/80 shadow-red-200/50;
+    @apply bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400;
   }
 
   .badge-pending {
-    @apply bg-gradient-to-r from-blue-100 to-sky-100 text-blue-800 border border-blue-200/80 shadow-blue-200/50;
+    @apply bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400;
   }
 
   /* Status Indicators with pulsing animation */

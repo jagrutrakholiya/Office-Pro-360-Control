@@ -1,104 +1,28 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Layout from "../components/Layout";
 import { useAuth } from "../context/AuthContext";
-import api from "../lib/api";
-import {
-  LineChart,
-  Line,
-  AreaChart,
-  Area,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
-
-const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4"];
-
-type DashboardStats = {
-  companies: {
-    total: number;
-    active: number;
-    suspended: number;
-    thisMonth: number;
-  };
-  plans: {
-    total: number;
-  };
-  users: {
-    total: number;
-    avgPerCompany: number;
-  };
-  inquiries: {
-    pending: number;
-  };
-  queries: {
-    new: number;
-    in_progress: number;
-    resolved: number;
-    closed: number;
-  };
-  earnings: {
-    monthly: number;
-    byPlan: Record<string, { count: number; mrr: number }>;
-  };
-  recentCompanies: Array<{
-    _id: string;
-    name: string;
-    code: string;
-    plan: string;
-    status: string;
-    createdAt: string;
-  }>;
-};
-
-type RevenueTrendData = {
-  trend: Array<{ month: string; revenue: number }>;
-  totalLast6Months: number;
-  growthRate: number;
-};
-
-type CompanyStatusData = {
-  statuses: {
-    active: number;
-    view_only: number;
-    suspended: number;
-    pending: number;
-  };
-  total: number;
-};
-
-type EarningsData = {
-  byPlan: Record<string, { count: number; mrr: number }>;
-  totalMRR: number;
-  totalCompanies: number;
-};
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user } = useAuth();
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [revenueTrend, setRevenueTrend] = useState<RevenueTrendData | null>(null);
-  const [companyStatus, setCompanyStatus] = useState<CompanyStatusData | null>(null);
-  const [earningsData, setEarningsData] = useState<EarningsData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [autoRefresh, setAutoRefresh] = useState(true);
 
-  const loadStats = async () => {
-    try {
-      const [statsRes, revenueRes, statusRes, earningsRes] = await Promise.all([
-        api.get("/admin/dashboard/stats"),
-        api.get("/admin/metrics/revenue-trend"),
+  useEffect(() => {
+    // Redirect to enhanced dashboard
+    router.replace("/enhanced-dashboard");
+  }, [router]);
+
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+        <div className="text-slate-600 font-medium animate-pulse">
+          Loading dashboard...
+        </div>
+      </div>
+    </div>
+  );
+}
         api.get("/admin/metrics/company-status-distribution"),
         api.get("/admin/metrics/earnings")
       ]);

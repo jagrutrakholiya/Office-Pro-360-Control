@@ -118,7 +118,7 @@ export default function EnhancedDashboard() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 -m-6 p-6">
+      <div className="min-h-screen bg-slate-50 -m-6 p-6">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
