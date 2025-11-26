@@ -160,44 +160,61 @@ export default function DashboardPage() {
   }) => (
     <div
       onClick={onClick}
-      className={`card-gradient ${gradient} ${
-        onClick ? "card-interactive" : ""
-      } group relative overflow-hidden`}
+      className={`
+        relative overflow-hidden rounded-2xl p-6 shadow-lg 
+        bg-gradient-to-br ${gradient}
+        ${onClick ? "cursor-pointer hover:shadow-2xl hover:scale-[1.02] transition-all duration-300" : ""}
+        group
+      `}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      {/* Animated gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      
+      {/* Shine effect */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+      </div>
+
       <div className="relative z-10 flex items-start justify-between">
         <div className="flex-1 min-w-0">
-          <div className="text-sm text-white/80 mb-2 font-medium">{title}</div>
-          <div className="text-3xl sm:text-4xl font-bold mb-2 text-white">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="text-3xl opacity-80 group-hover:opacity-100 transition-opacity">
+              {icon}
+            </div>
+            <div className="text-sm text-white/90 font-semibold uppercase tracking-wide">
+              {title}
+            </div>
+          </div>
+          <div className="text-4xl sm:text-5xl font-bold mb-2 text-white drop-shadow-lg">
             {value}
           </div>
           {subtitle && (
-            <div className="text-xs text-white/70 leading-relaxed">
+            <div className="text-sm text-white/80 leading-relaxed font-medium">
               {subtitle}
             </div>
           )}
         </div>
-        <div className="text-4xl sm:text-5xl opacity-20 group-hover:opacity-30 transition-opacity duration-300 ml-4">
-          {icon}
-        </div>
+        {onClick && (
+          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 group-hover:bg-white/20 transition-all duration-300 group-hover:rotate-45">
+            <svg
+              className="w-5 h-5 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 7l5 5m0 0l-5 5m5-5H6"
+              />
+            </svg>
+          </div>
+        )}
       </div>
-      {onClick && (
-        <div className="absolute bottom-4 right-4 text-white/60 group-hover:text-white/80 transition-colors duration-300">
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </div>
-      )}
+
+      {/* Bottom accent line */}
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-white/0 via-white/50 to-white/0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
     </div>
   );
 

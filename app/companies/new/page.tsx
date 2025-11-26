@@ -53,15 +53,33 @@ export default function NewCompanyPage() {
     }
   })
   const [plans, setPlans] = useState<Plan[]>([])
+  const [plansLoading, setPlansLoading] = useState<boolean>(false)
+  const [plansError, setPlansError] = useState<string>("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>('')
   const [success, setSuccess] = useState(false)
 
   async function loadPlans() {
+    setPlansLoading(true)
+    setPlansError("")
     try {
       const res = await api.get('/admin/plans')
-      setPlans(res.data.plans || [])
-    } catch {}
+      const fetched = res.data.plans || []
+      setPlans(fetched)
+      // Ensure form.plan matches a real plan code; default to first available
+      if (fetched.length > 0) {
+        const codes = new Set(fetched.map((p: Plan) => p.code))
+        if (!codes.has(form.plan)) {
+          setForm(prev => ({ ...prev, plan: fetched[0].code }))
+        }
+      }
+    } catch (err: any) {
+      console.error('Failed to load plans', err)
+      setPlansError('Failed to load plans. You can still proceed, but plan options may be limited.')
+      setPlans([])
+    } finally {
+      setPlansLoading(false)
+    }
   }
 
   useEffect(() => { 
@@ -270,10 +288,22 @@ export default function NewCompanyPage() {
                 value={form.plan} 
                 onChange={e => setForm({ ...form, plan: e.target.value })} 
                 className="input"
+                disabled={plansLoading}
               >
-                {plans.map(p => <option key={p._id} value={p.code}>{p.name}</option>)}
-                {plans.length === 0 && <option value="starter">Starter</option>}
+                {plansLoading && (
+                  <option value="">Loading plans...</option>
+                )}
+                {!plansLoading && plans.length > 0 &&
+                  plans.map(p => (
+                    <option key={p._id} value={p.code}>{p.name}</option>
+                  ))}
+                {!plansLoading && plans.length === 0 && (
+                  <option value={form.plan}>{form.plan || 'No plans available'}</option>
+                )}
               </select>
+              {plansError && (
+                <p className="mt-1 text-xs text-red-600">{plansError}</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">Admin Email *</label>

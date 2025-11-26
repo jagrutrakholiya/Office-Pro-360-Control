@@ -51,6 +51,8 @@ export default function CompaniesPage() {
   const [viewingUsers, setViewingUsers] = useState<string | null>(null);
   const [companyUsers, setCompanyUsers] = useState<CompanyUser[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
+  const [plansLoading, setPlansLoading] = useState(false);
+  const [plansError, setPlansError] = useState<string>("");
 
   async function loadCompanies() {
     try {
@@ -60,10 +62,18 @@ export default function CompaniesPage() {
   }
 
   async function loadPlans() {
+    setPlansLoading(true);
+    setPlansError("");
     try {
       const res = await api.get("/admin/plans");
       setPlans(res.data.plans || []);
-    } catch {}
+    } catch (err: any) {
+      console.error("Failed to load plans", err);
+      setPlansError("Failed to load plans. Plan changes are disabled.");
+      setPlans([]);
+    } finally {
+      setPlansLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -143,8 +153,16 @@ export default function CompaniesPage() {
   }
 
   async function changePlan(id: string, plan: string) {
-    await api.patch(`/admin/companies/${id}/plan`, { plan });
-    await loadCompanies();
+    try {
+      await api.patch(`/admin/companies/${id}/plan`, { plan });
+      await loadCompanies();
+    } catch (err: any) {
+      console.error("Failed to change plan", err);
+      alert(
+        `Failed to change plan: ${err?.response?.data?.message || err?.message || "Unknown error"}`
+      );
+      await loadCompanies();
+    }
   }
 
   async function loadCompanyUsers(companyId: string) {
@@ -254,10 +272,17 @@ export default function CompaniesPage() {
                       defaultValue={c.plan}
                       onChange={(e) => changePlan(c._id, e.target.value)}
                       className="select-small"
+                      disabled={plansLoading || plans.length === 0}
                     >
-                      <option value="starter">Starter</option>
-                      <option value="growth">Growth</option>
-                      <option value="enterprise">Enterprise</option>
+                      {plans.length > 0 ? (
+                        plans.map((p) => (
+                          <option key={p._id} value={p.code}>
+                            {p.name}
+                          </option>
+                        ))
+                      ) : (
+                        <option value={c.plan}>{c.plan}</option>
+                      )}
                     </select>
                   </td>
                   <td className="px-6 py-4">
@@ -353,10 +378,17 @@ export default function CompaniesPage() {
                     defaultValue={c.plan}
                     onChange={(e) => changePlan(c._id, e.target.value)}
                     className="select-small w-32"
+                    disabled={plansLoading || plans.length === 0}
                   >
-                    <option value="starter">Starter</option>
-                    <option value="growth">Growth</option>
-                    <option value="enterprise">Enterprise</option>
+                    {plans.length > 0 ? (
+                      plans.map((p) => (
+                        <option key={p._id} value={p.code}>
+                          {p.name}
+                        </option>
+                      ))
+                    ) : (
+                      <option value={c.plan}>{c.plan}</option>
+                    )}
                   </select>
                 </div>
                 <div className="mobile-card-row">
