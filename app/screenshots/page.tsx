@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FiUpload, FiImage, FiTrash2, FiCheck } from "react-icons/fi";
 import api from "@/lib/api";
+import Layout from "../../components/Layout";
 
 const SCREENSHOT_TYPES = [
   {
@@ -38,6 +39,7 @@ interface Screenshot {
   title: string;
   description: string;
   imageUrl: string;
+  darkModeImageUrl?: string;
   order: number;
   isActive: boolean;
   createdAt: string;
@@ -49,6 +51,7 @@ export default function ScreenshotManagement() {
   const [screenshots, setScreenshots] = useState<Screenshot[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState<string | null>(null);
+  const [selectedMode, setSelectedMode] = useState<Record<string, 'light' | 'dark'>>({});
 
   useEffect(() => {
     fetchScreenshots();
@@ -65,13 +68,14 @@ export default function ScreenshotManagement() {
     }
   };
 
-  const handleUpload = async (key: string, file: File) => {
+  const handleUpload = async (key: string, file: File, mode: 'light' | 'dark') => {
     if (!file) return;
 
-    setUploading(key);
+    setUploading(`${key}-${mode}`);
     const formData = new FormData();
     formData.append("image", file);
     formData.append("key", key);
+    formData.append("mode", mode);
 
     const typeData = SCREENSHOT_TYPES.find((t) => t.key === key);
     if (typeData) {
@@ -112,14 +116,17 @@ export default function ScreenshotManagement() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
+      <Layout>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <Layout>
+      <div className="space-y-6">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
@@ -157,10 +164,12 @@ export default function ScreenshotManagement() {
       </div>
 
       {/* Screenshots Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-8">
         {SCREENSHOT_TYPES.map((type) => {
           const screenshot = getScreenshot(type.key);
-          const isUploading = uploading === type.key;
+          const currentMode = selectedMode[type.key] || 'light';
+          const isUploadingLight = uploading === `${type.key}-light`;
+          const isUploadingDark = uploading === `${type.key}-dark`;
 
           return (
             <div
@@ -176,7 +185,8 @@ export default function ScreenshotManagement() {
                     {screenshot && (
                       <span className="flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-xs font-medium">
                         <FiCheck className="text-xs" />
-                        Active
+                        {screenshot.imageUrl && screenshot.darkModeImageUrl ? 'Both Modes' : 
+                         screenshot.imageUrl ? 'Light Only' : 'Dark Only'}
                       </span>
                     )}
                   </div>
@@ -195,43 +205,96 @@ export default function ScreenshotManagement() {
                 )}
               </div>
 
+              {/* Mode Selector */}
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-sm text-slate-600 dark:text-slate-400">View Mode:</span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setSelectedMode({...selectedMode, [type.key]: 'light'})}
+                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                      currentMode === 'light'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+                    }`}
+                  >
+                    ☀️ Light Mode
+                  </button>
+                  <button
+                    onClick={() => setSelectedMode({...selectedMode, [type.key]: 'dark'})}
+                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                      currentMode === 'dark'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+                    }`}
+                  >
+                    🌙 Dark Mode
+                  </button>
+                </div>
+              </div>
+
               {/* Preview */}
               <div className="mb-4 aspect-video bg-slate-100 dark:bg-slate-700 rounded-lg overflow-hidden flex items-center justify-center">
-                {screenshot ? (
+                {screenshot && ((currentMode === 'light' && screenshot.imageUrl) || 
+                               (currentMode === 'dark' && screenshot.darkModeImageUrl)) ? (
                   <img
-                    src={screenshot.imageUrl}
-                    alt={type.title}
+                    src={currentMode === 'light' ? screenshot.imageUrl : screenshot.darkModeImageUrl}
+                    alt={`${type.title} - ${currentMode} mode`}
                     className="w-full h-full object-cover"
                   />
                 ) : (
                   <div className="text-center text-slate-400">
                     <FiImage className="mx-auto text-4xl mb-2" />
-                    <p className="text-sm">No screenshot uploaded</p>
+                    <p className="text-sm">
+                      No {currentMode} mode screenshot uploaded
+                    </p>
                   </div>
                 )}
               </div>
 
-              {/* Upload Button */}
-              <label className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer">
-                {isUploading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    Uploading...
-                  </>
-                ) : (
-                  <>
-                    <FiUpload />
-                    {screenshot ? "Replace Screenshot" : "Upload Screenshot"}
-                  </>
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => e.target.files && handleUpload(type.key, e.target.files[0])}
-                  disabled={isUploading}
-                  className="hidden"
-                />
-              </label>
+              {/* Upload Buttons */}
+              <div className="grid grid-cols-2 gap-3">
+                <label className="flex items-center justify-center gap-2 px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors cursor-pointer">
+                  {isUploadingLight ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <FiUpload />
+                      ☀️ {screenshot?.imageUrl ? "Replace Light" : "Upload Light"}
+                    </>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => e.target.files && handleUpload(type.key, e.target.files[0], 'light')}
+                    disabled={isUploadingLight || isUploadingDark}
+                    className="hidden"
+                  />
+                </label>
+
+                <label className="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors cursor-pointer">
+                  {isUploadingDark ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <FiUpload />
+                      🌙 {screenshot?.darkModeImageUrl ? "Replace Dark" : "Upload Dark"}
+                    </>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => e.target.files && handleUpload(type.key, e.target.files[0], 'dark')}
+                    disabled={isUploadingLight || isUploadingDark}
+                    className="hidden"
+                  />
+                </label>
+              </div>
 
               {screenshot && (
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 text-center">
@@ -249,14 +312,17 @@ export default function ScreenshotManagement() {
           📸 Upload Guidelines
         </h3>
         <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-1">
-          <li>• Recommended size: 1920x1080 pixels or larger</li>
-          <li>• Supported formats: JPEG, PNG, WebP</li>
-          <li>• Maximum file size: 5MB</li>
-          <li>• Use high-quality screenshots for best results</li>
-          <li>• Images will be displayed on the marketing website homepage</li>
-          <li>• Screenshots automatically appear on marketing site once uploaded</li>
+          <li>• <strong>Light & Dark Mode:</strong> Upload separate screenshots for each theme</li>
+          <li>• <strong>Recommended size:</strong> 1920x1080 pixels or larger</li>
+          <li>• <strong>Supported formats:</strong> JPEG, PNG, WebP</li>
+          <li>• <strong>Maximum file size:</strong> 5MB per image</li>
+          <li>• <strong>Light Mode:</strong> Use bright background screenshots (white/light colors)</li>
+          <li>• <strong>Dark Mode:</strong> Use dark background screenshots (black/dark colors)</li>
+          <li>• Marketing website automatically displays correct version based on user's theme</li>
+          <li>• Both versions should show the same feature/screen for consistency</li>
         </ul>
       </div>
-    </div>
+      </div>
+    </Layout>
   );
 }
