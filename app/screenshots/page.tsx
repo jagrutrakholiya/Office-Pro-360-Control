@@ -237,7 +237,7 @@ export default function ScreenshotManagement() {
                 {screenshot && ((currentMode === 'light' && screenshot.imageUrl) || 
                                (currentMode === 'dark' && screenshot.darkModeImageUrl)) ? (
                   <img
-                    src={currentMode === 'light' ? screenshot.imageUrl : screenshot.darkModeImageUrl}
+                    src={`${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api').replace('/api', '')}${currentMode === 'light' ? screenshot.imageUrl : screenshot.darkModeImageUrl}`}
                     alt={`${type.title} - ${currentMode} mode`}
                     className="w-full h-full object-cover"
                   />
