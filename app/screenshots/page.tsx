@@ -59,7 +59,7 @@ export default function ScreenshotManagement() {
 
   const fetchScreenshots = async () => {
     try {
-      const response = await api.get("/api/screenshots");
+      const response = await api.get("/screenshots");
       setScreenshots(response.data.screenshots || []);
     } catch (error) {
       console.error("Error fetching screenshots:", error);
@@ -86,7 +86,7 @@ export default function ScreenshotManagement() {
     }
 
     try {
-      await api.post("/api/screenshots/upload", formData, {
+      await api.post("/screenshots/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       fetchScreenshots();
@@ -102,7 +102,7 @@ export default function ScreenshotManagement() {
     if (!confirm("Are you sure you want to delete this screenshot?")) return;
 
     try {
-      await api.delete(`/api/screenshots/${key}`);
+      await api.delete(`/screenshots/${key}`);
       fetchScreenshots();
     } catch (error) {
       console.error("Error deleting screenshot:", error);
