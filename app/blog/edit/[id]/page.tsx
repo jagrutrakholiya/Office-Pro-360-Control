@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { FiSave, FiArrowLeft } from "react-icons/fi";
 import api from "@/lib/api";
 import Layout from "../../../components/Layout";
 import FirebaseImageUpload from "../../../components/FirebaseImageUpload";
 
-export default function NewBlogPost() {
+export default function EditBlogPost() {
   const router = useRouter();
+  const params = useParams();
+  const { id } = params;
 
   const [formData, setFormData] = useState({
     title: "",
@@ -24,13 +26,33 @@ export default function NewBlogPost() {
   });
   const [tagInput, setTagInput] = useState("");
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (id) {
+      fetchPost();
+    }
+  }, [id]);
+
+  const fetchPost = async () => {
+    try {
+      const response = await api.get(`/blog/${id}`);
+      setFormData(response.data);
+    } catch (error) {
+      console.error("Error fetching post:", error);
+      alert("Failed to load blog post");
+      router.push("/blog");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // Auto-generate slug from title
-    if (name === "title") {
+    // Auto-generate slug from title ONLY if it's empty (don't overwrite existing slug on edit unless cleared)
+    if (name === "title" && !formData.slug) {
       const slug = value
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
@@ -61,15 +83,25 @@ export default function NewBlogPost() {
     setSaving(true);
 
     try {
-      await api.post("/blog", formData);
+      await api.put(`/blog/${id}`, formData);
       router.push("/blog");
     } catch (error) {
-      console.error("Error saving post:", error);
-      alert("Failed to save blog post");
+      console.error("Error updating post:", error);
+      alert("Failed to update blog post");
     } finally {
       setSaving(false);
     }
   };
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -84,10 +116,10 @@ export default function NewBlogPost() {
         </button>
         <div>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-            Create New Blog Post
+            Edit Blog Post
           </h1>
           <p className="text-slate-600 dark:text-slate-400">
-            Write a new blog post for the marketing website
+            Update existing blog post
           </p>
         </div>
       </div>
@@ -304,7 +336,7 @@ export default function NewBlogPost() {
             className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <FiSave />
-            {saving ? "Saving..." : "Create Post"}
+            {saving ? "Saving..." : "Update Post"}
           </button>
         </div>
       </form>
