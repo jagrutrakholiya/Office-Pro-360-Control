@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { FiSave, FiArrowLeft } from "react-icons/fi";
 import api from "@/lib/api";
-import Layout from "../../../components/Layout";
-import FirebaseImageUpload from "../../../components/FirebaseImageUpload";
+import Layout from "@/components/Layout";
+import FirebaseImageUpload from "@/components/FirebaseImageUpload";
 
 export default function EditBlogPost() {
   const router = useRouter();
@@ -280,8 +280,9 @@ export default function EditBlogPost() {
             Featured Image
           </label>
           <FirebaseImageUpload
-            onUploadComplete={(url) => setFormData(prev => ({ ...prev, featuredImage: url }))}
-            defaultImage={formData.featuredImage}
+            label="Featured Image"
+            onUpload={(url) => setFormData(prev => ({ ...prev, featuredImage: url }))}
+            currentImage={formData.featuredImage}
             folder="blog-images"
           />
         </div>
