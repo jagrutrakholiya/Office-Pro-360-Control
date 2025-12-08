@@ -26,8 +26,8 @@ type CompanyUser = {
 type Service = { key: string; label: string; description: string };
 
 const SERVICE_CATEGORIES = {
-  "Core Features": ["tasks", "calendar", "attendance", "performance"],
-  Management: ["users", "teams", "projects"],
+  "Core Features": ["tasks", "calendar", "attendance", "performance", "timesheet"],
+  Management: ["users", "teams", "projects", "sprints", "reports", "analytics"],
   Administration: [
     "leave",
     "payroll",
@@ -35,9 +35,12 @@ const SERVICE_CATEGORIES = {
     "statuses",
     "holidays",
     "overtime",
+    "onboarding",
+    "offboarding",
+    "api_access",
   ],
-  "Office Management": ["offices", "shifts"],
-  Communication: ["chat", "messages"],
+  "Office Management": ["offices", "shifts", "documents", "expenses"],
+  Communication: ["chat", "messages", "microsoft_teams", "teams_integration"],
   Personal: ["profile", "settings"],
 };
 
