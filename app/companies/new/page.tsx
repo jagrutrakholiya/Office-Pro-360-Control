@@ -85,7 +85,11 @@ export default function NewCompanyPage() {
   useEffect(() => { 
     loadPlans()
     api.get('/public/services').then(({ data }) => {
-      setAvailableServices(data?.services || [])
+      const services = data?.services || []
+      setAvailableServices(services)
+      // Auto-select all services by default
+      const allEnabled = Object.fromEntries(services.map((s: Service) => [s.key, true]))
+      setForm(prev => ({ ...prev, services: allEnabled }))
     }).catch(() => {
       setAvailableServices([])
     })

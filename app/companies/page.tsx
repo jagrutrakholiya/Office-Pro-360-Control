@@ -110,7 +110,18 @@ export default function CompaniesPage() {
   const openEditServices = (c: Company) => {
     setEditingId(c._id);
     const current = (c.features || {}) as Record<string, boolean>;
-    setEditServices({ ...current });
+    
+    // Create new features object merging exist features with missing ones defaulting to true
+    const updatedFeatures: Record<string, boolean> = { ...current };
+    
+    // Check for any available service not in current features
+    availableServices.forEach(svc => {
+      if (updatedFeatures[svc.key] === undefined) {
+        updatedFeatures[svc.key] = true;
+      }
+    });
+
+    setEditServices(updatedFeatures);
   };
 
   const saveEditServices = async () => {
