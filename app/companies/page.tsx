@@ -40,7 +40,7 @@ const SERVICE_CATEGORIES = {
     "api_access",
   ],
   "Office Management": ["offices", "shifts", "documents", "expenses"],
-  Communication: ["chat", "messages", "microsoft_teams", "teams_integration"],
+  Communication: ["chat", "messages", "microsoft_teams", "teams_integration", "slack_integration"],
   Personal: ["profile", "settings"],
 };
 

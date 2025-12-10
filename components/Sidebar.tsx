@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { FiBarChart2, FiDollarSign, FiHome, FiLayers, FiStar, FiBriefcase, FiHelpCircle, FiPieChart, FiUsers, FiFileText, FiTrendingUp, FiImage } from 'react-icons/fi';
+import { BsRobot, BsShieldCheck } from 'react-icons/bs';
 
 interface NavItem {
   href: string;
@@ -36,6 +37,13 @@ const groups: NavGroup[] = [
       { href: '/marketing', label: 'Marketing', icon: <FiTrendingUp /> },
       { href: '/marketing-stats', label: 'Marketing Stats', icon: <FiPieChart /> },
       { href: '/reviews', label: 'Reviews', icon: <FiStar /> }
+    ]
+  },
+  {
+    label: 'Bot Management',
+    items: [
+      { href: '/bot-approvals', label: 'Bot Approvals', icon: <BsRobot /> },
+      { href: '/bot-audit-logs', label: 'Audit Logs', icon: <BsShieldCheck /> }
     ]
   },
   {
