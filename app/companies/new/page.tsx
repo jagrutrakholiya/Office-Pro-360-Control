@@ -12,7 +12,7 @@ const SERVICE_CATEGORIES = {
   'Management': ['users', 'teams', 'projects', 'sprints', 'reports', 'analytics'],
   'Administration': ['leave', 'payroll', 'roles', 'statuses', 'holidays', 'overtime', 'onboarding', 'offboarding', 'api_access'],
   'Office Management': ['offices', 'shifts', 'documents', 'expenses'],
-  'Communication': ['chat', 'messages', 'microsoft_teams', 'teams_integration', 'slack_integration'],
+  'Communication': ['chat', 'messages', 'microsoft_teams', 'teams_integration', 'slack_integration', 'whatsapp_integration'],
   'Personal': ['profile', 'settings']
 }
 
