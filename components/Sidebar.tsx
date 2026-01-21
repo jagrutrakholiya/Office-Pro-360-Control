@@ -47,6 +47,12 @@ const groups: NavGroup[] = [
     ]
   },
   {
+    label: 'Growth',
+    items: [
+      { href: '/leads', label: 'Leads & CRM', icon: <FiTrendingUp /> }
+    ]
+  },
+  {
     label: 'Support',
     items: [
       { href: '/inquiries', label: 'Inquiries', icon: <FiHelpCircle /> },

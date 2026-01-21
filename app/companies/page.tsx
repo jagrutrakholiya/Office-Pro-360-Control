@@ -12,6 +12,21 @@ type Company = {
   status: string;
   createdAt: string;
   features?: Record<string, boolean>;
+  analytics?: {
+    totalUsers?: number;
+    totalProjects?: number;
+    totalTasks?: number;
+    completedTasks?: number;
+    completionRate?: number;
+    activeUsers?: number;
+  };
+  usage?: {
+    storageUsed?: number;
+    storageQuota?: number;
+    apiCallsThisMonth?: number;
+    apiQuota?: number;
+  };
+  limits?: Record<string, number>;
 };
 type Plan = { _id: string; name: string; code: string };
 type CompanyUser = {
@@ -253,6 +268,12 @@ export default function CompaniesPage() {
                   Plan
                 </th>
                 <th className="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                  Users
+                </th>
+                <th className="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                  Storage
+                </th>
+                <th className="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">
                   Services
                 </th>
                 <th className="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">
@@ -298,6 +319,68 @@ export default function CompaniesPage() {
                         <option value={c.plan}>{c.plan}</option>
                       )}
                     </select>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-semibold text-slate-900">
+                        {c.analytics?.totalUsers || 0}
+                      </span>
+                      {c.limits?.maxUsers && c.limits.maxUsers !== -1 && (
+                        <>
+                          <span className="text-slate-400">/</span>
+                          <span className="text-sm text-slate-600">
+                            {c.limits.maxUsers}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                    {c.limits?.maxUsers && c.limits.maxUsers !== -1 && (
+                      <div className="w-full bg-slate-200 rounded-full h-1.5 mt-1">
+                        <div
+                          className={`h-1.5 rounded-full transition-all ${
+                            ((c.analytics?.totalUsers || 0) / c.limits.maxUsers) > 0.9
+                              ? 'bg-red-500'
+                              : ((c.analytics?.totalUsers || 0) / c.limits.maxUsers) > 0.7
+                              ? 'bg-yellow-500'
+                              : 'bg-green-500'
+                          }`}
+                          style={{
+                            width: `${Math.min(
+                              ((c.analytics?.totalUsers || 0) / c.limits.maxUsers) * 100,
+                              100
+                            )}%`,
+                          }}
+                        />
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-semibold text-slate-900">
+                        {((c.usage?.storageUsed || 0) / 1024).toFixed(1)}GB
+                      </span>
+                      <span className="text-slate-400">/</span>
+                      <span className="text-sm text-slate-600">
+                        {((c.usage?.storageQuota || 5120) / 1024).toFixed(0)}GB
+                      </span>
+                    </div>
+                    <div className="w-full bg-slate-200 rounded-full h-1.5 mt-1">
+                      <div
+                        className={`h-1.5 rounded-full transition-all ${
+                          ((c.usage?.storageUsed || 0) / (c.usage?.storageQuota || 5120)) > 0.9
+                            ? 'bg-red-500'
+                            : ((c.usage?.storageUsed || 0) / (c.usage?.storageQuota || 5120)) > 0.7
+                            ? 'bg-yellow-500'
+                            : 'bg-green-500'
+                        }`}
+                        style={{
+                          width: `${Math.min(
+                            ((c.usage?.storageUsed || 0) / (c.usage?.storageQuota || 5120)) * 100,
+                            100
+                          )}%`,
+                        }}
+                      />
+                    </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
