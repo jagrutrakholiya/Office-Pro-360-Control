@@ -52,6 +52,7 @@ const groups: NavGroup[] = [
       { href: '/leads', label: 'Leads & CRM', icon: <FiTrendingUp /> }
     ]
   },
+  /*
   {
     label: 'Communication',
     items: [
@@ -59,6 +60,7 @@ const groups: NavGroup[] = [
       { href: '/polls', label: 'Polls & Surveys', icon: <FiPieChart /> }
     ]
   },
+  */
   {
     label: 'Support',
     items: [
