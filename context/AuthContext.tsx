@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     const { data } = await api.post('/auth/login', { email, password })
-    if (data.user.role !== 'super_admin') throw new Error('Super admin only')
+    if (data.user.role !== 'super_admin') throw new Error('Access denied')
     localStorage.setItem('cp_token', data.token)
     setToken(data.token)
     setUser(data.user)

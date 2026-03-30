@@ -5,7 +5,7 @@ const API_BASE = '/marketing';
 
 // Helper to get auth headers
 function getAuthHeaders() {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('cp_token');
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import api from '../../../lib/api';
 
 interface BackupHistory {
   id: string;
@@ -47,18 +48,10 @@ export default function DataExportPage() {
 
   const fetchPreferences = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/user-settings/preferences', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.data.dataPreferences) {
-          setPreferences(data.data.dataPreferences);
-        }
+      const response = await api.get('/user-settings/preferences');
+      const data = response.data;
+      if (data.success && data.data.dataPreferences) {
+        setPreferences(data.data.dataPreferences);
       }
     } catch (error) {
       console.error('Error fetching preferences:', error);
@@ -104,28 +97,22 @@ export default function DataExportPage() {
     setMessage('');
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/user-settings/export?format=${format}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      const response = await api.get(`/user-settings/export`, {
+        params: { format },
+        responseType: 'blob',
       });
 
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `data-export-${new Date().toISOString().split('T')[0]}.${format}`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-        
-        setMessage('Data exported successfully!');
-      } else {
-        setMessage('Failed to export data. Please try again.');
-      }
+      const blob = new Blob([response.data]);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `data-export-${new Date().toISOString().split('T')[0]}.${format}`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      setMessage('Data exported successfully!');
     } catch (error) {
       console.error('Error exporting data:', error);
       setMessage('An error occurred while exporting data.');
@@ -139,25 +126,13 @@ export default function DataExportPage() {
     setMessage('');
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/user-settings/backup', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          includeAttachments: preferences.includeAttachments,
-          compress: preferences.compressBackup
-        })
+      await api.post('/user-settings/backup', {
+        includeAttachments: preferences.includeAttachments,
+        compress: preferences.compressBackup
       });
 
-      if (response.ok) {
-        setMessage('Backup created successfully!');
-        fetchBackupHistory();
-      } else {
-        setMessage('Failed to create backup. Please try again.');
-      }
+      setMessage('Backup created successfully!');
+      fetchBackupHistory();
     } catch (error) {
       console.error('Error creating backup:', error);
       setMessage('An error occurred while creating backup.');
@@ -171,21 +146,9 @@ export default function DataExportPage() {
     setMessage('');
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/user-settings/preferences', {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ dataPreferences: preferences })
-      });
+      await api.put('/user-settings/preferences', { dataPreferences: preferences });
 
-      if (response.ok) {
-        setMessage('Preferences saved successfully!');
-      } else {
-        setMessage('Failed to save preferences. Please try again.');
-      }
+      setMessage('Preferences saved successfully!');
     } catch (error) {
       console.error('Error saving preferences:', error);
       setMessage('An error occurred while saving preferences.');

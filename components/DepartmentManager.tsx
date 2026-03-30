@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import api from '../lib/api';
 
 interface Department {
 	_id: string;
@@ -70,17 +71,8 @@ export default function DepartmentManager({ companyId }: DepartmentManagerProps)
 	const loadHierarchy = async () => {
 		try {
 			setLoading(true);
-			const token = localStorage.getItem('token');
-			const response = await fetch(`http://localhost:3000/api/companies/${companyId}/hierarchy`, {
-				headers: {
-					'Authorization': `Bearer ${token}`,
-				},
-			});
-
-			if (!response.ok) throw new Error('Failed to fetch hierarchy');
-
-			const data = await response.json();
-			setHierarchy(data);
+			const response = await api.get(`/companies/${companyId}/hierarchy`);
+			setHierarchy(response.data);
 		} catch (error) {
 			console.error('Error loading hierarchy:', error);
 		} finally {
@@ -90,17 +82,7 @@ export default function DepartmentManager({ companyId }: DepartmentManagerProps)
 
 	const handleAddDepartment = async () => {
 		try {
-			const token = localStorage.getItem('token');
-			const response = await fetch(`http://localhost:3000/api/companies/${companyId}/departments`, {
-				method: 'POST',
-				headers: {
-					'Authorization': `Bearer ${token}`,
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(deptForm),
-			});
-
-			if (!response.ok) throw new Error('Failed to add department');
+			await api.post(`/companies/${companyId}/departments`, deptForm);
 
 			setDeptForm({ name: '', code: '', description: '', headId: '', parentDepartment: '' });
 			setShowAddDept(false);
@@ -115,20 +97,7 @@ export default function DepartmentManager({ companyId }: DepartmentManagerProps)
 		if (!editingDept) return;
 
 		try {
-			const token = localStorage.getItem('token');
-			const response = await fetch(
-				`http://localhost:3000/api/companies/${companyId}/departments/${editingDept._id}`,
-				{
-					method: 'PUT',
-					headers: {
-						'Authorization': `Bearer ${token}`,
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify(deptForm),
-				}
-			);
-
-			if (!response.ok) throw new Error('Failed to update department');
+			await api.put(`/companies/${companyId}/departments/${editingDept._id}`, deptForm);
 
 			setEditingDept(null);
 			setDeptForm({ name: '', code: '', description: '', headId: '', parentDepartment: '' });
@@ -143,18 +112,7 @@ export default function DepartmentManager({ companyId }: DepartmentManagerProps)
 		if (!confirm('Are you sure you want to delete this department?')) return;
 
 		try {
-			const token = localStorage.getItem('token');
-			const response = await fetch(
-				`http://localhost:3000/api/companies/${companyId}/departments/${deptId}`,
-				{
-					method: 'DELETE',
-					headers: {
-						'Authorization': `Bearer ${token}`,
-					},
-				}
-			);
-
-			if (!response.ok) throw new Error('Failed to delete department');
+			await api.delete(`/companies/${companyId}/departments/${deptId}`);
 
 			loadHierarchy();
 		} catch (error) {
@@ -165,17 +123,7 @@ export default function DepartmentManager({ companyId }: DepartmentManagerProps)
 
 	const handleAddDivision = async () => {
 		try {
-			const token = localStorage.getItem('token');
-			const response = await fetch(`http://localhost:3000/api/companies/${companyId}/divisions`, {
-				method: 'POST',
-				headers: {
-					'Authorization': `Bearer ${token}`,
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(divForm),
-			});
-
-			if (!response.ok) throw new Error('Failed to add division');
+			await api.post(`/companies/${companyId}/divisions`, divForm);
 
 			setDivForm({ name: '', code: '', description: '', managerId: '' });
 			setShowAddDiv(false);

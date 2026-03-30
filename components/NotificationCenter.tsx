@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import api from '../lib/api';
 
 interface Notification {
 	_id: string;
@@ -44,16 +45,8 @@ export default function NotificationCenter() {
 
 	const loadNotifications = async () => {
 		try {
-			const token = localStorage.getItem('token');
-			const response = await fetch('http://localhost:3000/api/notifications/grouped', {
-				headers: {
-					'Authorization': `Bearer ${token}`,
-				},
-			});
-
-			if (!response.ok) throw new Error('Failed to load notifications');
-
-			const data = await response.json();
+			const response = await api.get('/notifications/grouped');
+			const data = response.data;
 			setNotifications({
 				grouped: data.grouped,
 				ungrouped: data.ungrouped,
@@ -78,22 +71,10 @@ export default function NotificationCenter() {
 		}
 
 		try {
-			const token = localStorage.getItem('token');
-			const response = await fetch(
-				`http://localhost:3000/api/notifications/groups/${groupKey}`,
-				{
-					headers: {
-						'Authorization': `Bearer ${token}`,
-					},
-				}
-			);
-
-			if (!response.ok) throw new Error('Failed to load group details');
-
-			const data = await response.json();
+			const response = await api.get(`/notifications/groups/${groupKey}`);
 			setGroupDetails({
 				...groupDetails,
-				[groupKey]: data.notifications,
+				[groupKey]: response.data.notifications,
 			});
 
 			const newExpanded = new Set(expandedGroups);
@@ -106,18 +87,7 @@ export default function NotificationCenter() {
 
 	const markAsRead = async (id: string) => {
 		try {
-			const token = localStorage.getItem('token');
-			const response = await fetch(
-				`http://localhost:3000/api/notifications/${id}/read`,
-				{
-					method: 'PATCH',
-					headers: {
-						'Authorization': `Bearer ${token}`,
-					},
-				}
-			);
-
-			if (!response.ok) throw new Error('Failed to mark as read');
+			await api.patch(`/notifications/${id}/read`);
 
 			loadNotifications();
 		} catch (error) {
@@ -127,30 +97,16 @@ export default function NotificationCenter() {
 
 	const markAllAsRead = async () => {
 		try {
-			const token = localStorage.getItem('token');
-			
 			if (!notifications) return;
-			
+
 			const allIds = [
 				...notifications.grouped.map(n => n._id),
 				...notifications.ungrouped.map(n => n._id),
 			];
 
-			const response = await fetch(
-				'http://localhost:3000/api/notifications/mark-multiple-read',
-				{
-					method: 'POST',
-					headers: {
-						'Authorization': `Bearer ${token}`,
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify({
-						notificationIds: allIds,
-					}),
-				}
-			);
-
-			if (!response.ok) throw new Error('Failed to mark all as read');
+			await api.post('/notifications/mark-multiple-read', {
+				notificationIds: allIds,
+			});
 
 			loadNotifications();
 		} catch (error) {
@@ -160,18 +116,7 @@ export default function NotificationCenter() {
 
 	const archiveNotification = async (id: string) => {
 		try {
-			const token = localStorage.getItem('token');
-			const response = await fetch(
-				`http://localhost:3000/api/notifications/${id}/archive`,
-				{
-					method: 'PATCH',
-					headers: {
-						'Authorization': `Bearer ${token}`,
-					},
-				}
-			);
-
-			if (!response.ok) throw new Error('Failed to archive notification');
+			await api.patch(`/notifications/${id}/archive`);
 
 			loadNotifications();
 		} catch (error) {
@@ -183,18 +128,7 @@ export default function NotificationCenter() {
 		if (!confirm('Delete all read notifications?')) return;
 
 		try {
-			const token = localStorage.getItem('token');
-			const response = await fetch(
-				'http://localhost:3000/api/notifications/clear-all',
-				{
-					method: 'DELETE',
-					headers: {
-						'Authorization': `Bearer ${token}`,
-					},
-				}
-			);
-
-			if (!response.ok) throw new Error('Failed to clear notifications');
+			await api.delete('/notifications/clear-all');
 
 			loadNotifications();
 		} catch (error) {
@@ -206,18 +140,7 @@ export default function NotificationCenter() {
 		if (!confirm('Archive all read notifications?')) return;
 
 		try {
-			const token = localStorage.getItem('token');
-			const response = await fetch(
-				'http://localhost:3000/api/notifications/archive-all-read',
-				{
-					method: 'PATCH',
-					headers: {
-						'Authorization': `Bearer ${token}`,
-					},
-				}
-			);
-
-			if (!response.ok) throw new Error('Failed to archive all read');
+			await api.patch('/notifications/archive-all-read');
 
 			loadNotifications();
 		} catch (error) {

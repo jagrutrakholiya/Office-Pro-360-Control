@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import api from '../lib/api';
 
 interface Activity {
 	_id: string;
@@ -44,23 +45,15 @@ export default function CompanyActivityFeed({ companyId }: CompanyActivityFeedPr
 				setLoadingMore(true);
 			}
 
-			const token = localStorage.getItem('token');
 			const currentOffset = reset ? 0 : offset;
-			
-			let url = `http://localhost:3000/api/companies/${companyId}/activity?limit=${limit}&offset=${currentOffset}`;
+
+			const params: Record<string, string | number> = { limit, offset: currentOffset };
 			if (filter !== 'all') {
-				url += `&resourceType=${filter}`;
+				params.resourceType = filter;
 			}
 
-			const response = await fetch(url, {
-				headers: {
-					'Authorization': `Bearer ${token}`,
-				},
-			});
-
-			if (!response.ok) throw new Error('Failed to fetch activities');
-
-			const data = await response.json();
+			const response = await api.get(`/companies/${companyId}/activity`, { params });
+			const data = response.data;
 			
 			if (reset) {
 				setActivities(data);

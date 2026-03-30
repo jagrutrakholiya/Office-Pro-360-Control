@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import api from '../../../lib/api';
 
 interface PrivacySettings {
   profileVisibility: 'public' | 'team' | 'private';
@@ -67,18 +68,10 @@ export default function PrivacySecurityPage() {
 
   const fetchPrivacySettings = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/user-settings/preferences', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.data.privacy) {
-          setSettings(data.data.privacy);
-        }
+      const response = await api.get('/user-settings/preferences');
+      const data = response.data;
+      if (data.success && data.data.privacy) {
+        setSettings(data.data.privacy);
       }
     } catch (error) {
       console.error('Error fetching privacy settings:', error);
@@ -90,21 +83,9 @@ export default function PrivacySecurityPage() {
     setMessage('');
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/user-settings/preferences', {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ privacy: settings })
-      });
+      await api.put('/user-settings/preferences', { privacy: settings });
 
-      if (response.ok) {
-        setMessage('Privacy settings saved successfully!');
-      } else {
-        setMessage('Failed to save settings. Please try again.');
-      }
+      setMessage('Privacy settings saved successfully!');
     } catch (error) {
       console.error('Error saving settings:', error);
       setMessage('An error occurred while saving settings.');

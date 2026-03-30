@@ -164,8 +164,9 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setIsSearching(true);
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/search?q=${encodeURIComponent(query)}`, {
+      const token = localStorage.getItem('cp_token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+      const response = await fetch(`${apiUrl}/search?q=${encodeURIComponent(query)}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

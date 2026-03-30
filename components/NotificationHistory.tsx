@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import api from '../lib/api';
 
 interface Notification {
 	_id: string;
@@ -54,17 +55,8 @@ export default function NotificationHistory() {
 
 	const loadStats = async () => {
 		try {
-			const token = localStorage.getItem('token');
-			const response = await fetch('http://localhost:3000/api/notifications/stats', {
-				headers: {
-					'Authorization': `Bearer ${token}`,
-				},
-			});
-
-			if (!response.ok) throw new Error('Failed to load stats');
-
-			const data = await response.json();
-			setStats(data.stats);
+			const response = await api.get('/notifications/stats');
+			setStats(response.data.stats);
 		} catch (error) {
 			console.error('Error loading stats:', error);
 		}
@@ -73,30 +65,18 @@ export default function NotificationHistory() {
 	const loadNotifications = async () => {
 		try {
 			setLoading(true);
-			const token = localStorage.getItem('token');
-			
-			const params = new URLSearchParams();
-			if (filters.type !== 'all') params.append('type', filters.type);
-			if (filters.priority !== 'all') params.append('priority', filters.priority);
-			if (filters.read !== 'all') params.append('read', filters.read);
-			if (filters.archived) params.append('archived', 'true');
-			if (filters.dateFrom) params.append('dateFrom', filters.dateFrom);
-			if (filters.dateTo) params.append('dateTo', filters.dateTo);
-			if (filters.search) params.append('search', filters.search);
 
-			const response = await fetch(
-				`http://localhost:3000/api/notifications/history?${params.toString()}`,
-				{
-					headers: {
-						'Authorization': `Bearer ${token}`,
-					},
-				}
-			);
+			const params: Record<string, string> = {};
+			if (filters.type !== 'all') params.type = filters.type;
+			if (filters.priority !== 'all') params.priority = filters.priority;
+			if (filters.read !== 'all') params.read = filters.read;
+			if (filters.archived) params.archived = 'true';
+			if (filters.dateFrom) params.dateFrom = filters.dateFrom;
+			if (filters.dateTo) params.dateTo = filters.dateTo;
+			if (filters.search) params.search = filters.search;
 
-			if (!response.ok) throw new Error('Failed to load notifications');
-
-			const data = await response.json();
-			setNotifications(data.notifications);
+			const response = await api.get('/notifications/history', { params });
+			setNotifications(response.data.notifications);
 		} catch (error) {
 			console.error('Error loading notifications:', error);
 		} finally {
@@ -106,18 +86,7 @@ export default function NotificationHistory() {
 
 	const archiveNotification = async (id: string) => {
 		try {
-			const token = localStorage.getItem('token');
-			const response = await fetch(
-				`http://localhost:3000/api/notifications/${id}/archive`,
-				{
-					method: 'PATCH',
-					headers: {
-						'Authorization': `Bearer ${token}`,
-					},
-				}
-			);
-
-			if (!response.ok) throw new Error('Failed to archive notification');
+			await api.patch(`/notifications/${id}/archive`);
 
 			loadNotifications();
 			loadStats();
@@ -128,18 +97,7 @@ export default function NotificationHistory() {
 
 	const unarchiveNotification = async (id: string) => {
 		try {
-			const token = localStorage.getItem('token');
-			const response = await fetch(
-				`http://localhost:3000/api/notifications/${id}/unarchive`,
-				{
-					method: 'PATCH',
-					headers: {
-						'Authorization': `Bearer ${token}`,
-					},
-				}
-			);
-
-			if (!response.ok) throw new Error('Failed to unarchive notification');
+			await api.patch(`/notifications/${id}/unarchive`);
 
 			loadNotifications();
 			loadStats();
@@ -152,18 +110,7 @@ export default function NotificationHistory() {
 		if (!confirm('Are you sure you want to delete this notification?')) return;
 
 		try {
-			const token = localStorage.getItem('token');
-			const response = await fetch(
-				`http://localhost:3000/api/notifications/${id}`,
-				{
-					method: 'DELETE',
-					headers: {
-						'Authorization': `Bearer ${token}`,
-					},
-				}
-			);
-
-			if (!response.ok) throw new Error('Failed to delete notification');
+			await api.delete(`/notifications/${id}`);
 
 			loadNotifications();
 			loadStats();
@@ -176,16 +123,9 @@ export default function NotificationHistory() {
 		if (selectedIds.size === 0) return;
 
 		try {
-			const token = localStorage.getItem('token');
-			
 			await Promise.all(
 				Array.from(selectedIds).map((id) =>
-					fetch(`http://localhost:3000/api/notifications/${id}/archive`, {
-						method: 'PATCH',
-						headers: {
-							'Authorization': `Bearer ${token}`,
-						},
-					})
+					api.patch(`/notifications/${id}/archive`)
 				)
 			);
 
@@ -202,22 +142,9 @@ export default function NotificationHistory() {
 		if (!confirm(`Delete ${selectedIds.size} selected notifications?`)) return;
 
 		try {
-			const token = localStorage.getItem('token');
-			const response = await fetch(
-				'http://localhost:3000/api/notifications/delete-multiple',
-				{
-					method: 'POST',
-					headers: {
-						'Authorization': `Bearer ${token}`,
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify({
-						notificationIds: Array.from(selectedIds),
-					}),
-				}
-			);
-
-			if (!response.ok) throw new Error('Failed to delete notifications');
+			await api.post('/notifications/delete-multiple', {
+				notificationIds: Array.from(selectedIds),
+			});
 
 			setSelectedIds(new Set());
 			loadNotifications();
@@ -231,18 +158,7 @@ export default function NotificationHistory() {
 		if (!confirm('Archive all read notifications?')) return;
 
 		try {
-			const token = localStorage.getItem('token');
-			const response = await fetch(
-				'http://localhost:3000/api/notifications/archive-all-read',
-				{
-					method: 'PATCH',
-					headers: {
-						'Authorization': `Bearer ${token}`,
-					},
-				}
-			);
-
-			if (!response.ok) throw new Error('Failed to archive all read');
+			await api.patch('/notifications/archive-all-read');
 
 			loadNotifications();
 			loadStats();

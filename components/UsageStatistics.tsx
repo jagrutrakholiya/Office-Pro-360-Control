@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import api from '../lib/api';
 
 interface UsageData {
 	storageUsed: number;
@@ -30,17 +31,8 @@ export default function UsageStatistics({ companyId }: UsageStatisticsProps) {
 	const loadUsageData = async () => {
 		try {
 			setLoading(true);
-			const token = localStorage.getItem('token');
-			const response = await fetch(`http://localhost:3000/api/companies/${companyId}/usage`, {
-				headers: {
-					'Authorization': `Bearer ${token}`,
-				},
-			});
-
-			if (!response.ok) throw new Error('Failed to fetch usage data');
-
-			const data = await response.json();
-			setUsage(data);
+			const response = await api.get(`/companies/${companyId}/usage`);
+			setUsage(response.data);
 		} catch (error) {
 			console.error('Error loading usage data:', error);
 		} finally {

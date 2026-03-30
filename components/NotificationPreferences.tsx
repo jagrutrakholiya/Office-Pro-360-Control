@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import api from '../lib/api';
 
 interface NotificationPreferences {
 	// Channels
@@ -55,17 +56,8 @@ export default function NotificationPreferences() {
 	const loadPreferences = async () => {
 		try {
 			setLoading(true);
-			const token = localStorage.getItem('token');
-			const response = await fetch('http://localhost:3000/api/notifications/preferences', {
-				headers: {
-					'Authorization': `Bearer ${token}`,
-				},
-			});
-
-			if (!response.ok) throw new Error('Failed to load preferences');
-
-			const data = await response.json();
-			setPreferences(data.preferences);
+			const response = await api.get('/notifications/preferences');
+			setPreferences(response.data.preferences);
 		} catch (error) {
 			console.error('Error loading preferences:', error);
 			setMessage({ type: 'error', text: 'Failed to load notification preferences' });
@@ -77,17 +69,7 @@ export default function NotificationPreferences() {
 	const savePreferences = async () => {
 		try {
 			setSaving(true);
-			const token = localStorage.getItem('token');
-			const response = await fetch('http://localhost:3000/api/notifications/preferences', {
-				method: 'PUT',
-				headers: {
-					'Authorization': `Bearer ${token}`,
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(preferences),
-			});
-
-			if (!response.ok) throw new Error('Failed to save preferences');
+			await api.put('/notifications/preferences', preferences);
 
 			setMessage({ type: 'success', text: 'Preferences saved successfully!' });
 			setTimeout(() => setMessage(null), 3000);
