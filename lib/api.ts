@@ -13,6 +13,8 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('cp_token');
     if (token) config.headers.Authorization = `Bearer ${token}`;
+    // Send timezone offset with every request
+    config.headers['X-Timezone-Offset'] = String(new Date().getTimezoneOffset());
     return config;
   },
   (error) => Promise.reject(error)
