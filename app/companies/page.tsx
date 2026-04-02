@@ -40,23 +40,16 @@ type CompanyUser = {
 
 type Service = { key: string; label: string; description: string };
 
-const SERVICE_CATEGORIES = {
-  "Core Features": ["tasks", "calendar", "attendance", "performance", "timesheet"],
-  Management: ["users", "teams", "projects", "sprints", "reports", "analytics"],
-  Administration: [
-    "leave",
-    "payroll",
-    "roles",
-    "statuses",
-    "holidays",
-    "overtime",
-    "onboarding",
-    "offboarding",
-    "api_access",
-  ],
-  "Office Management": ["offices", "shifts", "documents", "expenses"],
-  Communication: ["chat", "messages", "microsoft_teams", "teams_integration", "slack_integration", "whatsapp_integration"],
-  Personal: ["profile", "settings"],
+const SERVICE_CATEGORIES: Record<string, string[]> = {
+  "Core Features": ["tasks", "calendar", "attendance", "performance", "timesheet", "leaves"],
+  "Project Management": ["projects", "sprints", "task_board", "sprint_board"],
+  "People Management": ["users", "teams", "reports", "analytics", "timesheet_analytics"],
+  "HR & Payroll": ["leave", "payroll", "overtime", "onboarding", "offboarding", "expenses"],
+  "Office Management": ["offices", "shifts", "documents"],
+  "Communication": ["chat", "messages", "announcements", "polls"],
+  "Integrations": ["microsoft_teams", "teams_integration", "slack_integration", "whatsapp_integration"],
+  "Attendance Advanced": ["clock_logs", "team_attendance", "all_attendance"],
+  "Administration": ["roles", "statuses", "holidays", "api_access", "settings"],
 };
 
 export default function CompaniesPage() {
@@ -129,14 +122,17 @@ export default function CompaniesPage() {
     setEditingId(c._id);
     const current = (c.features || {}) as Record<string, boolean>;
     
-    // Create new features object merging exist features with missing ones defaulting to true
-    const updatedFeatures: Record<string, boolean> = { ...current };
-    
-    // Check for any available service not in current features
+    // Show current features as-is — missing ones default to OFF (not selected)
+    const updatedFeatures: Record<string, boolean> = {};
+
+    // First set all available services to false
     availableServices.forEach(svc => {
-      if (updatedFeatures[svc.key] === undefined) {
-        updatedFeatures[svc.key] = true;
-      }
+      updatedFeatures[svc.key] = false;
+    });
+
+    // Then overlay with company's actual current features
+    Object.entries(current).forEach(([key, value]) => {
+      updatedFeatures[key] = !!value;
     });
 
     setEditServices(updatedFeatures);
@@ -144,10 +140,9 @@ export default function CompaniesPage() {
 
   const saveEditServices = async () => {
     if (!editingId) return;
+    // Send ALL features (both true and false) so disabled features are properly saved
     await api.patch(`/admin/companies/${editingId}/features`, {
-      features: Object.fromEntries(
-        Object.entries(editServices).filter(([_, v]) => v)
-      ),
+      features: editServices,
     });
     setEditingId(null);
     setEditServices({});
