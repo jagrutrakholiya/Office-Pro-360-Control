@@ -95,12 +95,20 @@ export default function PlansPage() {
                     ₹{p.priceYearly}
                   </td>
                   <td className="px-6 py-4">
-                    <button
-                      onClick={() => deletePlan(p._id)}
-                      className="btn-danger"
-                    >
-                      Delete
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => router.push(`/plans/${p._id}`)}
+                        className="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => deletePlan(p._id)}
+                        className="btn-danger"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
