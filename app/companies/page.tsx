@@ -40,6 +40,50 @@ type CompanyUser = {
 
 type Service = { key: string; label: string; description: string };
 
+// Hardcoded service definitions — single source of truth (no API dependency)
+const ALL_SERVICES: Service[] = [
+  { key: 'tasks', label: 'Tasks', description: 'Task management and tracking' },
+  { key: 'calendar', label: 'Calendar', description: 'Events and schedules' },
+  { key: 'attendance', label: 'Attendance', description: 'Clock-in/out and tracking' },
+  { key: 'performance', label: 'Performance', description: 'Reviews and KPIs' },
+  { key: 'timesheet', label: 'Timesheet', description: 'Time tracking per task' },
+  { key: 'leaves', label: 'Leaves (Employee)', description: 'Employee leave view' },
+  { key: 'projects', label: 'Projects', description: 'Project management' },
+  { key: 'sprints', label: 'Sprints', description: 'Agile sprint planning' },
+  { key: 'task_board', label: 'Task Board', description: 'Kanban board' },
+  { key: 'sprint_board', label: 'Sprint Board', description: 'Sprint Kanban board' },
+  { key: 'users', label: 'Employees', description: 'User directory' },
+  { key: 'teams', label: 'Teams', description: 'Team management' },
+  { key: 'reports', label: 'Reports', description: 'Reports generation' },
+  { key: 'analytics', label: 'Analytics', description: 'Data analytics' },
+  { key: 'timesheet_analytics', label: 'Timesheet Analytics', description: 'Advanced timesheet reports' },
+  { key: 'leave', label: 'Leave Management', description: 'Policies, approvals, balances' },
+  { key: 'payroll', label: 'Payroll', description: 'Salaries and payslips' },
+  { key: 'overtime', label: 'Overtime', description: 'Overtime tracking' },
+  { key: 'onboarding', label: 'Onboarding', description: 'New employee onboarding' },
+  { key: 'offboarding', label: 'Offboarding', description: 'Employee exit process' },
+  { key: 'expenses', label: 'Expenses', description: 'Expense tracking' },
+  { key: 'offices', label: 'Branches / Offices', description: 'Branch management' },
+  { key: 'shifts', label: 'Shifts', description: 'Shift schedules' },
+  { key: 'documents', label: 'Documents', description: 'Document management' },
+  { key: 'chat', label: 'Chat', description: 'Real-time messaging' },
+  { key: 'messages', label: 'Messages', description: 'Internal messages' },
+  { key: 'announcements', label: 'Announcements', description: 'Company broadcasts' },
+  { key: 'polls', label: 'Polls & Surveys', description: 'Polls and voting' },
+  { key: 'microsoft_teams', label: 'Microsoft Teams', description: 'Teams integration' },
+  { key: 'teams_integration', label: 'Teams (Legacy)', description: 'Legacy Teams webhook' },
+  { key: 'slack_integration', label: 'Slack', description: 'Slack notifications' },
+  { key: 'whatsapp_integration', label: 'WhatsApp', description: 'WhatsApp messaging' },
+  { key: 'clock_logs', label: 'Clock Logs', description: 'Clock audit trail' },
+  { key: 'team_attendance', label: 'Team Attendance', description: 'Manager attendance view' },
+  { key: 'all_attendance', label: 'All Attendance', description: 'Company-wide attendance' },
+  { key: 'roles', label: 'Roles', description: 'Role management' },
+  { key: 'statuses', label: 'Statuses', description: 'Custom statuses' },
+  { key: 'holidays', label: 'Holidays', description: 'Holiday calendar' },
+  { key: 'api_access', label: 'API Access', description: 'REST API access' },
+  { key: 'settings', label: 'Settings', description: 'Company settings' },
+];
+
 const SERVICE_CATEGORIES: Record<string, string[]> = {
   "Core Features": ["tasks", "calendar", "attendance", "performance", "timesheet", "leaves"],
   "Project Management": ["projects", "sprints", "task_board", "sprint_board"],
@@ -54,7 +98,7 @@ const SERVICE_CATEGORIES: Record<string, string[]> = {
 
 export default function CompaniesPage() {
   const router = useRouter();
-  const [availableServices, setAvailableServices] = useState<Service[]>([]);
+  const [availableServices] = useState<Service[]>(ALL_SERVICES);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -90,14 +134,6 @@ export default function CompaniesPage() {
   useEffect(() => {
     loadCompanies();
     loadPlans();
-    api
-      .get("/public/services")
-      .then(({ data }) => {
-        setAvailableServices(data?.services || []);
-      })
-      .catch(() => {
-        setAvailableServices([]);
-      });
   }, []);
 
   const getServicesByCategory = () => {
