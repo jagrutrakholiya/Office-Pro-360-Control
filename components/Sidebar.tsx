@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { FiBarChart2, FiDollarSign, FiHome, FiLayers, FiStar, FiBriefcase, FiHelpCircle, FiPieChart, FiUsers, FiFileText, FiTrendingUp, FiImage, FiVolume2, FiCreditCard, FiShield, FiActivity } from 'react-icons/fi';
+import { FiBarChart2, FiDollarSign, FiHome, FiLayers, FiStar, FiBriefcase, FiHelpCircle, FiPieChart, FiUsers, FiFileText, FiTrendingUp, FiImage, FiVolume2, FiCreditCard, FiShield, FiActivity, FiHardDrive } from 'react-icons/fi';
 import { BsRobot, BsShieldCheck } from 'react-icons/bs';
 
 interface NavItem {
@@ -76,6 +76,7 @@ const groups: NavGroup[] = [
   {
     label: 'System',
     items: [
+      { href: '/storage', label: 'Storage', icon: <FiHardDrive /> },
       { href: '/audit-logs', label: 'Audit Logs', icon: <FiShield /> },
       { href: '/system', label: 'System Health', icon: <FiActivity /> }
     ]
