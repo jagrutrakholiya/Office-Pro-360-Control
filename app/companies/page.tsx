@@ -43,56 +43,46 @@ type Service = { key: string; label: string; description: string; category?: str
 // FALLBACK — only used if the API is unreachable. Real data comes from
 // GET /api/public/services which reads from backend/utils/services.js.
 const FALLBACK_SERVICES: Service[] = [
- // Core
- { key: 'tasks', label: 'Tasks', description: 'Task management, assignment, and tracking' },
- { key: 'calendar', label: 'Calendar', description: 'Events, schedules, and holiday calendar' },
- { key: 'attendance', label: 'Attendance', description: 'Clock-in/out, GPS tracking, breaks' },
- { key: 'performance', label: 'Performance', description: 'Reviews, KPIs, and ratings' },
- { key: 'timesheet', label: 'Timesheet', description: 'Detailed time tracking per task' },
- { key: 'leaves', label: 'Leaves (Employee)', description: 'Employee leave view and apply' },
- // Project Management
- { key: 'projects', label: 'Projects', description: 'Project creation, teams, and budgets' },
- { key: 'sprints', label: 'Sprints', description: 'Agile sprint planning and tracking' },
- { key: 'task_board', label: 'Task Board', description: 'Kanban board for tasks' },
- { key: 'sprint_board', label: 'Sprint Board', description: 'Sprint-based Kanban board' },
- // People Management
- { key: 'users', label: 'Employees', description: 'User directory and employee management' },
- { key: 'teams', label: 'Teams', description: 'Team creation and member management' },
- { key: 'reports', label: 'Reports', description: 'Attendance, task, and team reports' },
- { key: 'analytics', label: 'Analytics', description: 'Data analytics, charts, and insights' },
- { key: 'timesheet_analytics', label: 'Timesheet Analytics', description: 'Advanced timesheet reports and trends' },
- // HR & Payroll
- { key: 'leave', label: 'Leave Management', description: 'Leave policies, approvals, and balances' },
- { key: 'payroll', label: 'Payroll', description: 'Salaries, payslips, tax calculation' },
- { key: 'overtime', label: 'Overtime', description: 'Overtime tracking, approval, and pay' },
- { key: 'onboarding', label: 'Onboarding', description: 'New employee onboarding workflows' },
- { key: 'offboarding', label: 'Offboarding', description: 'Employee exit and offboarding process' },
- { key: 'expenses', label: 'Expenses', description: 'Expense tracking, budgets, and reimbursement' },
- { key: 'invoices', label: 'GST Invoices', description: 'GST invoicing, payment tracking, PDF export' },
- // Office Management
- { key: 'offices', label: 'Branches / Offices', description: 'Branch locations and settings' },
- { key: 'shifts', label: 'Shifts', description: 'Shift schedules and assignment' },
- { key: 'documents', label: 'Documents', description: 'Document management with folders and versions' },
- // Communication
- { key: 'chat', label: 'Chat', description: 'Real-time direct and group messaging' },
- { key: 'messages', label: 'Messages', description: 'Internal messaging system' },
- { key: 'announcements', label: 'Announcements', description: 'Company-wide broadcast updates' },
- { key: 'polls', label: 'Polls & Surveys', description: 'Create polls and collect votes' },
- // Integrations
- { key: 'slack_integration', label: 'Slack', description: 'Slack webhook notifications' },
- { key: 'whatsapp_integration', label: 'WhatsApp', description: 'WhatsApp messaging integration' },
- // Attendance Advanced
- { key: 'clock_logs', label: 'Clock Logs', description: 'Detailed clock-in/out audit trail' },
- { key: 'team_attendance', label: 'Team Attendance', description: 'Manager view of team attendance' },
- { key: 'all_attendance', label: 'All Attendance', description: 'Company-wide attendance view' },
- // AI
- { key: 'ai_assistant', label: 'AI Assistant', description: 'Natural language queries on company data' },
- // Administration
- { key: 'roles', label: 'Roles', description: 'Role management and permissions' },
- { key: 'statuses', label: 'Statuses', description: 'Custom task and project statuses' },
- { key: 'holidays', label: 'Holidays', description: 'Holiday calendar management' },
- { key: 'api_access', label: 'API Access', description: 'REST API access for integrations' },
- { key: 'settings', label: 'Settings', description: 'Company and user settings' },
+ { key: 'tasks', label: 'Tasks', description: 'Task management, assignment, and tracking', category: 'Core Features' },
+ { key: 'calendar', label: 'Calendar', description: 'Events, schedules, and holiday calendar', category: 'Core Features' },
+ { key: 'attendance', label: 'Attendance', description: 'Clock-in/out, GPS tracking, breaks', category: 'Core Features' },
+ { key: 'performance', label: 'Performance', description: 'Reviews, KPIs, and ratings', category: 'Core Features' },
+ { key: 'timesheet', label: 'Timesheet', description: 'Detailed time tracking per task', category: 'Core Features' },
+ { key: 'leaves', label: 'Leaves (Employee)', description: 'Employee leave view and apply', category: 'Core Features' },
+ { key: 'projects', label: 'Projects', description: 'Project creation, teams, and budgets', category: 'Project Management' },
+ { key: 'sprints', label: 'Sprints', description: 'Agile sprint planning and tracking', category: 'Project Management' },
+ { key: 'task_board', label: 'Task Board', description: 'Kanban board for tasks', category: 'Project Management' },
+ { key: 'sprint_board', label: 'Sprint Board', description: 'Sprint-based Kanban board', category: 'Project Management' },
+ { key: 'users', label: 'Employees', description: 'User directory and employee management', category: 'People Management' },
+ { key: 'teams', label: 'Teams', description: 'Team creation and member management', category: 'People Management' },
+ { key: 'reports', label: 'Reports', description: 'Attendance, task, and team reports', category: 'People Management' },
+ { key: 'analytics', label: 'Analytics', description: 'Data analytics, charts, and insights', category: 'People Management' },
+ { key: 'timesheet_analytics', label: 'Timesheet Analytics', description: 'Advanced timesheet reports and trends', category: 'People Management' },
+ { key: 'leave', label: 'Leave Management', description: 'Leave policies, approvals, and balances', category: 'HR & Payroll' },
+ { key: 'payroll', label: 'Payroll', description: 'Salaries, payslips, tax calculation', category: 'HR & Payroll' },
+ { key: 'overtime', label: 'Overtime', description: 'Overtime tracking, approval, and pay', category: 'HR & Payroll' },
+ { key: 'onboarding', label: 'Onboarding', description: 'New employee onboarding workflows', category: 'HR & Payroll' },
+ { key: 'offboarding', label: 'Offboarding', description: 'Employee exit and offboarding process', category: 'HR & Payroll' },
+ { key: 'expenses', label: 'Expenses', description: 'Expense tracking, budgets, and reimbursement', category: 'HR & Payroll' },
+ { key: 'invoices', label: 'GST Invoices', description: 'GST invoicing, payment tracking, PDF export', category: 'HR & Payroll' },
+ { key: 'offices', label: 'Branches / Offices', description: 'Branch locations and settings', category: 'Office Management' },
+ { key: 'shifts', label: 'Shifts', description: 'Shift schedules and assignment', category: 'Office Management' },
+ { key: 'documents', label: 'Documents', description: 'Document management with folders and versions', category: 'Office Management' },
+ { key: 'chat', label: 'Chat', description: 'Real-time direct and group messaging', category: 'Communication' },
+ { key: 'messages', label: 'Messages', description: 'Internal messaging system', category: 'Communication' },
+ { key: 'announcements', label: 'Announcements', description: 'Company-wide broadcast updates', category: 'Communication' },
+ { key: 'polls', label: 'Polls & Surveys', description: 'Create polls and collect votes', category: 'Communication' },
+ { key: 'slack_integration', label: 'Slack', description: 'Slack webhook notifications', category: 'Integrations' },
+ { key: 'whatsapp_integration', label: 'WhatsApp', description: 'WhatsApp messaging integration', category: 'Integrations' },
+ { key: 'clock_logs', label: 'Clock Logs', description: 'Detailed clock-in/out audit trail', category: 'Attendance Advanced' },
+ { key: 'team_attendance', label: 'Team Attendance', description: 'Manager view of team attendance', category: 'Attendance Advanced' },
+ { key: 'all_attendance', label: 'All Attendance', description: 'Company-wide attendance view', category: 'Attendance Advanced' },
+ { key: 'ai_assistant', label: 'AI Assistant', description: 'Natural language queries on company data', category: 'AI' },
+ { key: 'roles', label: 'Roles', description: 'Role management and permissions', category: 'Administration' },
+ { key: 'statuses', label: 'Statuses', description: 'Custom task and project statuses', category: 'Administration' },
+ { key: 'holidays', label: 'Holidays', description: 'Holiday calendar management', category: 'Administration' },
+ { key: 'api_access', label: 'API Access', description: 'REST API access for integrations', category: 'Administration' },
+ { key: 'settings', label: 'Settings', description: 'Company and user settings', category: 'Administration' },
 ];
 
 const SERVICE_CATEGORIES: Record<string, string[]> = {
@@ -164,6 +154,13 @@ export default function CompaniesPage() {
  const categorized: Record<string, Service[]> = {};
 
  availableServices.forEach((svc) => {
+ // 1. If the service has its own category from the API, use that first
+ if (svc.category) {
+ if (!categorized[svc.category]) categorized[svc.category] = [];
+ categorized[svc.category].push(svc);
+ return;
+ }
+ // 2. Fall back to the SERVICE_CATEGORIES mapping
  for (const [category, keys] of Object.entries(serviceCategories)) {
  if (keys.includes(svc.key)) {
  if (!categorized[category]) categorized[category] = [];
@@ -171,6 +168,7 @@ export default function CompaniesPage() {
  return;
  }
  }
+ // 3. Last resort: "Other"
  if (!categorized["Other"]) categorized["Other"] = [];
  categorized["Other"].push(svc);
  });
