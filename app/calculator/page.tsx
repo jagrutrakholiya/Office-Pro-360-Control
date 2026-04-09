@@ -184,18 +184,26 @@ export default function CalculatorPage() {
                 disabled={plans.length === 0}
               >
                 {plans.length === 0 ? (
-                  <option>No plans available</option>
+                  <option>No plans available — run seedPricingPlans.js</option>
                 ) : (
-                  plans.map((p) => (
-                    <option key={p.code} value={p.code}>
-                      {p.name} ({p.pricing.model})
-                    </option>
-                  ))
+                  plans.map((p) => {
+                    const base = p.pricing?.baseMonthly || p.priceMonthly || 0;
+                    const perUser = p.pricing?.perUserMonthly || 0;
+                    const included = p.pricing?.includedUsers || 0;
+                    const priceLabel = base === 0
+                      ? "Free"
+                      : `₹${base}/mo${perUser > 0 ? ` + ₹${perUser}/user` : ""}${included > 0 ? ` (${included} incl)` : ""}`;
+                    return (
+                      <option key={p.code} value={p.code}>
+                        {p.name} — {priceLabel}
+                      </option>
+                    );
+                  })
                 )}
               </select>
               {plans.length === 0 && (
                 <p className="text-xs text-amber-600 mt-1">
-                  Create at least one plan in the Plans section first.
+                  No plans found. Run <code className="bg-amber-50 px-1 rounded">node scripts/seedPricingPlans.js</code> to create them.
                 </p>
               )}
             </Field>

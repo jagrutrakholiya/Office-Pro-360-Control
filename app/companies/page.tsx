@@ -88,11 +88,12 @@ const SERVICE_CATEGORIES: Record<string, string[]> = {
   "Core Features": ["tasks", "calendar", "attendance", "performance", "timesheet", "leaves"],
   "Project Management": ["projects", "sprints", "task_board", "sprint_board"],
   "People Management": ["users", "teams", "reports", "analytics", "timesheet_analytics"],
-  "HR & Payroll": ["leave", "payroll", "overtime", "onboarding", "offboarding", "expenses"],
+  "HR & Payroll": ["leave", "payroll", "overtime", "onboarding", "offboarding", "expenses", "invoices"],
   "Office Management": ["offices", "shifts", "documents"],
   "Communication": ["chat", "messages", "announcements", "polls"],
-  "Integrations": ["microsoft_teams", "teams_integration", "slack_integration", "whatsapp_integration"],
+  "Integrations": ["slack_integration", "whatsapp_integration"],
   "Attendance Advanced": ["clock_logs", "team_attendance", "all_attendance"],
+  "AI": ["ai_assistant"],
   "Administration": ["roles", "statuses", "holidays", "api_access", "settings"],
 };
 

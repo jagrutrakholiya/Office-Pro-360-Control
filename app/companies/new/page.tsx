@@ -10,10 +10,11 @@ type Service = { key: string; label: string; description: string }
 const SERVICE_CATEGORIES = {
   'Core Features': ['tasks', 'calendar', 'attendance', 'performance', 'timesheet'],
   'Management': ['users', 'teams', 'projects', 'sprints', 'reports', 'analytics'],
-  'Administration': ['leave', 'payroll', 'roles', 'statuses', 'holidays', 'overtime', 'onboarding', 'offboarding', 'api_access'],
-  'Office Management': ['offices', 'shifts', 'documents', 'expenses'],
-  'Communication': ['chat', 'messages', 'microsoft_teams', 'teams_integration', 'slack_integration', 'whatsapp_integration'],
-  'Personal': ['profile', 'settings']
+  'HR & Payroll': ['leave', 'payroll', 'roles', 'statuses', 'holidays', 'overtime', 'onboarding', 'offboarding', 'expenses', 'invoices'],
+  'Office Management': ['offices', 'shifts', 'documents'],
+  'Communication': ['chat', 'messages', 'announcements', 'polls', 'slack_integration', 'whatsapp_integration'],
+  'AI': ['ai_assistant'],
+  'Admin': ['api_access', 'settings']
 }
 
 export default function NewCompanyPage() {
