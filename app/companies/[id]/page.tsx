@@ -60,6 +60,7 @@ const FEATURE_CATEGORIES: Record<string, string[]> = {
     "onboarding",
     "offboarding",
     "expenses",
+    "invoices",
     "documents",
     "assets",
   ],
@@ -68,10 +69,11 @@ const FEATURE_CATEGORIES: Record<string, string[]> = {
     "messages",
     "announcements",
     "polls",
-    "microsoft_teams",
-    "teams_integration",
     "slack_integration",
     "whatsapp_integration",
+  ],
+  AI: [
+    "ai_assistant",
   ],
   Management: [
     "users",
