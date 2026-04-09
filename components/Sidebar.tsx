@@ -70,7 +70,10 @@ const groups: NavGroup[] = [
   {
     label: 'Finance',
     items: [
-      { href: '/subscriptions', label: 'Subscriptions', icon: <FiCreditCard /> }
+      { href: '/subscriptions', label: 'Subscriptions', icon: <FiCreditCard /> },
+      { href: '/costs', label: 'Platform Costs', icon: <FiActivity /> },
+      { href: '/pnl', label: 'Profit & Loss', icon: <FiTrendingUp /> },
+      { href: '/calculator', label: 'Profit Calculator', icon: <FiPieChart /> }
     ]
   },
   {
@@ -78,6 +81,7 @@ const groups: NavGroup[] = [
     items: [
       { href: '/storage', label: 'Storage', icon: <FiHardDrive /> },
       { href: '/audit-logs', label: 'Audit Logs', icon: <FiShield /> },
+      { href: '/ai-audit', label: 'AI Audit', icon: <BsRobot /> },
       { href: '/system', label: 'System Health', icon: <FiActivity /> }
     ]
   },

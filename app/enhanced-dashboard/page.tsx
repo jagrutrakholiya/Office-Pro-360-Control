@@ -84,37 +84,41 @@ export default function EnhancedDashboard() {
     );
   }
 
-  const totalSales = stats?.earnings?.monthly || 0;
+  // ─── Real values from APIs (no fakes, no Math.random, no hardcoded fallbacks) ─
+  const totalMRR = earningsData?.totalMRR || 0;
+  const payingCompanies = earningsData?.totalCompanies || 0;
   const totalCompanies = stats?.companies?.total || 0;
   const activeCompanies = stats?.companies?.active || 0;
   const activeUsers = stats?.users?.total || 0;
   const thisMonthCompanies = stats?.companies?.thisMonth || 0;
   const suspendedCompanies = stats?.companies?.suspended || 0;
   const avgUsersPerCompany = stats?.users?.avgPerCompany || 0;
-  
-  // Calculate growth percentages
+
+  // Real growth from trend (last vs first month). 0 if there's no data yet.
   const monthGrowth = revenueTrend?.growthRate || 0;
-  const companiesGrowthPercentage = totalCompanies > 0 ? ((thisMonthCompanies / totalCompanies) * 100) : 0;
-  const visitorGrowth = -2.0; // You can calculate this from your analytics
-  
-  // Product stats
-  const totalProducts = activeCompanies * 10; // Assuming 10 products per company
-  const productsGrowth = 15.1;
-  
-  // Get revenue trend data
-  const revenueChartData = revenueTrend?.trend?.map((item: any) => ({
-    month: new Date(item.month).toLocaleDateString('en-US', { month: 'short' }),
-    seen: Math.floor(Math.random() * 40) + 30, // Replace with real data
-    sales: item.revenue / 10000 // Scale for display
-  })) || [];
-  
-  // Calculate product statistics
-  const productStats = earningsData?.byPlan ? Object.entries(earningsData.byPlan).map(([plan, data]: [string, any], index) => ({
-    label: plan.charAt(0).toUpperCase() + plan.slice(1),
-    value: data.count * 100, // Estimated products
-    color: ['#3b82f6', '#8b5cf6', '#ec4899'][index] || '#3b82f6',
-    percentage: ((data.count / earningsData.totalCompanies) * 100)
-  })) : [];
+  const companiesGrowthPercentage = totalCompanies > 0
+    ? ((thisMonthCompanies / totalCompanies) * 100)
+    : 0;
+
+  // Revenue trend chart — pure real data, no synthetic "seen" series.
+  // Each point is { month: "Jan", revenue: 12345, activeCompanies: 4 }.
+  const revenueChartData = (revenueTrend?.trend || []).map((item: any) => ({
+    month: new Date(item.month + '-01').toLocaleDateString('en-US', { month: 'short' }),
+    revenue: item.revenue,
+    activeCompanies: item.activeCompanies || 0,
+  }));
+
+  // Plan distribution donut — real counts, palette is fixed but mapped in order.
+  const PLAN_PALETTE = ['#0f172a', '#475569', '#94a3b8', '#cbd5e1', '#e2e8f0'];
+  const planEntries = earningsData?.byPlan
+    ? Object.entries(earningsData.byPlan)
+    : [];
+  const productStats = planEntries.map(([planCode, data]: [string, any], index) => ({
+    label: data.name || (planCode.charAt(0).toUpperCase() + planCode.slice(1)),
+    value: data.count,
+    color: PLAN_PALETTE[index % PLAN_PALETTE.length],
+    percentage: payingCompanies > 0 ? (data.count / payingCompanies) * 100 : 0,
+  }));
 
   return (
     <Layout>
@@ -188,11 +192,11 @@ export default function EnhancedDashboard() {
                 </div>
                 
                 <div>
-                  <div className="text-white/90 text-sm font-medium mb-2">Total Sales</div>
+                  <div className="text-white/90 text-sm font-medium mb-2">Total MRR</div>
                   <div className="text-4xl font-bold text-white mb-1">
-                    {formatCurrency(totalSales)}
+                    {formatCurrency(totalMRR)}
                   </div>
-                  <div className="text-white/70 text-xs">Revenue vs last month</div>
+                  <div className="text-white/70 text-xs">From {payingCompanies} paying companies</div>
                 </div>
               </div>
             </div>
@@ -264,9 +268,9 @@ export default function EnhancedDashboard() {
             <div>
               <div className="text-slate-600 text-sm font-medium mb-2">Monthly Revenue</div>
               <div className="text-4xl font-bold text-slate-900 mb-1">
-                {formatCurrency(earningsData?.totalMRR || totalSales)}
+                {formatCurrency(totalMRR)}
               </div>
-              <div className="text-slate-500 text-xs">From {earningsData?.totalCompanies || activeCompanies} paying companies</div>
+              <div className="text-slate-500 text-xs">From {payingCompanies} paying companies</div>
             </div>
           </div>
 
@@ -291,55 +295,47 @@ export default function EnhancedDashboard() {
 
             <div className="flex items-center gap-6 mb-6">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-slate-300"></div>
-                <span className="text-sm text-slate-600">Seen product</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-blue-600"></div>
-                <span className="text-sm text-slate-600">Sales</span>
+                <div className="w-3 h-3 rounded-full bg-slate-900"></div>
+                <span className="text-sm text-slate-600">Monthly recurring revenue (₹)</span>
               </div>
             </div>
 
-            <ResponsiveContainer width="100%" height={240}>
-              <BarChart
-                data={revenueChartData.length > 0 ? revenueChartData : [
-                  { month: 'Jan', seen: 30, sales: 45 },
-                  { month: 'Feb', seen: 50, sales: 25 },
-                  { month: 'Mar', seen: 40, sales: 35 },
-                  { month: 'Apr', seen: 70, sales: 55 },
-                  { month: 'May', seen: 45, sales: 30 },
-                  { month: 'Jun', seen: 60, sales: 40 },
-                ]}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                <XAxis 
-                  dataKey="month" 
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: '#94a3b8', fontSize: 12 }}
-                />
-                <YAxis 
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: '#94a3b8', fontSize: 12 }}
-                  label={{ value: '60K', position: 'top', fill: '#64748b', fontSize: 12, offset: 10 }}
-                />
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: '#1e293b',
-                    border: 'none',
-                    borderRadius: '12px',
-                    padding: '12px',
-                    boxShadow: '0 10px 40px rgba(0,0,0,0.2)'
-                  }}
-                  labelStyle={{ color: '#fff', fontWeight: 'bold', marginBottom: '4px' }}
-                  itemStyle={{ color: '#fff', fontSize: '14px' }}
-                  cursor={{ fill: '#f8fafc' }}
-                />
-                <Bar dataKey="seen" fill="#e2e8f0" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="sales" fill="#3b82f6" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {revenueChartData.length === 0 ? (
+              <div className="h-[240px] flex items-center justify-center text-sm text-slate-400 border border-dashed border-slate-200 rounded-xl">
+                No subscription data yet — chart will populate once companies start paying.
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={240}>
+                <BarChart data={revenueChartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                  <XAxis
+                    dataKey="month"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#94a3b8', fontSize: 12 }}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#94a3b8', fontSize: 12 }}
+                    tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}K` : v}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#0f172a',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '8px 12px',
+                    }}
+                    labelStyle={{ color: '#fff', fontWeight: 600, marginBottom: '4px', fontSize: '12px' }}
+                    itemStyle={{ color: '#fff', fontSize: '13px' }}
+                    cursor={{ fill: '#f1f5f9' }}
+                    formatter={(value) => [formatCurrency(Number(value) || 0), 'MRR']}
+                  />
+                  <Bar dataKey="revenue" fill="#0f172a" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
 
             <div className="flex items-center justify-center gap-8 mt-4 p-4 bg-slate-900 rounded-2xl">
               <div className="text-center">
@@ -359,32 +355,21 @@ export default function EnhancedDashboard() {
           {/* Product Statistics */}
           <div className="bg-white rounded-3xl p-6 shadow-lg">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold text-slate-900">Product Statistic</h3>
-              <select className="px-3 py-1.5 rounded-xl border border-slate-200 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option>Today</option>
-                <option>Week</option>
-                <option>Month</option>
-              </select>
+              <h3 className="text-lg font-bold text-slate-900">Plan Distribution</h3>
             </div>
-            <p className="text-sm text-slate-600 mb-6">Track your product sales</p>
+            <p className="text-sm text-slate-600 mb-6">Active subscriptions by plan</p>
 
             <div className="flex items-center justify-center mb-6">
               {productStats.length > 0 ? (
                 <MultiCircularProgress
-                  data={productStats.slice(0, 3)}
-                  centerValue={totalCompanies.toLocaleString()}
-                  centerLabel="Total Companies"
+                  data={productStats.slice(0, 4)}
+                  centerValue={payingCompanies.toLocaleString()}
+                  centerLabel="Paying"
                 />
               ) : (
-                <MultiCircularProgress
-                  data={[
-                    { label: 'Starter', value: activeCompanies, color: '#3b82f6', percentage: 45 },
-                    { label: 'Pro', value: Math.floor(activeCompanies * 0.3), color: '#8b5cf6', percentage: 30 },
-                    { label: 'Enterprise', value: Math.floor(activeCompanies * 0.25), color: '#ec4899', percentage: 25 },
-                  ]}
-                  centerValue={totalCompanies.toLocaleString()}
-                  centerLabel="Total Companies"
-                />
+                <div className="h-[200px] w-full flex items-center justify-center text-sm text-slate-400 border border-dashed border-slate-200 rounded-xl">
+                  No paying subscriptions yet.
+                </div>
               )}
             </div>
           </div>
@@ -432,27 +417,40 @@ export default function EnhancedDashboard() {
             </div>
           </div>
 
-          {/* Upgrade Pro Card */}
-          <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 shadow-2xl relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10"></div>
-            <div className="absolute -right-8 -top-8 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl"></div>
-            <div className="absolute -left-8 -bottom-8 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl"></div>
-            
-            <div className="relative z-10">
-              <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center mb-6">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              
-              <h3 className="text-2xl font-bold text-white mb-3">Upgrade Pro</h3>
-              <p className="text-white/70 text-sm mb-6 leading-relaxed">
-                Discover the benefits of an upgraded account
-              </p>
-              
-              <button className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-2xl hover:scale-105">
-                Upgrade $30
-              </button>
+          {/* Finance Quick Links — replaces the old "Upgrade Pro" promo
+              card. These three pages are the new dynamic finance suite:
+              Costs (track what you spend), P&L (revenue minus costs), and
+              Calculator (what-if scenarios at N users on plan X). */}
+          <div className="bg-slate-900 rounded-3xl p-6 shadow-lg flex flex-col">
+            <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-4">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-white mb-1">Finance</h3>
+            <p className="text-white/60 text-xs mb-5">Track costs, profit & scenarios</p>
+            <div className="space-y-2 mt-auto">
+              <a
+                href="/costs"
+                className="flex items-center justify-between px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition-colors"
+              >
+                <span>Platform costs</span>
+                <span className="text-white/40">→</span>
+              </a>
+              <a
+                href="/pnl"
+                className="flex items-center justify-between px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition-colors"
+              >
+                <span>Profit & Loss</span>
+                <span className="text-white/40">→</span>
+              </a>
+              <a
+                href="/calculator"
+                className="flex items-center justify-between px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition-colors"
+              >
+                <span>Profit calculator</span>
+                <span className="text-white/40">→</span>
+              </a>
             </div>
           </div>
         </div>
