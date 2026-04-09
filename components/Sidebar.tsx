@@ -49,7 +49,9 @@ const groups: NavGroup[] = [
   {
     label: 'Growth',
     items: [
-      { href: '/leads', label: 'Leads & CRM', icon: <FiTrendingUp /> }
+      { href: '/leads', label: 'Leads & CRM', icon: <FiTrendingUp /> },
+      { href: '/marketing-leads', label: 'Marketing Leads', icon: <FiUsers /> },
+      { href: '/email-campaigns', label: 'Email Campaigns', icon: <FiFileText /> }
     ]
   },
   /*
@@ -71,6 +73,7 @@ const groups: NavGroup[] = [
     label: 'Finance',
     items: [
       { href: '/subscriptions', label: 'Subscriptions', icon: <FiCreditCard /> },
+      { href: '/all-invoices', label: 'All Invoices', icon: <FiFileText /> },
       { href: '/costs', label: 'Platform Costs', icon: <FiActivity /> },
       { href: '/pnl', label: 'Profit & Loss', icon: <FiTrendingUp /> },
       { href: '/calculator', label: 'Profit Calculator', icon: <FiPieChart /> }
