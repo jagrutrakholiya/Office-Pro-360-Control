@@ -21,7 +21,7 @@ export default function NotificationsPage() {
 								: 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-700'
 						}`}
 					>
-						🔔 Notification Center
+						 Notification Center
 					</button>
 					<button
 						onClick={() => setActiveTab('history')}
@@ -31,7 +31,7 @@ export default function NotificationsPage() {
 								: 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-700'
 						}`}
 					>
-						📜 History
+						 History
 					</button>
 					<button
 						onClick={() => setActiveTab('settings')}
@@ -41,7 +41,7 @@ export default function NotificationsPage() {
 								: 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-700'
 						}`}
 					>
-						⚙️ Settings
+						 Settings
 					</button>
 				</div>
 

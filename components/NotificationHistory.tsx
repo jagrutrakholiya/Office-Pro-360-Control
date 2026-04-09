@@ -187,16 +187,16 @@ export default function NotificationHistory() {
 
 	const getTypeIcon = (type: string) => {
 		const icons: Record<string, string> = {
-			task: '✅',
-			mention: '👤',
-			deadline: '📅',
-			milestone: '🏆',
-			comment: '💬',
-			approval: '✓',
+			task: '',
+			mention: '',
+			deadline: '',
+			milestone: '',
+			comment: '',
+			approval: '',
 			reminder: '⏰',
-			system: '⚙️',
+			system: '',
 		};
-		return icons[type] || '🔔';
+		return icons[type] || '';
 	};
 
 	const getPriorityColor = (priority: string) => {
@@ -252,7 +252,7 @@ export default function NotificationHistory() {
 			{/* Filters */}
 			<div className="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6">
 				<h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4">
-					🔍 Filters
+					 Filters
 				</h3>
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 					<div>
@@ -419,7 +419,7 @@ export default function NotificationHistory() {
 					</div>
 				) : notifications.length === 0 ? (
 					<div className="text-center p-12 bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700">
-						<div className="text-6xl mb-4">🔔</div>
+						<div className="text-6xl mb-4"></div>
 						<p className="text-xl font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
 							No notifications found
 						</p>
@@ -489,7 +489,7 @@ export default function NotificationHistory() {
 											className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
 											title="Unarchive"
 										>
-											📤
+											
 										</button>
 									) : (
 										<button
@@ -497,7 +497,7 @@ export default function NotificationHistory() {
 											className="p-2 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
 											title="Archive"
 										>
-											📥
+											
 										</button>
 									)}
 									<button
@@ -505,7 +505,7 @@ export default function NotificationHistory() {
 										className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
 										title="Delete"
 									>
-										🗑️
+										
 									</button>
 								</div>
 							</div>

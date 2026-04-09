@@ -150,16 +150,16 @@ export default function NotificationCenter() {
 
 	const getTypeIcon = (type: string) => {
 		const icons: Record<string, string> = {
-			task: '✅',
-			mention: '👤',
-			deadline: '📅',
-			milestone: '🏆',
-			comment: '💬',
-			approval: '✓',
+			task: '',
+			mention: '',
+			deadline: '',
+			milestone: '',
+			comment: '',
+			approval: '',
 			reminder: '⏰',
-			system: '⚙️',
+			system: '',
 		};
-		return icons[type] || '🔔';
+		return icons[type] || '';
 	};
 
 	const getPriorityColor = (priority: string) => {
@@ -230,7 +230,7 @@ export default function NotificationCenter() {
 						className="p-1 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/20 rounded transition-colors"
 						title="Mark as read"
 					>
-						✓
+						
 					</button>
 				)}
 				<button
@@ -238,7 +238,7 @@ export default function NotificationCenter() {
 					className="p-1 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded transition-colors"
 					title="Archive"
 				>
-					📥
+					
 				</button>
 			</div>
 		</div>
@@ -295,13 +295,13 @@ export default function NotificationCenter() {
 						onClick={archiveAllRead}
 						className="px-4 py-2 bg-neutral-200 dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-lg hover:bg-neutral-300 dark:hover:bg-neutral-600 transition-colors text-sm"
 					>
-						📥 Archive All Read
+						 Archive All Read
 					</button>
 					<button
 						onClick={clearAllRead}
 						className="px-4 py-2 bg-neutral-200 dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-lg hover:bg-neutral-300 dark:hover:bg-neutral-600 transition-colors text-sm"
 					>
-						🗑️ Clear All Read
+						 Clear All Read
 					</button>
 				</div>
 			)}
@@ -309,7 +309,7 @@ export default function NotificationCenter() {
 			{/* Notifications List */}
 			{!hasNotifications ? (
 				<div className="text-center p-12 bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700">
-					<div className="text-6xl mb-4">🔔</div>
+					<div className="text-6xl mb-4"></div>
 					<p className="text-xl font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
 						All caught up!
 					</p>
@@ -370,7 +370,7 @@ export default function NotificationCenter() {
 												className="p-1 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/20 rounded transition-colors"
 												title="Mark as read"
 											>
-												✓
+												
 											</button>
 										)}
 										<button
@@ -378,7 +378,7 @@ export default function NotificationCenter() {
 											className="p-1 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded transition-colors"
 											title="Archive"
 										>
-											📥
+											
 										</button>
 									</div>
 								</div>

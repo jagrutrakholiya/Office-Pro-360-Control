@@ -178,7 +178,7 @@ export default function AIInsightsWidget({ widgetId, config }: AIInsightsWidgetP
 			{/* Refresh Info */}
 			<div className="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-700">
 				<p className="text-xs text-center text-neutral-500 dark:text-neutral-400">
-					💡 AI insights are updated every 15 minutes
+					 AI insights are updated every 15 minutes
 				</p>
 			</div>
 		</div>

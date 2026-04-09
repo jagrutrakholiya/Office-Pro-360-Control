@@ -88,7 +88,7 @@ export default function CompanyAnalytics({ companyId }: CompanyAnalyticsProps) {
 		{
 			label: 'Total Users',
 			value: analytics.totalUsers,
-			icon: '👥',
+			icon: '',
 			color: 'bg-blue-500',
 			textColor: 'text-blue-600 dark:text-blue-400'
 		},
@@ -96,35 +96,35 @@ export default function CompanyAnalytics({ companyId }: CompanyAnalyticsProps) {
 			label: 'Active Users',
 			value: analytics.activeUsers,
 			subtitle: 'Last 7 days',
-			icon: '🟢',
+			icon: '',
 			color: 'bg-green-500',
 			textColor: 'text-green-600 dark:text-green-400'
 		},
 		{
 			label: 'Total Projects',
 			value: analytics.totalProjects,
-			icon: '📁',
+			icon: '',
 			color: 'bg-purple-500',
 			textColor: 'text-purple-600 dark:text-purple-400'
 		},
 		{
 			label: 'Total Tasks',
 			value: analytics.totalTasks,
-			icon: '📋',
+			icon: '',
 			color: 'bg-orange-500',
 			textColor: 'text-orange-600 dark:text-orange-400'
 		},
 		{
 			label: 'Completed Tasks',
 			value: analytics.completedTasks,
-			icon: '✅',
+			icon: '',
 			color: 'bg-emerald-500',
 			textColor: 'text-emerald-600 dark:text-emerald-400'
 		},
 		{
 			label: 'Completion Rate',
 			value: `${analytics.completionRate}%`,
-			icon: '📊',
+			icon: '',
 			color: 'bg-amber-500',
 			textColor: 'text-amber-600 dark:text-amber-400'
 		}
@@ -156,7 +156,7 @@ export default function CompanyAnalytics({ companyId }: CompanyAnalyticsProps) {
 						</>
 					) : (
 						<>
-							🔄 Refresh Analytics
+							 Refresh Analytics
 						</>
 					)}
 				</button>

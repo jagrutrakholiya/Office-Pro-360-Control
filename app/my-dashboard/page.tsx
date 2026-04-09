@@ -237,7 +237,7 @@ export default function UserDashboardPage() {
 			{isEditMode && (
 				<div className="fixed bottom-4 right-4 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg">
 					<p className="text-sm font-medium">
-						✏️ Edit Mode Active - Click widget buttons to configure or remove
+						 Edit Mode Active - Click widget buttons to configure or remove
 					</p>
 				</div>
 			)}

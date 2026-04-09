@@ -75,17 +75,17 @@ export default function CompanyActivityFeed({ companyId }: CompanyActivityFeedPr
 
 	const getActivityIcon = (resourceType: string): string => {
 		const icons: Record<string, string> = {
-			user: '👤',
-			project: '📁',
-			task: '✅',
-			department: '🏢',
-			division: '🏛️',
-			file: '📄',
-			comment: '💬',
-			invoice: '💰',
-			settings: '⚙️',
+			user: '',
+			project: '',
+			task: '',
+			department: '',
+			division: '',
+			file: '',
+			comment: '',
+			invoice: '',
+			settings: '',
 		};
-		return icons[resourceType] || '📌';
+		return icons[resourceType] || '';
 	};
 
 	const getActivityColor = (action: string): string => {

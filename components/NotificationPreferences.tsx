@@ -150,7 +150,7 @@ export default function NotificationPreferences() {
 			{/* Notification Channels */}
 			<div className="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6">
 				<h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4">
-					📢 Notification Channels
+					 Notification Channels
 				</h3>
 				<div className="space-y-3">
 					<label className="flex items-center justify-between p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors">
@@ -195,7 +195,7 @@ export default function NotificationPreferences() {
 			{/* Email Digest */}
 			<div className="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6">
 				<h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4">
-					📧 Email Digest
+					 Email Digest
 				</h3>
 				<div className="space-y-4">
 					<label className="flex items-center justify-between">
@@ -264,22 +264,22 @@ export default function NotificationPreferences() {
 			{/* Notification Types */}
 			<div className="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6">
 				<h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4">
-					🔔 Notification Types
+					 Notification Types
 				</h3>
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 					{[
-						{ key: 'taskAssigned', label: 'Task Assigned', icon: '✅' },
+						{ key: 'taskAssigned', label: 'Task Assigned', icon: '' },
 						{ key: 'taskDueSoon', label: 'Task Due Soon', icon: '⏰' },
-						{ key: 'taskCompleted', label: 'Task Completed', icon: '🎉' },
-						{ key: 'taskCommented', label: 'Task Comments', icon: '💬' },
-						{ key: 'taskMention', label: 'Mentions (@)', icon: '👤' },
-						{ key: 'projectUpdates', label: 'Project Updates', icon: '📁' },
-						{ key: 'deadlineReminders', label: 'Deadline Reminders', icon: '📅' },
-						{ key: 'milestoneReached', label: 'Milestones', icon: '🏆' },
-						{ key: 'leaveRequests', label: 'Leave Requests', icon: '🌴' },
-						{ key: 'approvalRequests', label: 'Approvals', icon: '✓' },
-						{ key: 'announcements', label: 'Announcements', icon: '📣' },
-						{ key: 'systemAlerts', label: 'System Alerts', icon: '⚠️' },
+						{ key: 'taskCompleted', label: 'Task Completed', icon: '' },
+						{ key: 'taskCommented', label: 'Task Comments', icon: '' },
+						{ key: 'taskMention', label: 'Mentions (@)', icon: '' },
+						{ key: 'projectUpdates', label: 'Project Updates', icon: '' },
+						{ key: 'deadlineReminders', label: 'Deadline Reminders', icon: '' },
+						{ key: 'milestoneReached', label: 'Milestones', icon: '' },
+						{ key: 'leaveRequests', label: 'Leave Requests', icon: '' },
+						{ key: 'approvalRequests', label: 'Approvals', icon: '' },
+						{ key: 'announcements', label: 'Announcements', icon: '' },
+						{ key: 'systemAlerts', label: 'System Alerts', icon: '' },
 					].map((type) => (
 						<label
 							key={type.key}
@@ -303,7 +303,7 @@ export default function NotificationPreferences() {
 			{/* Priority Filter */}
 			<div className="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6">
 				<h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4">
-					🎯 Priority Levels
+					 Priority Levels
 				</h3>
 				<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
 					Select which priority levels you want to receive
@@ -338,7 +338,7 @@ export default function NotificationPreferences() {
 			{/* Quiet Hours */}
 			<div className="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6">
 				<h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4">
-					🌙 Quiet Hours
+					 Quiet Hours
 				</h3>
 				<p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
 					Mute notifications during specific hours
