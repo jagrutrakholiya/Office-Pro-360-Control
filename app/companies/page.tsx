@@ -38,10 +38,11 @@ type CompanyUser = {
  createdAt: string;
 };
 
-type Service = { key: string; label: string; description: string };
+type Service = { key: string; label: string; description: string; category?: string };
 
-// Hardcoded service definitions — single source of truth (no API dependency)
-const ALL_SERVICES: Service[] = [
+// FALLBACK — only used if the API is unreachable. Real data comes from
+// GET /api/public/services which reads from backend/utils/services.js.
+const FALLBACK_SERVICES: Service[] = [
  // Core
  { key: 'tasks', label: 'Tasks', description: 'Task management, assignment, and tracking' },
  { key: 'calendar', label: 'Calendar', description: 'Events, schedules, and holiday calendar' },
@@ -109,7 +110,8 @@ const SERVICE_CATEGORIES: Record<string, string[]> = {
 
 export default function CompaniesPage() {
  const router = useRouter();
- const [availableServices] = useState<Service[]>(ALL_SERVICES);
+ const [availableServices, setAvailableServices] = useState<Service[]>(FALLBACK_SERVICES);
+ const [serviceCategories, setServiceCategories] = useState<Record<string, string[]>>(SERVICE_CATEGORIES);
  const [companies, setCompanies] = useState<Company[]>([]);
  const [plans, setPlans] = useState<Plan[]>([]);
  const [editingId, setEditingId] = useState<string | null>(null);
@@ -142,16 +144,27 @@ export default function CompaniesPage() {
  }
  }
 
+ async function loadServices() {
+ try {
+ const res = await api.get("/public/services");
+ if (res.data.services?.length > 0) setAvailableServices(res.data.services);
+ if (res.data.categories) setServiceCategories(res.data.categories);
+ } catch {
+ // Keep fallback
+ }
+ }
+
  useEffect(() => {
  loadCompanies();
  loadPlans();
+ loadServices();
  }, []);
 
  const getServicesByCategory = () => {
  const categorized: Record<string, Service[]> = {};
 
  availableServices.forEach((svc) => {
- for (const [category, keys] of Object.entries(SERVICE_CATEGORIES)) {
+ for (const [category, keys] of Object.entries(serviceCategories)) {
  if (keys.includes(svc.key)) {
  if (!categorized[category]) categorized[category] = [];
  categorized[category].push(svc);
