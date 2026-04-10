@@ -24,6 +24,8 @@ import api from "../../lib/api";
 type Plan = {
  code: string;
  name: string;
+ priceMonthly?: number;
+ priceYearly?: number;
  pricing: {
  model: string;
  baseMonthly: number;
