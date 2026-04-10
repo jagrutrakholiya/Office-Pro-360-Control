@@ -52,50 +52,12 @@ export default function EmailCampaignsPage() {
  };
 
  const loadTemplate = async () => {
- // The promotional template is generated in the emailLayout format
- // For now, use a simple HTML template with merge tags
- setForm({
- ...form,
- subject: "{{contactName}}, streamline {{companyName}} with OfficePro360",
- htmlBody: `<div style="font-family:system-ui,sans-serif;max-width:600px;margin:0 auto;padding:40px 20px">
- <h1 style="font-size:24px;font-weight:700;color:#0f172a;margin-bottom:16px">Hi {{contactName}},</h1>
-
- <p style="color:#475569;line-height:1.7;margin-bottom:20px">
- We noticed <b>{{companyName}}</b> might benefit from a modern workforce management platform.
- OfficePro360 replaces 5+ tools with one integrated solution.
- </p>
-
- <h2 style="font-size:18px;font-weight:600;color:#0f172a;margin-bottom:12px">What you get — FREE trial, full access:</h2>
-
- <table style="width:100%;border-collapse:collapse;margin-bottom:24px">
- <tr><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#334155"><b>HR & Employees</b></td><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#64748b">Directory, org chart, onboarding, offboarding</td></tr>
- <tr><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#334155"><b>Attendance</b></td><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#64748b">GPS clock-in/out, live tracking, shifts</td></tr>
- <tr><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#334155"><b>Payroll</b></td><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#64748b">Auto-generate, salary slips, tax</td></tr>
- <tr><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#334155"><b>Tasks & Projects</b></td><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#64748b">Kanban, sprints, timesheet</td></tr>
- <tr><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#334155"><b>GST Invoicing</b></td><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#64748b">CGST/SGST auto-split, HSN, PDF</td></tr>
- <tr><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#334155"><b>AI Assistant</b></td><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#64748b">Ask questions in plain English</td></tr>
- <tr><td style="padding:8px 12px;font-size:14px;color:#334155"><b>+ More</b></td><td style="padding:8px 12px;font-size:14px;color:#64748b">Expenses, docs, messaging, analytics</td></tr>
- </table>
-
- <h2 style="font-size:18px;font-weight:600;color:#0f172a;margin-bottom:12px">Pricing that scales:</h2>
- <p style="color:#475569;line-height:1.7;margin-bottom:4px">• <b>Free</b> — ₹0, 3 users, ALL features</p>
- <p style="color:#475569;line-height:1.7;margin-bottom:4px">• <b>Starter</b> — ₹199/mo, 10 users</p>
- <p style="color:#475569;line-height:1.7;margin-bottom:4px">• <b>Professional</b> — ₹499/mo, 25 users</p>
- <p style="color:#475569;line-height:1.7;margin-bottom:20px">• <b>Enterprise</b> — ₹999/mo, 50 users</p>
-
- <div style="text-align:center;margin:32px 0">
- <a href="https://officepro360.in/signup" style="background:#0f172a;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:600;font-size:16px;display:inline-block">Start Free Trial →</a>
- </div>
-
- <p style="color:#475569;line-height:1.7">Questions? Reply to this email — a real human responds.</p>
- <p style="color:#475569;line-height:1.7">Best,<br/><b>Team OfficePro360</b></p>
-
- <div style="margin-top:32px;padding-top:16px;border-top:1px solid #e2e8f0;font-size:11px;color:#9ca3af;text-align:center">
- You received this because we think OfficePro360 could help {{companyName}}.<br/>
- <a href="https://officepro360.in/unsubscribe?email={{email}}" style="color:#9ca3af">Unsubscribe</a>
- </div>
-</div>`,
- });
+ try {
+ const res = await api.get("/admin/campaigns/template");
+ setForm({ ...form, subject: res.data.subject, htmlBody: res.data.htmlBody });
+ } catch {
+ setForm({ ...form, subject: "{{contactName}}, manage {{companyName}} smarter with OfficePro360", htmlBody: "<p>Hi {{contactName}}, try OfficePro360 for {{companyName}}. Visit https://officepro360.in/signup</p>" });
+ }
  };
 
  const STATUS_COLORS: Record<string, string> = {
