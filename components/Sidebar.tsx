@@ -3,14 +3,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { FiBarChart2, FiDollarSign, FiHome, FiLayers, FiStar, FiBriefcase, FiHelpCircle, FiPieChart, FiUsers, FiFileText, FiTrendingUp, FiImage, FiVolume2, FiCreditCard, FiShield, FiActivity, FiHardDrive } from 'react-icons/fi';
+import { FiBarChart2, FiDollarSign, FiHome, FiLayers, FiStar, FiBriefcase, FiHelpCircle, FiPieChart, FiUsers, FiFileText, FiTrendingUp, FiImage, FiCreditCard, FiShield, FiActivity, FiHardDrive } from 'react-icons/fi';
 import { BsRobot, BsShieldCheck } from 'react-icons/bs';
 
 interface NavItem {
  href: string;
  label: string;
  icon: JSX.Element;
- description?: string;
 }
 
 interface NavGroup {
@@ -54,15 +53,6 @@ const groups: NavGroup[] = [
  { href: '/email-campaigns', label: 'Email Campaigns', icon: <FiFileText /> }
  ]
  },
- /*
- {
- label: 'Communication',
- items: [
- { href: '/announcements', label: 'Announcements', icon: <FiVolume2 /> },
- { href: '/polls', label: 'Polls & Surveys', icon: <FiPieChart /> }
- ]
- },
- */
  {
  label: 'Users & Access',
  items: [
@@ -98,13 +88,12 @@ const groups: NavGroup[] = [
  }
 ];
 
-export default function Sidebar() {
+function SidebarContent({ collapsed, onNavClick }: { collapsed: boolean; onNavClick?: () => void }) {
  const pathname = usePathname();
  const { user, logout } = useAuth();
- const [collapsed, setCollapsed] = useState(false);
 
  return (
- <aside className={`hidden lg:flex ${collapsed ? 'w-20' : 'w-72'} h-screen sticky top-0 transition-all duration-300 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-800 text-white flex-col border-r border-slate-800/50`}> 
+ <>
  {/* Brand / Collapse */}
  <div className="flex items-center justify-between px-5 py-6 border-b border-slate-800/60">
  {!collapsed && (
@@ -113,9 +102,6 @@ export default function Sidebar() {
  <div className="text-[10px] uppercase text-slate-500 mt-1">Control Panel</div>
  </div>
  )}
- <button onClick={()=> setCollapsed(c=> !c)} className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors" aria-label="Toggle sidebar">
- {collapsed ? '»' : '«'}
- </button>
  </div>
 
  {/* Navigation */}
@@ -127,7 +113,12 @@ export default function Sidebar() {
  {group.items.map(item => {
  const active = pathname === item.href;
  return (
- <Link key={item.href} href={item.href} className={`group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${active ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>
+ <Link
+ key={item.href}
+ href={item.href}
+ onClick={onNavClick}
+ className={`group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${active ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}
+ >
  <span className={`text-lg flex-shrink-0 ${active ? 'text-white' : 'text-slate-400 group-hover:text-slate-200'}`}>{item.icon}</span>
  {!collapsed && <span className="truncate flex-1">{item.label}</span>}
  </Link>
@@ -151,8 +142,31 @@ export default function Sidebar() {
  </div>
  </div>
  )}
- <button onClick={logout} className="w-full text-sm font-medium px-3 py-2 rounded-lg bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 transition-all shadow-md shadow-red-700/20"> {collapsed ? '' : 'Sign Out'}</button>
+ <button onClick={logout} className="w-full text-sm font-medium px-3 py-2 rounded-lg bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 transition-all shadow-md shadow-red-700/20">
+ {collapsed ? '' : 'Sign Out'}
+ </button>
+ </div>
+ </>
+ );
+}
+
+export default function Sidebar() {
+ const [collapsed, setCollapsed] = useState(false);
+
+ return (
+ <aside className={`hidden lg:flex ${collapsed ? 'w-20' : 'w-72'} h-screen sticky top-0 transition-all duration-300 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-800 text-white flex-col border-r border-slate-800/50`}>
+ <div className="flex flex-col h-full">
+ <div className="flex items-center justify-end px-3 pt-3">
+ <button onClick={() => setCollapsed(c => !c)} className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors" aria-label="Toggle sidebar">
+ {collapsed ? '»' : '«'}
+ </button>
+ </div>
+ <SidebarContent collapsed={collapsed} />
  </div>
  </aside>
  );
+}
+
+export function MobileSidebarContent({ onNavClick }: { onNavClick?: () => void }) {
+ return <SidebarContent collapsed={false} onNavClick={onNavClick} />;
 }

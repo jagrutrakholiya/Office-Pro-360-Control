@@ -69,7 +69,7 @@ export default function QuickActionsWidget({ widgetId, config }: QuickActionsWid
 				</svg>
 			),
 			color: 'bg-orange-600 hover:bg-orange-700',
-			onClick: () => router.push('/reports')
+			onClick: () => router.push('/marketing-stats')
 		}
 	];
 
