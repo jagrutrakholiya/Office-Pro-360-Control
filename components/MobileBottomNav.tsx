@@ -3,6 +3,7 @@
 import { useIsMobile } from 'lib/mobileUtils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '../context/AuthContext';
 
 interface NavItem {
  label: string;
@@ -14,6 +15,7 @@ interface NavItem {
 export default function MobileBottomNav() {
  const pathname = usePathname();
  const isMobile = useIsMobile();
+ const { user } = useAuth();
 
  const navItems: NavItem[] = [
  {
@@ -63,8 +65,8 @@ export default function MobileBottomNav() {
  }
  ];
 
- // Only show on mobile devices
- if (!isMobile) {
+ // Only show on mobile for authenticated users
+ if (!isMobile || !user) {
  return null;
  }
 

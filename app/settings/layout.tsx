@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "../../context/AuthContext";
 
 interface SettingsLayoutProps {
  children: React.ReactNode;
@@ -62,7 +63,26 @@ const settingsMenu = [
 
 export default function SettingsLayout({ children }: SettingsLayoutProps) {
  const pathname = usePathname();
+ const router = useRouter();
+ const { user, loading } = useAuth();
  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+ // Auth guard — redirect to login if not authenticated
+ if (loading) {
+ return (
+ <div className="min-h-screen flex items-center justify-center bg-gray-50">
+ <div className="flex flex-col items-center gap-4">
+ <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+ <div className="text-gray-600 font-medium">Checking authentication...</div>
+ </div>
+ </div>
+ );
+ }
+
+ if (!user) {
+ router.push("/login");
+ return null;
+ }
 
  const isActive = (href: string) => {
  return pathname === href;
@@ -73,7 +93,12 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
  {/* Header */}
  <div className="mb-8">
+ <div className="flex items-center gap-3 mb-1">
+ <button onClick={() => router.back()} className="p-1 rounded-md hover:bg-gray-200 text-gray-500">
+ <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+ </button>
  <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
+ </div>
  <p className="text-gray-600 mt-1">
  Manage your account settings and preferences
  </p>
