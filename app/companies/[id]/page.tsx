@@ -50,49 +50,7 @@ type HistoryEntry = {
 
 type Plan = { _id: string; name: string; code: string };
 
-const FEATURE_CATEGORIES: Record<string, string[]> = {
- Core: ["tasks", "calendar", "performance", "timesheet"],
- "Time & Attendance": ["attendance", "shifts", "overtime", "clock_logs"],
- HR: [
- "leave",
- "payroll",
- "holidays",
- "onboarding",
- "offboarding",
- "expenses",
- "invoices",
- "documents",
- "assets",
- ],
- Communication: [
- "chat",
- "messages",
- "announcements",
- "polls",
- "slack_integration",
- "whatsapp_integration",
- ],
- AI: [
- "ai_assistant",
- ],
- Management: [
- "users",
- "teams",
- "projects",
- "sprints",
- "reports",
- "analytics",
- "offices",
- ],
- Admin: [
- "roles",
- "statuses",
- "api_access",
- "audit_trail",
- "webhooks",
- "bulk_operations",
- ],
-};
+type ServiceEntry = { key: string; label: string; description?: string; category?: string };
 
 export default function CompanyDetailPage() {
  const params = useParams();
@@ -115,6 +73,7 @@ export default function CompanyDetailPage() {
  // Features tab state
  const [features, setFeatures] = useState<Record<string, boolean>>({});
  const [savingFeatures, setSavingFeatures] = useState(false);
+ const [availableServices, setAvailableServices] = useState<ServiceEntry[]>([]);
 
  // Limits tab state
  const [limits, setLimits] = useState({
@@ -150,10 +109,17 @@ export default function CompanyDetailPage() {
  } catch {}
  }
 
+ async function loadServices() {
+ try {
+ const res = await api.get("/public/services");
+ setAvailableServices(res.data.services || []);
+ } catch {}
+ }
+
  useEffect(() => {
  async function init() {
  setLoading(true);
- await Promise.all([loadCompany(), loadPlans()]);
+ await Promise.all([loadCompany(), loadPlans(), loadServices()]);
  setLoading(false);
  }
  init();
@@ -618,8 +584,14 @@ export default function CompanyDetailPage() {
  </div>
 
  <div className="space-y-8">
- {Object.entries(FEATURE_CATEGORIES).map(
- ([category, featureKeys]) => (
+ {(() => {
+ const grouped: Record<string, ServiceEntry[]> = {};
+ for (const svc of availableServices) {
+ const cat = svc.category || "Other";
+ if (!grouped[cat]) grouped[cat] = [];
+ grouped[cat].push(svc);
+ }
+ return Object.entries(grouped).map(([category, services]) => (
  <div key={category}>
  <div className="flex items-center gap-2 pb-3 border-b border-slate-200 mb-4">
  <div className="w-1 h-5 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full" />
@@ -628,22 +600,30 @@ export default function CompanyDetailPage() {
  </h4>
  </div>
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
- {featureKeys.map((key) => (
+ {services.map((svc) => (
  <label
- key={key}
+ key={svc.key}
  className="flex items-center justify-between p-3 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
+ title={svc.description || ""}
  >
- <span className="text-sm font-medium text-slate-700 capitalize">
- {key.replace(/_/g, " ")}
- </span>
- <div className="relative">
+ <div className="flex-1 min-w-0">
+ <div className="text-sm font-medium text-slate-700 truncate">
+ {svc.label}
+ </div>
+ {svc.description && (
+ <div className="text-[11px] text-slate-500 truncate">
+ {svc.description}
+ </div>
+ )}
+ </div>
+ <div className="relative ml-3 flex-shrink-0">
  <input
  type="checkbox"
- checked={!!features[key]}
+ checked={!!features[svc.key]}
  onChange={(e) =>
  setFeatures({
  ...features,
- [key]: e.target.checked,
+ [svc.key]: e.target.checked,
  })
  }
  className="sr-only peer"
@@ -655,8 +635,8 @@ export default function CompanyDetailPage() {
  ))}
  </div>
  </div>
- )
- )}
+ ));
+ })()}
  </div>
  </section>
  </div>
