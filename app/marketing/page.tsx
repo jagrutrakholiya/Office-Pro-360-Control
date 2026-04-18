@@ -15,6 +15,7 @@ import {
  industryAPI,
  useCaseAPI,
  helpArticleAPI,
+ comparisonAPI,
 } from "@/lib/marketingAPI";
 import {
  FaFileAlt,
@@ -31,6 +32,7 @@ import {
  FaBuilding,
  FaClipboardList,
  FaQuestionCircle,
+ FaBalanceScale,
 } from "react-icons/fa";
 
 interface ContentStats {
@@ -45,6 +47,7 @@ interface ContentStats {
  industries: number;
  useCases: number;
  helpArticles: number;
+ comparisons: number;
 }
 
 export default function MarketingDashboard() {
@@ -60,6 +63,7 @@ export default function MarketingDashboard() {
  industries: 0,
  useCases: 0,
  helpArticles: 0,
+ comparisons: 0,
  });
  const [loading, setLoading] = useState(true);
 
@@ -69,7 +73,7 @@ export default function MarketingDashboard() {
 
  const loadStats = async () => {
  try {
- const [pages, caseStudies, team, careers, tutorials, whitepapers, webinars, solutions, industries, useCases, helpArticles] = await Promise.all([
+ const [pages, caseStudies, team, careers, tutorials, whitepapers, webinars, solutions, industries, useCases, helpArticles, comparisons] = await Promise.all([
  pageContentAPI.list(),
  caseStudyAPI.list(),
  teamAPI.list(),
@@ -81,6 +85,7 @@ export default function MarketingDashboard() {
  industryAPI.list(),
  useCaseAPI.list(),
  helpArticleAPI.list(),
+ comparisonAPI.list(),
  ]);
 
  setStats({
@@ -95,6 +100,7 @@ export default function MarketingDashboard() {
  industries: industries.length,
  useCases: useCases.length,
  helpArticles: helpArticles.length,
+ comparisons: comparisons.length,
  });
  } catch (error) {
  console.error("Failed to load stats:", error);
@@ -192,12 +198,20 @@ export default function MarketingDashboard() {
  color: "bg-rose-500",
  description: "Help center documentation",
  },
+ {
+ name: "Comparisons",
+ count: stats.comparisons,
+ icon: FaBalanceScale,
+ href: "/marketing/comparisons",
+ color: "bg-slate-600",
+ description: "vs-competitor pages (Keka, Zoho, etc.)",
+ },
  ];
 
  const quickActions = [
  { label: "Add Solution", href: "/marketing/solutions/new", icon: FaLightbulb },
  { label: "Add Industry", href: "/marketing/industries/new", icon: FaBuilding },
- { label: "Add Use Case", href: "/marketing/use-cases/new", icon: FaClipboardList },
+ { label: "Add Comparison", href: "/marketing/comparisons/new", icon: FaBalanceScale },
  { label: "Add Help Article", href: "/marketing/help-articles/new", icon: FaQuestionCircle },
  ];
 

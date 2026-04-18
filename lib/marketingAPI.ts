@@ -622,6 +622,63 @@ export const helpArticleAPI = {
   },
 };
 
+// ==================== COMPARISONS ADMIN ====================
+
+export interface ComparisonRow {
+  feature: string;
+  us: string; // "yes" | "no" | "partial" | "custom"
+  competitor: string;
+  usNote?: string;
+  competitorNote?: string;
+}
+
+export interface Comparison {
+  _id?: string;
+  slug: string;
+  competitorName: string;
+  pageType: "versus" | "alternative";
+  hero: {
+    badge?: string;
+    title?: string;
+    titleHighlight?: string;
+    description?: string;
+  };
+  features: ComparisonRow[];
+  us: { pros: string[]; cons: string[] };
+  competitor: { pros: string[]; cons: string[] };
+  pricing: {
+    usHeadline?: string;
+    usNote?: string;
+    competitorHeadline?: string;
+    competitorNote?: string;
+  };
+  verdictTitle?: string;
+  verdict?: string;
+  seo: { title: string; description: string; keywords: string[] };
+  status: "draft" | "published" | "archived";
+  order: number;
+  featured: boolean;
+}
+
+export const comparisonAPI = {
+  list: async () => {
+    const response = await api.get(`${API_BASE}/admin/comparisons`, { headers: getAuthHeaders() });
+    return response.data as Comparison[];
+  },
+  create: async (data: Omit<Comparison, "_id">) => {
+    const response = await api.post(`${API_BASE}/admin/comparisons`, data, { headers: getAuthHeaders() });
+    return response.data as Comparison;
+  },
+  update: async (id: string, data: Partial<Comparison>) => {
+    const response = await api.put(`${API_BASE}/admin/comparisons/${id}`, data, { headers: getAuthHeaders() });
+    return response.data as Comparison;
+  },
+  delete: async (id: string) => {
+    const response = await api.delete(`${API_BASE}/admin/comparisons/${id}`, { headers: getAuthHeaders() });
+    return response.data;
+  },
+};
+
 // ==================== MARKETING STATS ADMIN ====================
 
 export interface MarketingStats {
