@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Layout from "../../../components/Layout";
+import { useToast } from "../../../components/ui/Toast";
 import { webinarAPI, Webinar } from "@/lib/marketingAPI";
 import { FaPlus, FaEdit, FaTrash, FaVideo, FaStar, FaUsers } from "react-icons/fa";
 
 export default function WebinarsManagement() {
+ const toast = useToast();
  const [webinars, setWebinars] = useState<Webinar[]>([]);
  const [loading, setLoading] = useState(true);
 
@@ -21,6 +23,7 @@ export default function WebinarsManagement() {
  setWebinars(data);
  } catch (error) {
  console.error("Failed to load webinars:", error);
+ toast.error("Failed to load webinars");
  } finally {
  setLoading(false);
  }
@@ -30,10 +33,10 @@ export default function WebinarsManagement() {
  if (!confirm(`Delete "${title}"?`)) return;
  try {
  await webinarAPI.delete(id);
- alert("Webinar deleted");
+ toast.success("Webinar deleted");
  loadWebinars();
  } catch (error) {
- alert("Failed to delete");
+ toast.error("Failed to delete webinar");
  }
  };
 

@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Layout from "../../../components/Layout";
+import { useToast } from "../../../components/ui/Toast";
 import { teamAPI, TeamMember } from "@/lib/marketingAPI";
 import { FaPlus, FaEdit, FaTrash, FaUsers, FaStar } from "react-icons/fa";
 
 export default function TeamManagement() {
+ const toast = useToast();
  const [members, setMembers] = useState<TeamMember[]>([]);
  const [loading, setLoading] = useState(true);
  const [filter, setFilter] = useState<string>("all");
@@ -22,7 +24,7 @@ export default function TeamManagement() {
  setMembers(data);
  } catch (error) {
  console.error("Failed to load team members:", error);
- alert("Failed to load team members. Please try again.");
+ toast.error("Failed to load team members");
  } finally {
  setLoading(false);
  }
@@ -33,11 +35,11 @@ export default function TeamManagement() {
 
  try {
  await teamAPI.delete(id);
- alert("Team member deleted successfully");
+ toast.success("Team member deleted");
  loadMembers();
  } catch (error) {
  console.error("Failed to delete team member:", error);
- alert("Failed to delete team member. Please try again.");
+ toast.error("Failed to delete team member");
  }
  };
 

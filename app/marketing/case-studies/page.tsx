@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Layout from "../../../components/Layout";
+import { useToast } from "../../../components/ui/Toast";
 import { caseStudyAPI, CaseStudy } from "@/lib/marketingAPI";
 import { FaPlus, FaEdit, FaTrash, FaChartLine, FaStar, FaEye } from "react-icons/fa";
 
 export default function CaseStudiesManagement() {
+ const toast = useToast();
  const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
  const [loading, setLoading] = useState(true);
  const [filter, setFilter] = useState<string>("all");
@@ -22,7 +24,7 @@ export default function CaseStudiesManagement() {
  setCaseStudies(data);
  } catch (error) {
  console.error("Failed to load case studies:", error);
- alert("Failed to load case studies. Please try again.");
+ toast.error("Failed to load case studies");
  } finally {
  setLoading(false);
  }
@@ -33,11 +35,11 @@ export default function CaseStudiesManagement() {
 
  try {
  await caseStudyAPI.delete(id);
- alert("Case study deleted successfully");
+ toast.success("Case study deleted");
  loadCaseStudies();
  } catch (error) {
  console.error("Failed to delete case study:", error);
- alert("Failed to delete case study. Please try again.");
+ toast.error("Failed to delete case study");
  }
  };
 

@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Layout from "../../../components/Layout";
+import { useToast } from "../../../components/ui/Toast";
 import { tutorialAPI, Tutorial } from "@/lib/marketingAPI";
 import { FaPlus, FaEdit, FaTrash, FaBook, FaStar, FaEye } from "react-icons/fa";
 
 export default function TutorialsManagement() {
+ const toast = useToast();
  const [tutorials, setTutorials] = useState<Tutorial[]>([]);
  const [loading, setLoading] = useState(true);
 
@@ -21,6 +23,7 @@ export default function TutorialsManagement() {
  setTutorials(data);
  } catch (error) {
  console.error("Failed to load tutorials:", error);
+ toast.error("Failed to load tutorials");
  } finally {
  setLoading(false);
  }
@@ -30,10 +33,10 @@ export default function TutorialsManagement() {
  if (!confirm(`Delete "${title}"?`)) return;
  try {
  await tutorialAPI.delete(id);
- alert("Tutorial deleted");
+ toast.success("Tutorial deleted");
  loadTutorials();
  } catch (error) {
- alert("Failed to delete");
+ toast.error("Failed to delete tutorial");
  }
  };
 

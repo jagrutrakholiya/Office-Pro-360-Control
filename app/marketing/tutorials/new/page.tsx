@@ -4,11 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Layout from "../../../../components/Layout";
 import FirebaseImageUpload from "../../../../components/FirebaseImageUpload";
+import RichTextEditor from "../../../../components/RichTextEditor";
+import { useToast } from "../../../../components/ui/Toast";
 import { tutorialAPI, Tutorial } from "@/lib/marketingAPI";
 import { FaSave, FaArrowLeft, FaPlus, FaTrash } from "react-icons/fa";
 
 export default function NewTutorial() {
  const router = useRouter();
+ const toast = useToast();
  const [loading, setLoading] = useState(false);
  const [formData, setFormData] = useState<Omit<Tutorial, '_id' | 'slug'>>({
  title: "",
@@ -27,18 +30,18 @@ export default function NewTutorial() {
  const handleSubmit = async (e: React.FormEvent) => {
  e.preventDefault();
  if (!formData.title || !formData.category) {
- alert("Please fill in required fields");
+ toast.warning("Please fill in required fields");
  return;
  }
 
  setLoading(true);
  try {
  await tutorialAPI.create(formData);
- alert("Tutorial created successfully!");
+ toast.success("Tutorial created");
  router.push("/marketing/tutorials");
  } catch (error) {
  console.error("Failed to create tutorial:", error);
- alert("Failed to create tutorial");
+ toast.error("Failed to create tutorial");
  } finally {
  setLoading(false);
  }
@@ -203,16 +206,12 @@ export default function NewTutorial() {
  {/* Content */}
  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
  <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Full Content</h2>
- 
- <div>
- <textarea
+ <RichTextEditor
  value={formData.content}
- onChange={(e) => setFormData({ ...formData, content: e.target.value })}
- rows={8}
- className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+ onChange={(html) => setFormData({ ...formData, content: html })}
  placeholder="Write the complete tutorial content here..."
+ minHeight={300}
  />
- </div>
  </div>
 
  {/* Steps */}

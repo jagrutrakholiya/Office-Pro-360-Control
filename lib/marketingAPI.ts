@@ -420,6 +420,208 @@ export const webinarAPI = {
   },
 };
 
+// ==================== SOLUTIONS ADMIN ====================
+
+export interface SolutionFeature {
+  icon?: string;
+  title: string;
+  description: string;
+  color?: string;
+}
+
+export interface SolutionMetric {
+  value: string;
+  label: string;
+}
+
+export interface Solution {
+  _id?: string;
+  slug: string;
+  name: string;
+  hero: {
+    badge?: string;
+    icon?: string;
+    title?: string;
+    titleHighlight?: string;
+    description?: string;
+    primaryCta?: { text: string; link: string };
+    secondaryCta?: { text: string; link: string };
+  };
+  featuresTitle?: string;
+  featuresDescription?: string;
+  features: SolutionFeature[];
+  metrics: SolutionMetric[];
+  seo: { title: string; description: string; keywords: string[] };
+  status: "draft" | "published" | "archived";
+  order: number;
+  featured: boolean;
+}
+
+export const solutionAPI = {
+  list: async () => {
+    const response = await api.get(`${API_BASE}/admin/solutions`, { headers: getAuthHeaders() });
+    return response.data as Solution[];
+  },
+  create: async (data: Omit<Solution, "_id">) => {
+    const response = await api.post(`${API_BASE}/admin/solutions`, data, { headers: getAuthHeaders() });
+    return response.data as Solution;
+  },
+  update: async (id: string, data: Partial<Solution>) => {
+    const response = await api.put(`${API_BASE}/admin/solutions/${id}`, data, { headers: getAuthHeaders() });
+    return response.data as Solution;
+  },
+  delete: async (id: string) => {
+    const response = await api.delete(`${API_BASE}/admin/solutions/${id}`, { headers: getAuthHeaders() });
+    return response.data;
+  },
+};
+
+// ==================== INDUSTRIES ADMIN ====================
+
+export interface IndustryBenefit {
+  icon?: string;
+  title: string;
+  description: string;
+  color?: string;
+}
+
+export interface IndustryStat {
+  value: string;
+  label: string;
+}
+
+export interface Industry {
+  _id?: string;
+  slug: string;
+  name: string;
+  hero: {
+    badge?: string;
+    icon?: string;
+    title?: string;
+    titleHighlight?: string;
+    description?: string;
+    primaryCta?: { text: string; link: string };
+    secondaryCta?: { text: string; link: string };
+  };
+  benefitsTitle?: string;
+  benefitsDescription?: string;
+  benefits: IndustryBenefit[];
+  stats: IndustryStat[];
+  seo: { title: string; description: string; keywords: string[] };
+  status: "draft" | "published" | "archived";
+  order: number;
+  featured: boolean;
+}
+
+export const industryAPI = {
+  list: async () => {
+    const response = await api.get(`${API_BASE}/admin/industries`, { headers: getAuthHeaders() });
+    return response.data as Industry[];
+  },
+  create: async (data: Omit<Industry, "_id">) => {
+    const response = await api.post(`${API_BASE}/admin/industries`, data, { headers: getAuthHeaders() });
+    return response.data as Industry;
+  },
+  update: async (id: string, data: Partial<Industry>) => {
+    const response = await api.put(`${API_BASE}/admin/industries/${id}`, data, { headers: getAuthHeaders() });
+    return response.data as Industry;
+  },
+  delete: async (id: string) => {
+    const response = await api.delete(`${API_BASE}/admin/industries/${id}`, { headers: getAuthHeaders() });
+    return response.data;
+  },
+};
+
+// ==================== USE CASES ADMIN ====================
+
+export interface UseCaseStep {
+  title: string;
+  description: string;
+}
+
+export interface UseCase {
+  _id?: string;
+  slug: string;
+  title: string;
+  category: string;
+  icon?: string;
+  color?: string;
+  summary?: string;
+  problem?: string;
+  solution?: string;
+  outcome?: string;
+  steps: UseCaseStep[];
+  image?: string;
+  seo: { title: string; description: string; keywords: string[] };
+  status: "draft" | "published" | "archived";
+  order: number;
+  featured: boolean;
+}
+
+export const useCaseAPI = {
+  list: async (filters?: { status?: string; category?: string }) => {
+    const response = await api.get(`${API_BASE}/admin/use-cases`, {
+      params: filters,
+      headers: getAuthHeaders(),
+    });
+    return response.data as UseCase[];
+  },
+  create: async (data: Omit<UseCase, "_id">) => {
+    const response = await api.post(`${API_BASE}/admin/use-cases`, data, { headers: getAuthHeaders() });
+    return response.data as UseCase;
+  },
+  update: async (id: string, data: Partial<UseCase>) => {
+    const response = await api.put(`${API_BASE}/admin/use-cases/${id}`, data, { headers: getAuthHeaders() });
+    return response.data as UseCase;
+  },
+  delete: async (id: string) => {
+    const response = await api.delete(`${API_BASE}/admin/use-cases/${id}`, { headers: getAuthHeaders() });
+    return response.data;
+  },
+};
+
+// ==================== HELP ARTICLES ADMIN ====================
+
+export interface HelpArticle {
+  _id?: string;
+  slug: string;
+  title: string;
+  category: string;
+  icon?: string;
+  excerpt?: string;
+  content?: string;
+  tags: string[];
+  views?: number;
+  helpful?: number;
+  notHelpful?: number;
+  seo: { title: string; description: string; keywords: string[] };
+  status: "draft" | "published" | "archived";
+  order: number;
+  featured: boolean;
+}
+
+export const helpArticleAPI = {
+  list: async (filters?: { status?: string; category?: string }) => {
+    const response = await api.get(`${API_BASE}/admin/help-articles`, {
+      params: filters,
+      headers: getAuthHeaders(),
+    });
+    return response.data as HelpArticle[];
+  },
+  create: async (data: Omit<HelpArticle, "_id">) => {
+    const response = await api.post(`${API_BASE}/admin/help-articles`, data, { headers: getAuthHeaders() });
+    return response.data as HelpArticle;
+  },
+  update: async (id: string, data: Partial<HelpArticle>) => {
+    const response = await api.put(`${API_BASE}/admin/help-articles/${id}`, data, { headers: getAuthHeaders() });
+    return response.data as HelpArticle;
+  },
+  delete: async (id: string) => {
+    const response = await api.delete(`${API_BASE}/admin/help-articles/${id}`, { headers: getAuthHeaders() });
+    return response.data;
+  },
+};
+
 // ==================== MARKETING STATS ADMIN ====================
 
 export interface MarketingStats {

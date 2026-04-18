@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Layout from "../../../components/Layout";
+import { useToast } from "../../../components/ui/Toast";
 import { pageContentAPI, PageContent } from "@/lib/marketingAPI";
 import { FaPlus, FaEdit, FaTrash, FaFileAlt, FaEye } from "react-icons/fa";
 
 export default function PagesManagement() {
+ const toast = useToast();
  const [pages, setPages] = useState<PageContent[]>([]);
  const [loading, setLoading] = useState(true);
 
@@ -21,6 +23,7 @@ export default function PagesManagement() {
  setPages(data);
  } catch (error) {
  console.error("Failed to load pages:", error);
+ toast.error("Failed to load pages");
  } finally {
  setLoading(false);
  }
@@ -30,10 +33,10 @@ export default function PagesManagement() {
  if (!confirm(`Delete "${pageName}"?`)) return;
  try {
  await pageContentAPI.delete(id);
- alert("Page deleted");
+ toast.success("Page deleted");
  loadPages();
  } catch (error) {
- alert("Failed to delete");
+ toast.error("Failed to delete page");
  }
  };
 

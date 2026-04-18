@@ -4,11 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Layout from "../../../../components/Layout";
 import FirebaseImageUpload from "../../../../components/FirebaseImageUpload";
+import { useToast } from "../../../../components/ui/Toast";
 import { whitepaperAPI, Whitepaper } from "@/lib/marketingAPI";
 import { FaSave, FaArrowLeft, FaPlus, FaTrash } from "react-icons/fa";
 
 export default function NewWhitepaper() {
  const router = useRouter();
+ const toast = useToast();
  const [loading, setLoading] = useState(false);
  const [formData, setFormData] = useState<Omit<Whitepaper, '_id' | 'slug'>>({
  title: "",
@@ -33,18 +35,18 @@ export default function NewWhitepaper() {
  const handleSubmit = async (e: React.FormEvent) => {
  e.preventDefault();
  if (!formData.title || !formData.category) {
- alert("Please fill in required fields");
+ toast.warning("Please fill in required fields");
  return;
  }
 
  setLoading(true);
  try {
  await whitepaperAPI.create(formData);
- alert("Whitepaper created successfully!");
+ toast.success("Whitepaper created");
  router.push("/marketing/whitepapers");
  } catch (error) {
  console.error("Failed to create whitepaper:", error);
- alert("Failed to create whitepaper");
+ toast.error("Failed to create whitepaper");
  } finally {
  setLoading(false);
  }

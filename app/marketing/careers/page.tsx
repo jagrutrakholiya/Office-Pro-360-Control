@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Layout from "../../../components/Layout";
+import { useToast } from "../../../components/ui/Toast";
 import { careerAPI, JobOpening } from "@/lib/marketingAPI";
 import { FaPlus, FaEdit, FaTrash, FaBriefcase, FaMapMarkerAlt, FaClock, FaStar } from "react-icons/fa";
 
 export default function CareersManagement() {
+ const toast = useToast();
  const [jobs, setJobs] = useState<JobOpening[]>([]);
  const [loading, setLoading] = useState(true);
  const [filter, setFilter] = useState<string>("all");
@@ -22,7 +24,7 @@ export default function CareersManagement() {
  setJobs(data);
  } catch (error) {
  console.error("Failed to load jobs:", error);
- alert("Failed to load jobs. Please try again.");
+ toast.error("Failed to load jobs");
  } finally {
  setLoading(false);
  }
@@ -33,11 +35,11 @@ export default function CareersManagement() {
 
  try {
  await careerAPI.delete(id);
- alert("Job deleted successfully");
+ toast.success("Job deleted");
  loadJobs();
  } catch (error) {
  console.error("Failed to delete job:", error);
- alert("Failed to delete job. Please try again.");
+ toast.error("Failed to delete job");
  }
  };
 

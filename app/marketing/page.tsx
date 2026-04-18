@@ -11,6 +11,10 @@ import {
  tutorialAPI,
  whitepaperAPI,
  webinarAPI,
+ solutionAPI,
+ industryAPI,
+ useCaseAPI,
+ helpArticleAPI,
 } from "@/lib/marketingAPI";
 import {
  FaFileAlt,
@@ -23,6 +27,10 @@ import {
  FaStar,
  FaEye,
  FaDownload,
+ FaLightbulb,
+ FaBuilding,
+ FaClipboardList,
+ FaQuestionCircle,
 } from "react-icons/fa";
 
 interface ContentStats {
@@ -33,6 +41,10 @@ interface ContentStats {
  tutorials: number;
  whitepapers: number;
  webinars: number;
+ solutions: number;
+ industries: number;
+ useCases: number;
+ helpArticles: number;
 }
 
 export default function MarketingDashboard() {
@@ -44,6 +56,10 @@ export default function MarketingDashboard() {
  tutorials: 0,
  whitepapers: 0,
  webinars: 0,
+ solutions: 0,
+ industries: 0,
+ useCases: 0,
+ helpArticles: 0,
  });
  const [loading, setLoading] = useState(true);
 
@@ -53,7 +69,7 @@ export default function MarketingDashboard() {
 
  const loadStats = async () => {
  try {
- const [pages, caseStudies, team, careers, tutorials, whitepapers, webinars] = await Promise.all([
+ const [pages, caseStudies, team, careers, tutorials, whitepapers, webinars, solutions, industries, useCases, helpArticles] = await Promise.all([
  pageContentAPI.list(),
  caseStudyAPI.list(),
  teamAPI.list(),
@@ -61,6 +77,10 @@ export default function MarketingDashboard() {
  tutorialAPI.list(),
  whitepaperAPI.list(),
  webinarAPI.list(),
+ solutionAPI.list(),
+ industryAPI.list(),
+ useCaseAPI.list(),
+ helpArticleAPI.list(),
  ]);
 
  setStats({
@@ -71,6 +91,10 @@ export default function MarketingDashboard() {
  tutorials: tutorials.length,
  whitepapers: whitepapers.length,
  webinars: webinars.length,
+ solutions: solutions.length,
+ industries: industries.length,
+ useCases: useCases.length,
+ helpArticles: helpArticles.length,
  });
  } catch (error) {
  console.error("Failed to load stats:", error);
@@ -136,13 +160,45 @@ export default function MarketingDashboard() {
  color: "bg-red-500",
  description: "Training sessions",
  },
+ {
+ name: "Solutions",
+ count: stats.solutions,
+ icon: FaLightbulb,
+ href: "/marketing/solutions",
+ color: "bg-indigo-500",
+ description: "Solution pages (HR, Payroll, etc.)",
+ },
+ {
+ name: "Industries",
+ count: stats.industries,
+ icon: FaBuilding,
+ href: "/marketing/industries",
+ color: "bg-teal-500",
+ description: "Industry-specific pages",
+ },
+ {
+ name: "Use Cases",
+ count: stats.useCases,
+ icon: FaClipboardList,
+ href: "/marketing/use-cases",
+ color: "bg-amber-500",
+ description: "Customer workflows & scenarios",
+ },
+ {
+ name: "Help Articles",
+ count: stats.helpArticles,
+ icon: FaQuestionCircle,
+ href: "/marketing/help-articles",
+ color: "bg-rose-500",
+ description: "Help center documentation",
+ },
  ];
 
  const quickActions = [
- { label: "Create Page Content", href: "/marketing/pages/new", icon: FaFileAlt },
- { label: "Add Case Study", href: "/marketing/case-studies/new", icon: FaChartLine },
- { label: "Add Team Member", href: "/marketing/team/new", icon: FaUsers },
- { label: "Post Job Opening", href: "/marketing/careers/new", icon: FaBriefcase },
+ { label: "Add Solution", href: "/marketing/solutions/new", icon: FaLightbulb },
+ { label: "Add Industry", href: "/marketing/industries/new", icon: FaBuilding },
+ { label: "Add Use Case", href: "/marketing/use-cases/new", icon: FaClipboardList },
+ { label: "Add Help Article", href: "/marketing/help-articles/new", icon: FaQuestionCircle },
  ];
 
  if (loading) {

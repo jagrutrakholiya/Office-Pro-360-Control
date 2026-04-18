@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState, useCallback, useRef } from "react";
 import Layout from "../../components/Layout";
+import PageHeader from "../../components/ui/PageHeader";
+import { useToast } from "../../components/ui/Toast";
 import api from "../../lib/api";
 
 const STATUS_COLORS: Record<string, string> = {
@@ -11,6 +13,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function MarketingLeadsPage() {
+ const toast = useToast();
  const [leads, setLeads] = useState<any[]>([]);
  const [stats, setStats] = useState<any>(null);
  const [loading, setLoading] = useState(true);
@@ -49,11 +52,12 @@ export default function MarketingLeadsPage() {
  setSaving(true);
  try {
  await api.post("/admin/leads", form);
+ toast.success("Lead added");
  setShowAdd(false);
  setForm({ companyName: "", contactName: "", email: "", phone: "", industry: "", city: "" });
  await load();
  } catch (err: any) {
- alert(err?.response?.data?.message || "Failed");
+ toast.error("Failed to add lead", err?.response?.data?.message);
  } finally { setSaving(false); }
  };
 
@@ -63,7 +67,7 @@ export default function MarketingLeadsPage() {
  try {
  // Parse CSV text → array of objects
  const lines = importData.trim().split("\n");
- if (lines.length < 2) { alert("Need header row + at least one data row"); setSaving(false); return; }
+ if (lines.length < 2) { toast.warning("Need header row + at least one data row"); setSaving(false); return; }
  const headers = lines[0].split(",").map((h) => h.trim().toLowerCase());
  const rows = lines.slice(1).map((line) => {
  const vals = line.split(",").map((v) => v.trim());
@@ -81,37 +85,48 @@ export default function MarketingLeadsPage() {
 
  const res = await api.post("/admin/leads/import", { leads: rows });
  setImportResult(res.data);
+ toast.success(`Imported ${res.data?.imported ?? 0} leads`);
  await load();
  } catch (err: any) {
- alert(err?.response?.data?.message || "Import failed");
+ toast.error("Import failed", err?.response?.data?.message);
  } finally { setSaving(false); }
  };
 
  const updateStatus = async (id: string, status: string) => {
+ try {
  await api.patch(`/admin/leads/${id}`, { status });
+ toast.success("Status updated");
  await load();
+ } catch {
+ toast.error("Failed to update status");
+ }
  };
 
  const deleteLead = async (id: string) => {
  if (!confirm("Delete this lead?")) return;
+ try {
  await api.delete(`/admin/leads/${id}`);
+ toast.success("Lead deleted");
  await load();
+ } catch {
+ toast.error("Failed to delete lead");
+ }
  };
 
  const totalPages = Math.max(1, Math.ceil(total / 30));
 
  return (
  <Layout>
- <div className="mb-6 flex items-end justify-between">
- <div>
- <h1 className="text-2xl font-bold text-slate-900">Marketing Leads</h1>
- <p className="text-sm text-slate-600 mt-1">Import companies, manage leads, and send promotional campaigns.</p>
- </div>
+ <PageHeader
+ title="Marketing Leads"
+ description="Import companies, manage leads, and send promotional campaigns."
+ actions={
  <div className="flex gap-2">
- <button onClick={() => setShowImport(true)} className="px-4 py-2 text-sm font-medium rounded-md border border-slate-300 hover:bg-slate-50">Import CSV</button>
- <button onClick={() => setShowAdd(true)} className="px-4 py-2 text-sm font-medium rounded-md bg-slate-900 text-white hover:bg-slate-800">+ Add Lead</button>
+ <button onClick={() => setShowImport(true)} className="px-4 py-2 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">Import CSV</button>
+ <button onClick={() => setShowAdd(true)} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">+ Add Lead</button>
  </div>
- </div>
+ }
+ />
 
  {/* Stats */}
  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -204,8 +219,24 @@ export default function MarketingLeadsPage() {
  {showImport && (
  <Modal title="Import Leads from CSV" onClose={() => { setShowImport(false); setImportResult(null); }}>
  <p className="text-xs text-slate-500 mb-3">
- Paste CSV with headers: <code className="bg-slate-100 px-1 rounded">companyName,contactName,email,phone,industry,city</code>
+ Upload a .csv file or paste CSV with headers: <code className="bg-slate-100 px-1 rounded">companyName,contactName,email,phone,industry,city</code>
  </p>
+ <div className="mb-3">
+ <input
+ type="file"
+ accept=".csv,text/csv"
+ onChange={(e) => {
+ const file = e.target.files?.[0];
+ if (!file) return;
+ const reader = new FileReader();
+ reader.onload = (evt) => {
+ setImportData(String(evt.target?.result || ""));
+ };
+ reader.readAsText(file);
+ }}
+ className="block w-full text-sm text-slate-600 file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-slate-900 file:text-white hover:file:bg-slate-800 cursor-pointer"
+ />
+ </div>
  <textarea rows={8} value={importData} onChange={(e) => setImportData(e.target.value)} placeholder="companyName,contactName,email,phone,industry,city&#10;Acme Corp,John Doe,john@acme.com,9876543210,Technology,Mumbai"
  className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm font-mono" />
  {importResult && (

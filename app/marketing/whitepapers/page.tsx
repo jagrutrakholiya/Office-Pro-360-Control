@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Layout from "../../../components/Layout";
+import { useToast } from "../../../components/ui/Toast";
 import { whitepaperAPI, Whitepaper } from "@/lib/marketingAPI";
 import { FaPlus, FaEdit, FaTrash, FaFileDownload, FaStar, FaDownload } from "react-icons/fa";
 
 export default function WhitepapersManagement() {
+ const toast = useToast();
  const [whitepapers, setWhitepapers] = useState<Whitepaper[]>([]);
  const [loading, setLoading] = useState(true);
 
@@ -21,6 +23,7 @@ export default function WhitepapersManagement() {
  setWhitepapers(data);
  } catch (error) {
  console.error("Failed to load whitepapers:", error);
+ toast.error("Failed to load whitepapers");
  } finally {
  setLoading(false);
  }
@@ -30,10 +33,10 @@ export default function WhitepapersManagement() {
  if (!confirm(`Delete "${title}"?`)) return;
  try {
  await whitepaperAPI.delete(id);
- alert("Whitepaper deleted");
+ toast.success("Whitepaper deleted");
  loadWhitepapers();
  } catch (error) {
- alert("Failed to delete");
+ toast.error("Failed to delete whitepaper");
  }
  };
 

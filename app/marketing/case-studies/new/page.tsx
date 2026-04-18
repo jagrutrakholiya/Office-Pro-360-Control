@@ -4,12 +4,15 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Layout from "../../../../components/Layout";
 import FirebaseImageUpload from "../../../../components/FirebaseImageUpload";
+import RichTextEditor from "../../../../components/RichTextEditor";
+import { useToast } from "../../../../components/ui/Toast";
 import { caseStudyAPI, CaseStudy } from "@/lib/marketingAPI";
 import { getMergedOptions, type OptionItem } from "@/lib/contentOptionsAPI";
 import { FaSave, FaArrowLeft, FaPlus, FaTrash } from "react-icons/fa";
 
 export default function NewCaseStudy() {
  const router = useRouter();
+ const toast = useToast();
  const [loading, setLoading] = useState(false);
  const [industryOptions, setIndustryOptions] = useState<OptionItem[]>([]);
  const [companySizeOptions, setCompanySizeOptions] = useState<OptionItem[]>([]);
@@ -50,18 +53,18 @@ export default function NewCaseStudy() {
  const handleSubmit = async (e: React.FormEvent) => {
  e.preventDefault();
  if (!formData.title || !formData.company.name) {
- alert("Please fill in required fields");
+ toast.warning("Please fill in required fields");
  return;
  }
 
  setLoading(true);
  try {
  await caseStudyAPI.create(formData);
- alert("Case study created successfully!");
+ toast.success("Case study created");
  router.push("/marketing/case-studies");
  } catch (error) {
  console.error("Failed to create case study:", error);
- alert("Failed to create case study");
+ toast.error("Failed to create case study");
  } finally {
  setLoading(false);
  }
@@ -239,34 +242,31 @@ export default function NewCaseStudy() {
  <div className="space-y-4">
  <div>
  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Challenge</label>
- <textarea
+ <RichTextEditor
  value={formData.challenge}
- onChange={(e) => setFormData({ ...formData, challenge: e.target.value })}
- rows={4}
- className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+ onChange={(html) => setFormData({ ...formData, challenge: html })}
  placeholder="What problem did the client face?"
+ minHeight={180}
  />
  </div>
 
  <div>
  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Solution</label>
- <textarea
+ <RichTextEditor
  value={formData.solution}
- onChange={(e) => setFormData({ ...formData, solution: e.target.value })}
- rows={4}
- className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+ onChange={(html) => setFormData({ ...formData, solution: html })}
  placeholder="How did you solve it?"
+ minHeight={180}
  />
  </div>
 
  <div>
  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Results</label>
- <textarea
+ <RichTextEditor
  value={formData.results}
- onChange={(e) => setFormData({ ...formData, results: e.target.value })}
- rows={4}
- className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+ onChange={(html) => setFormData({ ...formData, results: html })}
  placeholder="What were the outcomes?"
+ minHeight={180}
  />
  </div>
  </div>

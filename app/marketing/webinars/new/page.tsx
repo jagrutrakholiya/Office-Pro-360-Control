@@ -4,11 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Layout from "../../../../components/Layout";
 import FirebaseImageUpload from "../../../../components/FirebaseImageUpload";
+import { useToast } from "../../../../components/ui/Toast";
 import { webinarAPI, Webinar } from "@/lib/marketingAPI";
 import { FaSave, FaArrowLeft, FaPlus, FaTrash } from "react-icons/fa";
 
 export default function NewWebinar() {
  const router = useRouter();
+ const toast = useToast();
  const [loading, setLoading] = useState(false);
  const [formData, setFormData] = useState<Omit<Webinar, '_id' | 'slug'>>({
  title: "",
@@ -29,18 +31,18 @@ export default function NewWebinar() {
  const handleSubmit = async (e: React.FormEvent) => {
  e.preventDefault();
  if (!formData.title || !formData.date) {
- alert("Please fill in required fields");
+ toast.warning("Please fill in required fields");
  return;
  }
 
  setLoading(true);
  try {
  await webinarAPI.create(formData);
- alert("Webinar created successfully!");
+ toast.success("Webinar created");
  router.push("/marketing/webinars");
  } catch (error) {
  console.error("Failed to create webinar:", error);
- alert("Failed to create webinar");
+ toast.error("Failed to create webinar");
  } finally {
  setLoading(false);
  }

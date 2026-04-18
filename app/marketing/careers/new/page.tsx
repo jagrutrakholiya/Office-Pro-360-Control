@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Layout from "../../../../components/Layout";
+import { useToast } from "../../../../components/ui/Toast";
 import { careerAPI, JobOpening } from "@/lib/marketingAPI";
 import { getMergedOptions, type OptionItem } from "@/lib/contentOptionsAPI";
 import { FaSave, FaArrowLeft, FaPlus, FaTrash } from "react-icons/fa";
 
 export default function NewCareer() {
  const router = useRouter();
+ const toast = useToast();
  const [loading, setLoading] = useState(false);
  const [loadingOptions, setLoadingOptions] = useState(true);
  const [deptOptions, setDeptOptions] = useState<OptionItem[]>([]);
@@ -51,18 +53,18 @@ export default function NewCareer() {
  const handleSubmit = async (e: React.FormEvent) => {
  e.preventDefault();
  if (!formData.title || !formData.department) {
- alert("Please fill in required fields");
+ toast.warning("Please fill in required fields");
  return;
  }
 
  setLoading(true);
  try {
  await careerAPI.create(formData);
- alert("Job opening posted successfully!");
+ toast.success("Job opening posted");
  router.push("/marketing/careers");
  } catch (error) {
  console.error("Failed to post job opening:", error);
- alert("Failed to post job opening");
+ toast.error("Failed to post job opening");
  } finally {
  setLoading(false);
  }

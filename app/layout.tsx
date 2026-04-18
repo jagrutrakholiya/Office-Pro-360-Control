@@ -3,6 +3,7 @@ import { AuthProvider } from "../context/AuthContext";
 import { SearchProvider } from "../context/SearchContext";
 import MobileBottomNav from "../components/MobileBottomNav";
 import PWAInstaller from "../components/PWAInstaller";
+import { ToastProvider } from "../components/ui/Toast";
 import "./globals.css";
 
 export default function RootLayout({
@@ -56,8 +57,10 @@ export default function RootLayout({
  <PWAInstaller />
  <AuthProvider>
  <SearchProvider>
+ <ToastProvider>
  {children}
  <MobileBottomNav />
+ </ToastProvider>
  </SearchProvider>
  </AuthProvider>
  </body>

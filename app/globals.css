@@ -407,6 +407,21 @@
     }
   }
 
+  @keyframes slide-in-right {
+    0% {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  .animate-slide-in-right {
+    animation: slide-in-right 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
   .shimmer {
     animation: shimmer 2s infinite linear;
     background: linear-gradient(to right, #f1f5f9 4%, #e2e8f0 25%, #f1f5f9 36%);

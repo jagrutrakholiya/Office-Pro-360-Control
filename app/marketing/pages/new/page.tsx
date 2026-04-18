@@ -3,11 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Layout from "../../../../components/Layout";
+import { useToast } from "../../../../components/ui/Toast";
 import { pageContentAPI, PageContent } from "@/lib/marketingAPI";
 import { FaSave, FaArrowLeft, FaPlus, FaTrash } from "react-icons/fa";
 
 export default function NewPageContent() {
  const router = useRouter();
+ const toast = useToast();
  const [loading, setLoading] = useState(false);
  const [formData, setFormData] = useState<Omit<PageContent, '_id' | 'createdAt' | 'updatedAt'>>({
  pageName: "",
@@ -31,18 +33,18 @@ export default function NewPageContent() {
  const handleSubmit = async (e: React.FormEvent) => {
  e.preventDefault();
  if (!formData.pageName || !formData.seo.title) {
- alert("Please fill in required fields");
+ toast.warning("Please fill in required fields");
  return;
  }
 
  setLoading(true);
  try {
  await pageContentAPI.create(formData);
- alert("Page created successfully!");
+ toast.success("Page created");
  router.push("/marketing/pages");
  } catch (error) {
  console.error("Failed to create page:", error);
- alert("Failed to create page");
+ toast.error("Failed to create page");
  } finally {
  setLoading(false);
  }

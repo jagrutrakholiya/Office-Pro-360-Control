@@ -1,114 +1,190 @@
-'use client'
-import { useEffect, useState } from 'react'
-import Layout from '../../components/Layout'
-import api from '../../lib/api'
+"use client";
+import { useEffect, useState, useMemo } from "react";
+import Layout from "../../components/Layout";
+import PageHeader from "../../components/ui/PageHeader";
+import EmptyState from "../../components/ui/EmptyState";
+import DataTable, { Column } from "../../components/ui/DataTable";
+import { useToast } from "../../components/ui/Toast";
+import api from "../../lib/api";
+import { FaInbox, FaEnvelope } from "react-icons/fa";
 
-type Inquiry = { _id: string; name: string; email: string; phone?: string; company?: string; topic?: string; message: string; planCode?: string; status: string; createdAt: string }
+type Inquiry = {
+  _id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  company?: string;
+  topic?: string;
+  message: string;
+  planCode?: string;
+  status: string;
+  createdAt: string;
+};
+
+type FilterValue = "all" | "new" | "in_progress" | "closed";
+
+const FILTERS: { value: FilterValue; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "new", label: "New" },
+  { value: "in_progress", label: "In Progress" },
+  { value: "closed", label: "Closed" },
+];
 
 export default function InquiriesPage() {
- const [inquiries, setInquiries] = useState<Inquiry[]>([])
- const [loading, setLoading] = useState(true)
- const [filter, setFilter] = useState('all')
+  const toast = useToast();
+  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<FilterValue>("all");
 
- async function load() {
- try {
- const res = await api.get('/marketing/admin/inquiries')
- setInquiries(res.data.inquiries || [])
- } catch {} finally {
- setLoading(false)
- }
- }
+  const load = async () => {
+    try {
+      const res = await api.get("/marketing/admin/inquiries");
+      setInquiries(res.data.inquiries || []);
+    } catch {
+      toast.error("Failed to load inquiries");
+    } finally {
+      setLoading(false);
+    }
+  };
 
- useEffect(() => { load() }, [])
+  useEffect(() => {
+    load();
+  }, []);
 
- async function changeStatus(id: string, status: string) {
- await api.patch(`/marketing/admin/inquiries/${id}`, { status })
- await load()
- }
+  const changeStatus = async (id: string, status: string) => {
+    try {
+      await api.patch(`/marketing/admin/inquiries/${id}`, { status });
+      toast.success("Status updated");
+      await load();
+    } catch {
+      toast.error("Failed to update status");
+    }
+  };
 
- const filtered = filter === 'all' ? inquiries : inquiries.filter(i => i.status === filter)
- const newCount = inquiries.filter(i => i.status === 'new').length
- const inProgressCount = inquiries.filter(i => i.status === 'in_progress').length
+  const filtered = useMemo(
+    () => (filter === "all" ? inquiries : inquiries.filter((i) => i.status === filter)),
+    [inquiries, filter]
+  );
 
- return (
- <Layout>
- <div className="mb-8">
- <h2 className="text-3xl font-bold text-slate-900 mb-2">Inquiries</h2>
- <p className="text-slate-600">Leads and contact submissions from the marketing site</p>
- </div>
+  const newCount = inquiries.filter((i) => i.status === "new").length;
+  const inProgressCount = inquiries.filter((i) => i.status === "in_progress").length;
+  const closedCount = inquiries.filter((i) => i.status === "closed").length;
 
- {/* Stats */}
- <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
- <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
- <div className="text-sm font-medium text-slate-600">Total</div>
- <div className="text-3xl font-bold text-slate-900 mt-1">{inquiries.length}</div>
- </div>
- <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
- <div className="text-sm font-medium text-slate-600">New</div>
- <div className="text-3xl font-bold text-blue-600 mt-1">{newCount}</div>
- </div>
- <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
- <div className="text-sm font-medium text-slate-600">In Progress</div>
- <div className="text-3xl font-bold text-amber-600 mt-1">{inProgressCount}</div>
- </div>
- </div>
+  const columns: Column<Inquiry>[] = [
+    {
+      key: "name",
+      header: "Name",
+      render: (inq) => (
+        <div>
+          <div className="font-semibold text-slate-900 dark:text-white">{inq.name}</div>
+          {inq.phone && <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{inq.phone}</div>}
+        </div>
+      ),
+    },
+    { key: "email", header: "Email", render: (inq) => inq.email },
+    { key: "company", header: "Company", render: (inq) => inq.company || "—" },
+    {
+      key: "plan",
+      header: "Plan",
+      render: (inq) =>
+        inq.planCode ? (
+          <span className="inline-flex px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-md text-xs font-medium">
+            {inq.planCode}
+          </span>
+        ) : (
+          "—"
+        ),
+    },
+    {
+      key: "message",
+      header: "Message",
+      render: (inq) => (
+        <p className="max-w-xs truncate text-slate-600 dark:text-slate-400" title={inq.message}>
+          {inq.message}
+        </p>
+      ),
+    },
+    {
+      key: "status",
+      header: "Status",
+      width: "160px",
+      render: (inq) => (
+        <select
+          defaultValue={inq.status}
+          onChange={(e) => changeStatus(inq._id, e.target.value)}
+          className="px-3 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+        >
+          <option value="new">New</option>
+          <option value="in_progress">In Progress</option>
+          <option value="closed">Closed</option>
+        </select>
+      ),
+    },
+  ];
 
- {/* Filter */}
- <div className="mb-4 flex gap-2">
- {['all', 'new', 'in_progress', 'closed'].map(f => (
- <button key={f} onClick={() => setFilter(f)} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === f ? 'bg-blue-600 text-white' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'}`}>
- {f === 'all' ? 'All' : f === 'in_progress' ? 'In Progress' : f.charAt(0).toUpperCase() + f.slice(1)}
- </button>
- ))}
- </div>
+  return (
+    <Layout>
+      <PageHeader title="Inquiries" description="Leads and contact submissions from the marketing site" />
 
- {/* Table */}
- <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
- <div className="overflow-x-auto">
- <table className="w-full">
- <thead className="bg-slate-50 border-b border-slate-200">
- <tr>
- <th className="text-left px-6 py-3 text-xs font-semibold text-slate-600 uppercase tracking-wider">Name</th>
- <th className="text-left px-6 py-3 text-xs font-semibold text-slate-600 uppercase tracking-wider">Email</th>
- <th className="text-left px-6 py-3 text-xs font-semibold text-slate-600 uppercase tracking-wider">Company</th>
- <th className="text-left px-6 py-3 text-xs font-semibold text-slate-600 uppercase tracking-wider">Plan</th>
- <th className="text-left px-6 py-3 text-xs font-semibold text-slate-600 uppercase tracking-wider">Message</th>
- <th className="text-left px-6 py-3 text-xs font-semibold text-slate-600 uppercase tracking-wider">Status</th>
- </tr>
- </thead>
- <tbody className="divide-y divide-slate-100">
- {loading ? (
- <tr><td colSpan={6} className="px-6 py-8 text-center text-slate-500">Loading...</td></tr>
- ) : filtered.length === 0 ? (
- <tr><td colSpan={6} className="px-6 py-8 text-center text-slate-500">No inquiries found</td></tr>
- ) : filtered.map(inq => (
- <tr key={inq._id} className="hover:bg-slate-50 transition-colors">
- <td className="px-6 py-4">
- <div className="text-sm font-medium text-slate-900">{inq.name}</div>
- {inq.phone && <div className="text-xs text-slate-500 mt-0.5">{inq.phone}</div>}
- </td>
- <td className="px-6 py-4 text-sm text-slate-600">{inq.email}</td>
- <td className="px-6 py-4 text-sm text-slate-700">{inq.company || '—'}</td>
- <td className="px-6 py-4 text-sm">
- {inq.planCode ? (
- <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-md text-xs font-medium">{inq.planCode}</span>
- ) : '—'}
- </td>
- <td className="px-6 py-4 text-sm text-slate-700 max-w-xs truncate">{inq.message}</td>
- <td className="px-6 py-4">
- <select defaultValue={inq.status} onChange={e => changeStatus(inq._id, e.target.value)} className="px-3 py-1.5 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20">
- <option value="new">New</option>
- <option value="in_progress">In Progress</option>
- <option value="closed">Closed</option>
- </select>
- </td>
- </tr>
- ))}
- </tbody>
- </table>
- </div>
- </div>
- </Layout>
- )
+      {/* Stat cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <StatCard label="Total" value={inquiries.length} color="slate" />
+        <StatCard label="New" value={newCount} color="blue" />
+        <StatCard label="In Progress" value={inProgressCount} color="amber" />
+        <StatCard label="Closed" value={closedCount} color="green" />
+      </div>
+
+      {/* Filter pills */}
+      <div className="mb-4 flex gap-2 flex-wrap">
+        {FILTERS.map((f) => (
+          <button
+            key={f.value}
+            onClick={() => setFilter(f.value)}
+            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+              filter === f.value
+                ? "bg-blue-600 text-white border border-blue-600"
+                : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700"
+            }`}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
+      {!loading && filtered.length === 0 ? (
+        <EmptyState
+          icon={filter === "all" ? <FaInbox className="w-6 h-6" /> : <FaEnvelope className="w-6 h-6" />}
+          title={filter === "all" ? "No inquiries yet" : `No ${filter.replace("_", " ")} inquiries`}
+          description={
+            filter === "all"
+              ? "Demo requests and contact form submissions from the marketing site will appear here."
+              : "Try a different filter to see more inquiries."
+          }
+        />
+      ) : (
+        <DataTable<Inquiry>
+          columns={columns}
+          data={filtered}
+          loading={loading}
+          rowKey={(i) => i._id}
+        />
+      )}
+    </Layout>
+  );
 }
 
+function StatCard({ label, value, color }: { label: string; value: number; color: "slate" | "blue" | "amber" | "green" }) {
+  const valueColor = {
+    slate: "text-slate-900 dark:text-white",
+    blue: "text-blue-600 dark:text-blue-400",
+    amber: "text-amber-600 dark:text-amber-400",
+    green: "text-green-600 dark:text-green-400",
+  }[color];
+
+  return (
+    <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5">
+      <div className="text-sm font-medium text-slate-600 dark:text-slate-400">{label}</div>
+      <div className={`text-3xl font-bold mt-1 tabular-nums ${valueColor}`}>{value}</div>
+    </div>
+  );
+}

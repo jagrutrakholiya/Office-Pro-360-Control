@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import Layout from "../../../../../components/Layout"; 
+import Layout from "../../../../../components/Layout";
+import { useToast } from "../../../../../components/ui/Toast";
 import { pageContentAPI, PageContent } from "@/lib/marketingAPI";
 import { FaSave, FaArrowLeft, FaPlus, FaTrash } from "react-icons/fa";
 
 export default function EditPageContent() {
  const router = useRouter();
+ const toast = useToast();
  const params = useParams();
  const id = params.id as string;
 
@@ -17,6 +19,7 @@ export default function EditPageContent() {
 
  useEffect(() => {
  loadPage();
+ // eslint-disable-next-line react-hooks/exhaustive-deps
  }, [id]);
 
  const loadPage = async () => {
@@ -25,7 +28,7 @@ export default function EditPageContent() {
  setFormData(data);
  } catch (error) {
  console.error("Failed to load page:", error);
- alert("Failed to load page data");
+ toast.error("Failed to load page data");
  } finally {
  setLoading(false);
  }
@@ -35,18 +38,18 @@ export default function EditPageContent() {
  e.preventDefault();
  if (!formData) return;
  if (!formData.pageName || !formData.seo.title) {
- alert("Please fill in required fields");
+ toast.warning("Please fill in required fields");
  return;
  }
 
  setLoading(true);
  try {
  await pageContentAPI.update(id, formData);
- alert("Page updated successfully!");
+ toast.success("Page updated");
  router.push("/marketing/pages");
  } catch (error) {
  console.error("Failed to update page:", error);
- alert("Failed to update page");
+ toast.error("Failed to update page");
  } finally {
  setLoading(false);
  }

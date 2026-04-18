@@ -6,6 +6,7 @@ import { FiSave, FiArrowLeft } from "react-icons/fi";
 import api from "@/lib/api";
 import Layout from "@/components/Layout";
 import FirebaseImageUpload from "@/components/FirebaseImageUpload";
+import RichTextEditor from "@/components/RichTextEditor";
 
 export default function NewBlogPost() {
  const router = useRouter();
@@ -153,14 +154,11 @@ export default function NewBlogPost() {
  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
  Content *
  </label>
- <textarea
- name="content"
+ <RichTextEditor
  value={formData.content}
- onChange={handleChange}
- required
- rows={15}
- className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-mono text-sm"
- placeholder="Write your blog post content (supports Markdown)"
+ onChange={(html) => setFormData((prev) => ({ ...prev, content: html }))}
+ placeholder="Write your blog post content..."
+ minHeight={400}
  />
  </div>
 

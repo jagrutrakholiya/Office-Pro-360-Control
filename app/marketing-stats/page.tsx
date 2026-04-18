@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Layout from "../../components/Layout";
+import FirebaseImageUpload from "../../components/FirebaseImageUpload";
 import api from "../../lib/api";
 import {
  BarChart,
@@ -743,20 +744,17 @@ export default function MarketingStatsPage() {
  </select>
  </div>
  <div className="md:col-span-2">
- <label className="block text-sm font-medium mb-2">
- Avatar URL (optional)
- </label>
- <input
- type="url"
- value={newTestimonial.avatar}
- onChange={(e) =>
+ <FirebaseImageUpload
+ label="Avatar (optional)"
+ currentImage={newTestimonial.avatar}
+ onUpload={(url) =>
  setNewTestimonial({
  ...newTestimonial,
- avatar: e.target.value,
+ avatar: url,
  })
  }
- className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 focus:ring-2 focus:ring-blue-500"
- placeholder="https://example.com/avatar.jpg"
+ folder="testimonials/avatars"
+ maxSize={2}
  />
  </div>
  <div className="md:col-span-2">
@@ -920,17 +918,12 @@ export default function MarketingStatsPage() {
  />
  </div>
  <div>
- <label className="block text-sm font-medium mb-2">
- Logo URL *
- </label>
- <input
- type="url"
- value={newLogo.logoUrl}
- onChange={(e) =>
- setNewLogo({ ...newLogo, logoUrl: e.target.value })
- }
- className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 focus:ring-2 focus:ring-blue-500"
- placeholder="https://example.com/logo.png"
+ <FirebaseImageUpload
+ label="Company Logo *"
+ currentImage={newLogo.logoUrl}
+ onUpload={(url) => setNewLogo({ ...newLogo, logoUrl: url })}
+ folder="marketing/logos"
+ maxSize={2}
  />
  </div>
  </div>

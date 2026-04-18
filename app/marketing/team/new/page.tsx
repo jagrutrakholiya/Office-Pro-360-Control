@@ -4,12 +4,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Layout from "../../../../components/Layout";
 import FirebaseImageUpload from "../../../../components/FirebaseImageUpload";
+import { useToast } from "../../../../components/ui/Toast";
 import { teamAPI, TeamMember } from "@/lib/marketingAPI";
 import { getMergedOptions, type OptionItem } from "@/lib/contentOptionsAPI";
 import { FaSave, FaArrowLeft } from "react-icons/fa";
 
 export default function NewTeamMember() {
  const router = useRouter();
+ const toast = useToast();
  const [loading, setLoading] = useState(false);
  const [loadingOptions, setLoadingOptions] = useState(true);
  const [deptOptions, setDeptOptions] = useState<OptionItem[]>([]);
@@ -47,18 +49,18 @@ export default function NewTeamMember() {
  const handleSubmit = async (e: React.FormEvent) => {
  e.preventDefault();
  if (!formData.name || !formData.role) {
- alert("Please fill in required fields");
+ toast.warning("Please fill in required fields");
  return;
  }
 
  setLoading(true);
  try {
  await teamAPI.create(formData);
- alert("Team member added successfully!");
+ toast.success("Team member added");
  router.push("/marketing/team");
  } catch (error) {
  console.error("Failed to add team member:", error);
- alert("Failed to add team member");
+ toast.error("Failed to add team member");
  } finally {
  setLoading(false);
  }
