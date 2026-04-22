@@ -3,6 +3,12 @@ import { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
 import api from "../../lib/api";
 
+// userId / companyId / resolvedBy are Mongoose populate() results. They come
+// back as `null` when the referenced document was deleted (user/company
+// off-boarded, orphaned query). The page must never assume they're present —
+// a deleted user used to crash the entire /queries route with
+// `Cannot read properties of null (reading 'name')` before this type change
+// made the nullability explicit and we null-guarded every access.
 type Query = {
  _id: string;
  userId: {
@@ -10,12 +16,12 @@ type Query = {
  name: string;
  email: string;
  role: string;
- };
+ } | null;
  companyId: {
  _id: string;
  name: string;
  code: string;
- };
+ } | null;
  subject: string;
  description: string;
  screenshot: string | null;
@@ -316,20 +322,22 @@ export default function QueriesPage() {
  <td className="px-6 py-4">
  <div>
  <div className="font-medium text-slate-900">
- {query.userId.name}
+ {query.userId?.name ?? <span className="italic text-slate-400">(deleted user)</span>}
  </div>
  <div className="text-xs text-slate-500">
- {query.userId.email}
+ {query.userId?.email ?? "—"}
  </div>
  </div>
  </td>
  <td className="px-6 py-4">
  <div className="font-medium text-slate-900">
- {query.companyId.name}
+ {query.companyId?.name ?? <span className="italic text-slate-400">(deleted company)</span>}
  </div>
+ {query.companyId?.code && (
  <code className="text-xs bg-slate-100 px-2 py-0.5 rounded">
  {query.companyId.code}
  </code>
+ )}
  </td>
  <td className="px-6 py-4">
  <span className={`badge ${getStatusColor(query.status)}`}>
@@ -397,9 +405,11 @@ export default function QueriesPage() {
  {selectedQuery.subject}
  </h3>
  <p className="text-sm text-slate-600 mt-2">
- Reported by <strong>{selectedQuery.userId.name}</strong> (
- {selectedQuery.userId.email}) from{" "}
- <strong>{selectedQuery.companyId.name}</strong>
+ Reported by{" "}
+ <strong>{selectedQuery.userId?.name ?? "(deleted user)"}</strong>
+ {selectedQuery.userId?.email ? ` (${selectedQuery.userId.email})` : ""}
+ {" "}from{" "}
+ <strong>{selectedQuery.companyId?.name ?? "(deleted company)"}</strong>
  </p>
  <p className="text-xs text-slate-500 mt-1">
  {new Date(selectedQuery.createdAt).toLocaleString()}
@@ -504,7 +514,8 @@ export default function QueriesPage() {
  Resolved
  </h4>
  <p className="text-sm text-green-700">
- Resolved by <strong>{selectedQuery.resolvedBy.name}</strong>{" "}
+ Resolved by{" "}
+ <strong>{selectedQuery.resolvedBy?.name ?? "(deleted admin)"}</strong>{" "}
  on {new Date(selectedQuery.resolvedAt).toLocaleString()}
  </p>
  </div>
