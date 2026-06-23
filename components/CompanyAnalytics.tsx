@@ -30,7 +30,7 @@ export default function CompanyAnalytics({ companyId }: CompanyAnalyticsProps) {
 			setLoading(true);
 			const response = await fetch(`/api/companies/${companyId}/analytics`, {
 				headers: {
-					'Authorization': `Bearer ${localStorage.getItem('token')}`
+					'Authorization': `Bearer ${localStorage.getItem('cp_token')}`
 				}
 			});
 			const data = await response.json();
@@ -48,7 +48,7 @@ export default function CompanyAnalytics({ companyId }: CompanyAnalyticsProps) {
 			const response = await fetch(`/api/companies/${companyId}/analytics/calculate`, {
 				method: 'POST',
 				headers: {
-					'Authorization': `Bearer ${localStorage.getItem('token')}`,
+					'Authorization': `Bearer ${localStorage.getItem('cp_token')}`,
 					'Content-Type': 'application/json'
 				}
 			});

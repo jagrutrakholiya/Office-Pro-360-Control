@@ -30,9 +30,9 @@ export default function ApiKeysPage() {
 
  const fetchApiKeys = async () => {
  try {
- const token = localStorage.getItem("token");
+ const token = localStorage.getItem("cp_token");
  const response = await fetch(
- `${process.env.NEXT_PUBLIC_API_URL}/api/user-settings/api-keys`,
+ `${process.env.NEXT_PUBLIC_API_URL}/user-settings/api-keys`,
  {
  headers: { Authorization: `Bearer ${token}` },
  }
@@ -56,9 +56,9 @@ export default function ApiKeysPage() {
  }
 
  try {
- const token = localStorage.getItem("token");
+ const token = localStorage.getItem("cp_token");
  const response = await fetch(
- `${process.env.NEXT_PUBLIC_API_URL}/api/user-settings/api-keys`,
+ `${process.env.NEXT_PUBLIC_API_URL}/user-settings/api-keys`,
  {
  method: "POST",
  headers: {
@@ -86,9 +86,9 @@ export default function ApiKeysPage() {
  return;
 
  try {
- const token = localStorage.getItem("token");
+ const token = localStorage.getItem("cp_token");
  const response = await fetch(
- `${process.env.NEXT_PUBLIC_API_URL}/api/user-settings/api-keys/${id}/revoke`,
+ `${process.env.NEXT_PUBLIC_API_URL}/user-settings/api-keys/${id}/revoke`,
  {
  method: "POST",
  headers: { Authorization: `Bearer ${token}` },

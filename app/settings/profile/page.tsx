@@ -28,9 +28,9 @@ export default function ProfileSettingsPage() {
 
  const fetchProfile = async () => {
  try {
- const token = localStorage.getItem("token");
+ const token = localStorage.getItem("cp_token");
  const response = await fetch(
- `${process.env.NEXT_PUBLIC_API_URL}/api/user-settings/preferences`,
+ `${process.env.NEXT_PUBLIC_API_URL}/user-settings/preferences`,
  {
  headers: {
  Authorization: `Bearer ${token}`,
@@ -55,9 +55,9 @@ export default function ProfileSettingsPage() {
  setSaved(false);
 
  try {
- const token = localStorage.getItem("token");
+ const token = localStorage.getItem("cp_token");
  const response = await fetch(
- `${process.env.NEXT_PUBLIC_API_URL}/api/user-settings/preferences/profile`,
+ `${process.env.NEXT_PUBLIC_API_URL}/user-settings/preferences/profile`,
  {
  method: "PUT",
  headers: {

@@ -56,9 +56,9 @@ export default function NotificationSettingsPage() {
 
  const fetchNotifications = async () => {
  try {
- const token = localStorage.getItem("token");
+ const token = localStorage.getItem("cp_token");
  const response = await fetch(
- `${process.env.NEXT_PUBLIC_API_URL}/api/user-settings/preferences`,
+ `${process.env.NEXT_PUBLIC_API_URL}/user-settings/preferences`,
  {
  headers: { Authorization: `Bearer ${token}` },
  }
@@ -81,9 +81,9 @@ export default function NotificationSettingsPage() {
  setSaved(false);
 
  try {
- const token = localStorage.getItem("token");
+ const token = localStorage.getItem("cp_token");
  const response = await fetch(
- `${process.env.NEXT_PUBLIC_API_URL}/api/user-settings/preferences/notifications`,
+ `${process.env.NEXT_PUBLIC_API_URL}/user-settings/preferences/notifications`,
  {
  method: "PUT",
  headers: {

@@ -35,9 +35,9 @@ export default function IntegrationsPage() {
 
  const fetchIntegrations = async () => {
  try {
- const token = localStorage.getItem("token");
+ const token = localStorage.getItem("cp_token");
  const response = await fetch(
- `${process.env.NEXT_PUBLIC_API_URL}/api/user-settings/integrations`,
+ `${process.env.NEXT_PUBLIC_API_URL}/user-settings/integrations`,
  {
  headers: { Authorization: `Bearer ${token}` },
  }
@@ -56,9 +56,9 @@ export default function IntegrationsPage() {
 
  const testIntegration = async (id: string) => {
  try {
- const token = localStorage.getItem("token");
+ const token = localStorage.getItem("cp_token");
  const response = await fetch(
- `${process.env.NEXT_PUBLIC_API_URL}/api/user-settings/integrations/${id}/test`,
+ `${process.env.NEXT_PUBLIC_API_URL}/user-settings/integrations/${id}/test`,
  {
  method: "POST",
  headers: { Authorization: `Bearer ${token}` },
@@ -79,9 +79,9 @@ export default function IntegrationsPage() {
  if (!confirm("Are you sure you want to delete this integration?")) return;
 
  try {
- const token = localStorage.getItem("token");
+ const token = localStorage.getItem("cp_token");
  const response = await fetch(
- `${process.env.NEXT_PUBLIC_API_URL}/api/user-settings/integrations/${id}`,
+ `${process.env.NEXT_PUBLIC_API_URL}/user-settings/integrations/${id}`,
  {
  method: "DELETE",
  headers: { Authorization: `Bearer ${token}` },

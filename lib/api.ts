@@ -20,6 +20,21 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// On 401 (expired/revoked token) clear the session and bounce to login, so a
+// stale super-admin token can't keep appearing "logged in" with broken data.
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error?.response?.status === 401 && typeof window !== 'undefined') {
+      localStorage.removeItem('cp_token');
+      if (!window.location.pathname.startsWith('/login')) {
+        window.location.assign('/login');
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Helper function for making API requests
 export async function apiRequest(url: string, options?: any) {
   const response = await api.get(url, options);

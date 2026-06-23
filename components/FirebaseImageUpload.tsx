@@ -59,7 +59,7 @@ export default function FirebaseImageUpload({
  formData.append('file', file);
  formData.append('folder', folder);
 
- const token = localStorage.getItem('token');
+ const token = localStorage.getItem('cp_token');
  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/file`, {
  method: 'POST',
  headers: {
