@@ -74,6 +74,7 @@ const groups: NavGroup[] = [
  items: [
  { href: '/realtime', label: 'Real-Time', icon: <FiActivity /> },
  { href: '/storage', label: 'Storage', icon: <FiHardDrive /> },
+ { href: '/drive', label: 'Drive Connection', icon: <FiHardDrive /> },
  { href: '/audit-logs', label: 'Audit Logs', icon: <FiShield /> },
  { href: '/ai-audit', label: 'AI Audit', icon: <BsRobot /> },
  { href: '/system', label: 'System Health', icon: <FiActivity /> }
