@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import Layout from "../../../../../components/Layout";
 import FirebaseImageUpload from "../../../../../components/FirebaseImageUpload";
 import { useToast } from "../../../../../components/ui/Toast";
+import { Button, Card, CardHeader, CardTitle, PageHeader, Input, Textarea, Select, Skeleton } from "../../../../../components/ui";
 import { webinarAPI, Webinar } from "@/lib/marketingAPI";
 import { FaSave, FaArrowLeft, FaPlus, FaTrash } from "react-icons/fa";
 
@@ -106,8 +107,9 @@ export default function EditWebinar() {
   if (loading) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="space-y-4">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-64 w-full" />
         </div>
       </Layout>
     );
@@ -115,116 +117,93 @@ export default function EditWebinar() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-6">
-          <button
-            onClick={() => router.push("/marketing/webinars")}
-            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-4"
-          >
-            <FaArrowLeft /> Back to Webinars
-          </button>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Edit Webinar</h1>
-        </div>
+      <div className="space-y-6">
+        <PageHeader
+          title="Edit Webinar"
+          breadcrumbs={[{ label: 'Webinars', href: '/marketing/webinars' }, { label: 'Edit' }]}
+          actions={
+            <Button
+              type="button"
+              variant="outline"
+              leadingIcon={<FaArrowLeft />}
+              onClick={() => router.push("/marketing/webinars")}
+            >
+              Back to Webinars
+            </Button>
+          }
+        />
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Basic Information</h2>
+          <Card>
+            <CardHeader>
+              <CardTitle>Basic Information</CardTitle>
+            </CardHeader>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                  Title <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  required
-                />
-              </div>
+            <div className="mt-4 space-y-4">
+              <Input
+                label="Title"
+                required
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              />
 
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Description</label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
+              <Textarea
+                label="Description"
+                rows={3}
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              />
 
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Type</label>
-                  <select
-                    value={formData.type}
-                    onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  >
-                    <option value="upcoming">Upcoming</option>
-                    <option value="recorded">Recorded</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Category</label>
-                  <input
-                    type="text"
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
-                </div>
+                <Select
+                  label="Type"
+                  value={formData.type}
+                  onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
+                >
+                  <option value="upcoming">Upcoming</option>
+                  <option value="recorded">Recorded</option>
+                </Select>
+                <Input
+                  label="Category"
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                />
               </div>
 
               <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                    Date <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    value={formData.date}
-                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Time</label>
-                  <input
-                    type="time"
-                    value={formData.time}
-                    onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Timezone</label>
-                  <select
-                    value={formData.timezone}
-                    onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  >
-                    <option value="UTC">UTC</option>
-                    <option value="EST">EST</option>
-                    <option value="PST">PST</option>
-                    <option value="IST">IST</option>
-                    <option value="GMT">GMT</option>
-                  </select>
-                </div>
+                <Input
+                  label="Date"
+                  required
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                />
+                <Input
+                  label="Time"
+                  type="time"
+                  value={formData.time}
+                  onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                />
+                <Select
+                  label="Timezone"
+                  value={formData.timezone}
+                  onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
+                >
+                  <option value="UTC">UTC</option>
+                  <option value="EST">EST</option>
+                  <option value="PST">PST</option>
+                  <option value="IST">IST</option>
+                  <option value="GMT">GMT</option>
+                </Select>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Duration (min)</label>
-                <input
-                  type="number"
-                  value={formData.duration}
-                  onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 0 })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  min="0"
-                />
-              </div>
+              <Input
+                label="Duration (min)"
+                type="number"
+                value={formData.duration}
+                onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 0 })}
+                min="0"
+              />
 
               <FirebaseImageUpload
                 label="Thumbnail Image"
@@ -233,31 +212,25 @@ export default function EditWebinar() {
                 folder="webinars"
               />
 
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Registration URL</label>
-                <input
-                  type="url"
-                  value={formData.registrationUrl || ""}
-                  onChange={(e) => setFormData({ ...formData, registrationUrl: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="https://zoom.us/webinar/..."
-                />
-              </div>
+              <Input
+                label="Registration URL"
+                type="url"
+                value={formData.registrationUrl || ""}
+                onChange={(e) => setFormData({ ...formData, registrationUrl: e.target.value })}
+                placeholder="https://zoom.us/webinar/..."
+              />
 
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Recording URL</label>
-                <input
-                  type="url"
-                  value={formData.recordingUrl || ""}
-                  onChange={(e) => setFormData({ ...formData, recordingUrl: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="https://youtube.com/..."
-                />
-              </div>
+              <Input
+                label="Recording URL"
+                type="url"
+                value={formData.recordingUrl || ""}
+                onChange={(e) => setFormData({ ...formData, recordingUrl: e.target.value })}
+                placeholder="https://youtube.com/..."
+              />
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
                     <input
                       type="checkbox"
                       checked={formData.featured}
@@ -267,39 +240,37 @@ export default function EditWebinar() {
                     Featured
                   </label>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Status</label>
-                  <select
-                    value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  >
-                    <option value="draft">Draft</option>
-                    <option value="published">Published</option>
-                    <option value="archived">Archived</option>
-                  </select>
-                </div>
+                <Select
+                  label="Status"
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                >
+                  <option value="draft">Draft</option>
+                  <option value="published">Published</option>
+                  <option value="archived">Archived</option>
+                </Select>
               </div>
             </div>
-          </div>
+          </Card>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Speakers</h2>
-              <button
+          <Card>
+            <div className="flex items-center justify-between">
+              <CardTitle>Speakers</CardTitle>
+              <Button
                 type="button"
+                variant="primary"
+                leadingIcon={<FaPlus />}
                 onClick={addSpeaker}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
-                <FaPlus /> Add Speaker
-              </button>
+                Add Speaker
+              </Button>
             </div>
 
-            <div className="space-y-4">
+            <div className="mt-4 space-y-4">
               {formData.speakers.map((speaker, index) => (
-                <div key={index} className="border border-gray-300 dark:border-gray-600 rounded-lg p-4">
+                <div key={index} className="border border-slate-300 dark:border-slate-700 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-medium text-gray-900 dark:text-white">Speaker {index + 1}</h3>
+                    <h3 className="font-medium text-slate-900 dark:text-white">Speaker {index + 1}</h3>
                     {formData.speakers.length > 1 && (
                       <button
                         type="button"
@@ -312,26 +283,21 @@ export default function EditWebinar() {
                   </div>
 
                   <div className="space-y-3">
-                    <input
-                      type="text"
+                    <Input
                       value={speaker.name}
                       onChange={(e) => updateSpeaker(index, "name", e.target.value)}
                       placeholder="Speaker name"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
-                    <input
-                      type="text"
+                    <Input
                       value={speaker.title}
                       onChange={(e) => updateSpeaker(index, "title", e.target.value)}
                       placeholder="Title/Position"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
-                    <textarea
+                    <Textarea
                       value={speaker.bio}
                       onChange={(e) => updateSpeaker(index, "bio", e.target.value)}
                       placeholder="Brief bio"
                       rows={2}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
                     <FirebaseImageUpload
                       label={`Speaker ${index + 1} Photo`}
@@ -344,23 +310,24 @@ export default function EditWebinar() {
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
 
           <div className="flex gap-4">
-            <button
+            <Button
               type="submit"
-              disabled={saving}
-              className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+              variant="primary"
+              loading={saving}
+              leadingIcon={<FaSave />}
             >
-              <FaSave /> {saving ? "Saving..." : "Save Changes"}
-            </button>
-            <button
+              {saving ? "Saving..." : "Save Changes"}
+            </Button>
+            <Button
               type="button"
+              variant="outline"
               onClick={() => router.push("/marketing/webinars")}
-              className="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       </div>

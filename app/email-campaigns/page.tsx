@@ -1,6 +1,16 @@
 "use client";
 import { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
+import {
+ Button,
+ PageHeader,
+ Badge,
+ DataTable,
+ Column,
+ Modal,
+ Input,
+ Textarea,
+} from "@/components/ui";
 import api from "../../lib/api";
 
 export default function EmailCampaignsPage() {
@@ -60,100 +70,132 @@ export default function EmailCampaignsPage() {
  }
  };
 
- const STATUS_COLORS: Record<string, string> = {
- draft: "bg-slate-100 text-slate-700", sending: "bg-amber-100 text-amber-700",
- sent: "bg-emerald-100 text-emerald-700", failed: "bg-red-100 text-red-700",
+ const STATUS_VARIANT: Record<string, "neutral" | "warning" | "success" | "danger"> = {
+ draft: "neutral", sending: "warning", sent: "success", failed: "danger",
  };
+
+ const columns: Column<any>[] = [
+ {
+ key: "name",
+ header: "Name",
+ render: (c) => <span className="font-medium text-slate-900 dark:text-slate-100">{c.name}</span>,
+ },
+ {
+ key: "subject",
+ header: "Subject",
+ render: (c) => (
+ <span className="block max-w-xs truncate text-slate-600 dark:text-slate-400">{c.subject}</span>
+ ),
+ },
+ {
+ key: "status",
+ header: "Status",
+ render: (c) => <Badge variant={STATUS_VARIANT[c.status] || "neutral"}>{c.status}</Badge>,
+ },
+ {
+ key: "sent",
+ header: "Sent",
+ className: "text-right",
+ render: (c) => (
+ <span className="tabular-nums text-success-600 dark:text-success-400">{c.sentCount || 0}</span>
+ ),
+ },
+ {
+ key: "failed",
+ header: "Failed",
+ className: "text-right",
+ render: (c) => (
+ <span className="tabular-nums text-danger-600 dark:text-danger-400">{c.failedCount || 0}</span>
+ ),
+ },
+ {
+ key: "date",
+ header: "Date",
+ render: (c) => (
+ <span className="text-xs text-slate-500 dark:text-slate-400">
+ {c.sentAt ? new Date(c.sentAt).toLocaleDateString("en-IN") : "Not sent"}
+ </span>
+ ),
+ },
+ {
+ key: "actions",
+ header: "Actions",
+ className: "text-right",
+ render: (c) =>
+ c.status === "draft" ? (
+ <Button
+ size="sm"
+ onClick={() => sendCampaign(c._id)}
+ loading={sending === c._id}
+ >
+ {sending === c._id ? "Sending…" : "Send Now"}
+ </Button>
+ ) : null,
+ },
+ ];
 
  return (
  <Layout>
- <div className="mb-6 flex items-end justify-between">
- <div>
- <h1 className="text-2xl font-bold text-slate-900">Email Campaigns</h1>
- <p className="text-sm text-slate-600 mt-1">Create and send promotional emails to marketing leads.</p>
- </div>
- <button onClick={() => setShowCreate(true)} className="px-4 py-2 text-sm font-medium rounded-md bg-slate-900 text-white hover:bg-slate-800">+ New Campaign</button>
- </div>
+ <div className="space-y-6">
+ <PageHeader
+ title="Email Campaigns"
+ description="Create and send promotional emails to marketing leads."
+ actions={<Button onClick={() => setShowCreate(true)}>+ New Campaign</Button>}
+ />
 
- {/* Campaign list */}
- <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
- <table className="w-full">
- <thead className="bg-slate-50 border-b border-slate-200">
- <tr>
- <th className="text-left px-4 py-2 text-xs font-semibold text-slate-600 uppercase">Name</th>
- <th className="text-left px-4 py-2 text-xs font-semibold text-slate-600 uppercase">Subject</th>
- <th className="text-left px-4 py-2 text-xs font-semibold text-slate-600 uppercase">Status</th>
- <th className="text-right px-4 py-2 text-xs font-semibold text-slate-600 uppercase">Sent</th>
- <th className="text-right px-4 py-2 text-xs font-semibold text-slate-600 uppercase">Failed</th>
- <th className="text-left px-4 py-2 text-xs font-semibold text-slate-600 uppercase">Date</th>
- <th className="text-right px-4 py-2 text-xs font-semibold text-slate-600 uppercase">Actions</th>
- </tr>
- </thead>
- <tbody className="divide-y divide-slate-100">
- {loading ? (
- <tr><td colSpan={7} className="px-4 py-12 text-center text-sm text-slate-400">Loading…</td></tr>
- ) : campaigns.length === 0 ? (
- <tr><td colSpan={7} className="px-4 py-12 text-center text-sm text-slate-400">No campaigns yet. Create one to start outreach.</td></tr>
- ) : campaigns.map((c: any) => (
- <tr key={c._id} className="hover:bg-slate-50">
- <td className="px-4 py-3 text-sm font-medium text-slate-900">{c.name}</td>
- <td className="px-4 py-3 text-sm text-slate-600 max-w-xs truncate">{c.subject}</td>
- <td className="px-4 py-3"><span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[c.status] || ""}`}>{c.status}</span></td>
- <td className="px-4 py-3 text-sm text-right tabular-nums text-emerald-700">{c.sentCount || 0}</td>
- <td className="px-4 py-3 text-sm text-right tabular-nums text-red-600">{c.failedCount || 0}</td>
- <td className="px-4 py-3 text-xs text-slate-500">{c.sentAt ? new Date(c.sentAt).toLocaleDateString("en-IN") : "Not sent"}</td>
- <td className="px-4 py-3 text-right">
- {c.status === "draft" && (
- <button onClick={() => sendCampaign(c._id)} disabled={sending === c._id}
- className="text-xs px-3 py-1 rounded bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50">
- {sending === c._id ? "Sending…" : "Send Now"}
- </button>
- )}
- </td>
- </tr>
- ))}
- </tbody>
- </table>
- </div>
+ <DataTable<any>
+ columns={columns}
+ data={campaigns}
+ loading={loading}
+ rowKey={(c) => c._id}
+ emptyTitle="No campaigns yet"
+ emptyDescription="Create one to start outreach."
+ />
 
- {/* Create Campaign Modal */}
- {showCreate && (
- <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={() => setShowCreate(false)}>
- <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
- <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
- <h2 className="text-lg font-bold text-slate-900">New Email Campaign</h2>
- <button onClick={() => setShowCreate(false)} className="text-slate-400 hover:text-slate-600"></button>
- </div>
- <form onSubmit={createCampaign} className="p-6 space-y-4">
- <div>
- <label className="text-xs font-medium text-slate-700 mb-1 block">Campaign Name</label>
- <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. April 2026 Outreach"
- className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm" />
- </div>
+ <Modal
+ open={showCreate}
+ onClose={() => setShowCreate(false)}
+ title="New Email Campaign"
+ size="lg"
+ >
+ <form id="create-campaign-form" onSubmit={createCampaign} className="space-y-4">
+ <Input
+ label="Campaign Name"
+ required
+ value={form.name}
+ onChange={(e) => setForm({ ...form, name: e.target.value })}
+ placeholder="e.g. April 2026 Outreach"
+ />
 
  <div>
- <div className="flex items-center justify-between mb-1">
- <label className="text-xs font-medium text-slate-700">Email Subject</label>
- <button type="button" onClick={loadTemplate} className="text-xs text-blue-600 hover:text-blue-800">Load promo template</button>
+ <div className="flex items-center justify-between mb-1.5">
+ <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Email Subject</label>
+ <button type="button" onClick={loadTemplate} className="text-xs text-primary-600 dark:text-primary-400 hover:underline">Load promo template</button>
  </div>
- <input required value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })}
+ <Input
+ required
+ value={form.subject}
+ onChange={(e) => setForm({ ...form, subject: e.target.value })}
  placeholder="{{contactName}}, try OfficePro360 for {{companyName}}"
- className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm" />
- <p className="text-[11px] text-slate-400 mt-1">Merge tags: {"{{companyName}}"}, {"{{contactName}}"}, {"{{email}}"}</p>
+ helperText={`Merge tags: {{companyName}}, {{contactName}}, {{email}}`}
+ />
  </div>
 
- <div>
- <label className="text-xs font-medium text-slate-700 mb-1 block">Email Body (HTML)</label>
- <textarea required rows={12} value={form.htmlBody} onChange={(e) => setForm({ ...form, htmlBody: e.target.value })}
+ <Textarea
+ label="Email Body (HTML)"
+ required
+ rows={12}
+ value={form.htmlBody}
+ onChange={(e) => setForm({ ...form, htmlBody: e.target.value })}
  placeholder="<h1>Hi {{contactName}},</h1><p>...</p>"
- className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm font-mono" />
- </div>
+ className="font-mono"
+ />
 
  <div>
- <label className="text-xs font-medium text-slate-700 mb-1 block">Target lead statuses</label>
- <div className="flex flex-wrap gap-2">
+ <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 block">Target lead statuses</label>
+ <div className="flex flex-wrap gap-3">
  {["new", "contacted", "interested"].map((s) => (
- <label key={s} className="flex items-center gap-1.5 text-sm">
+ <label key={s} className="flex items-center gap-1.5 text-sm text-slate-700 dark:text-slate-300">
  <input type="checkbox" checked={form.targetStatus.includes(s)}
  onChange={(e) => {
  setForm({
@@ -169,17 +211,15 @@ export default function EmailCampaignsPage() {
  ))}
  </div>
  </div>
-
- <div className="flex justify-end gap-3 pt-3 border-t border-slate-200">
- <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2 text-sm border border-slate-300 rounded-md">Cancel</button>
- <button type="submit" disabled={saving} className="px-4 py-2 text-sm bg-slate-900 text-white rounded-md disabled:opacity-50">
- {saving ? "Creating…" : "Create Campaign"}
- </button>
- </div>
  </form>
+ <div className="flex justify-end gap-3 pt-4 mt-4 border-t border-slate-200 dark:border-slate-800">
+ <Button variant="outline" onClick={() => setShowCreate(false)}>Cancel</Button>
+ <Button type="submit" form="create-campaign-form" loading={saving}>
+ {saving ? "Creating…" : "Create Campaign"}
+ </Button>
  </div>
+ </Modal>
  </div>
- )}
  </Layout>
  );
 }

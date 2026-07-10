@@ -2,6 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import api from '../../../lib/api';
+import {
+ PageHeader,
+ Card,
+ CardHeader,
+ CardTitle,
+ CardDescription,
+ Button,
+ Badge,
+ Select,
+ Input,
+ DataTable,
+} from '@/components/ui';
 
 interface BackupHistory {
  id: string;
@@ -158,124 +170,72 @@ export default function DataExportPage() {
  };
 
  return (
- <div className="space-y-6">
- {/* Header */}
- <div>
- <h1 className="text-2xl font-bold text-gray-900">Data Export & Backup</h1>
- <p className="mt-2 text-sm text-gray-600">
- Export your data or configure automatic backups to keep your information safe.
- </p>
- </div>
-
- {/* Icons as SVG */}
- <svg className="hidden">
- <symbol id="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
- </symbol>
- <symbol id="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
- </symbol>
- <symbol id="icon-document" viewBox="0 0 24 24" fill="none" stroke="currentColor">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m.75 12l3 3m0 0l3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
- </symbol>
- <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
- </symbol>
- <symbol id="icon-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
- </symbol>
- <symbol id="icon-cog" viewBox="0 0 24 24" fill="none" stroke="currentColor">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
- </symbol>
- </svg>
+ <div className="p-6 space-y-6">
+ <PageHeader
+ title="Data Export & Backup"
+ description="Export your data or configure automatic backups to keep your information safe."
+ breadcrumbs={[
+ { label: 'Settings', href: '/settings' },
+ { label: 'Data & Backup' },
+ ]}
+ />
 
  {message && (
- <div className={`p-4 rounded-lg ${
- message.includes('success') 
- ? 'bg-green-50 text-green-800 border border-green-200' 
- : 'bg-red-50 text-red-800 border border-red-200'
- }`}>
+ <div
+ className={`p-4 rounded-lg text-sm border ${
+ message.includes('success')
+ ? 'bg-success-50 dark:bg-success-900/20 text-success-800 dark:text-success-300 border-success-200 dark:border-success-900/50'
+ : 'bg-danger-50 dark:bg-danger-900/20 text-danger-800 dark:text-danger-300 border-danger-200 dark:border-danger-900/50'
+ }`}
+ >
  {message}
  </div>
  )}
 
  {/* Export Data Section */}
- <div className="bg-white rounded-lg shadow p-6">
- <div className="flex items-center gap-3 mb-4">
- <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
- <use href="#icon-document" />
- </svg>
- <h2 className="text-lg font-semibold text-gray-900">Export Data</h2>
- </div>
- 
- <p className="text-sm text-gray-600 mb-6">
+ <Card>
+ <CardHeader>
+ <CardTitle>Export Data</CardTitle>
+ <CardDescription>
  Download all your data in your preferred format. Exports include tasks, projects, comments, and attachments.
- </p>
+ </CardDescription>
+ </CardHeader>
 
- <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+ <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+ {([
+ { format: 'json', title: 'JSON Format', subtitle: 'Structured data format' },
+ { format: 'csv', title: 'CSV Format', subtitle: 'Spreadsheet compatible' },
+ { format: 'excel', title: 'Excel Format', subtitle: 'Microsoft Excel ready' },
+ ] as const).map((opt) => (
  <button
- onClick={() => handleExportData('json')}
+ key={opt.format}
+ onClick={() => handleExportData(opt.format)}
  disabled={isExporting}
- className="flex flex-col items-center justify-center p-6 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+ className="flex flex-col items-center justify-center p-6 border-2 border-slate-200 dark:border-slate-700 rounded-lg hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
  >
- <svg className="h-8 w-8 text-blue-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
- <use href="#icon-download" />
- </svg>
- <span className="font-medium text-gray-900">JSON Format</span>
- <span className="text-xs text-gray-500 mt-1">Structured data format</span>
+ <span className="font-medium text-slate-900 dark:text-slate-100">{opt.title}</span>
+ <span className="text-xs text-slate-500 dark:text-slate-400 mt-1">{opt.subtitle}</span>
  </button>
-
- <button
- onClick={() => handleExportData('csv')}
- disabled={isExporting}
- className="flex flex-col items-center justify-center p-6 border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
- >
- <svg className="h-8 w-8 text-green-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
- <use href="#icon-download" />
- </svg>
- <span className="font-medium text-gray-900">CSV Format</span>
- <span className="text-xs text-gray-500 mt-1">Spreadsheet compatible</span>
- </button>
-
- <button
- onClick={() => handleExportData('excel')}
- disabled={isExporting}
- className="flex flex-col items-center justify-center p-6 border-2 border-gray-200 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
- >
- <svg className="h-8 w-8 text-purple-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
- <use href="#icon-download" />
- </svg>
- <span className="font-medium text-gray-900">Excel Format</span>
- <span className="text-xs text-gray-500 mt-1">Microsoft Excel ready</span>
- </button>
+ ))}
  </div>
- </div>
+ </Card>
 
  {/* Manual Backup Section */}
- <div className="bg-white rounded-lg shadow p-6">
- <div className="flex items-center justify-between mb-4">
- <div className="flex items-center gap-3">
- <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
- <use href="#icon-clock" />
- </svg>
- <h2 className="text-lg font-semibold text-gray-900">Manual Backup</h2>
- </div>
- <button
- onClick={handleCreateBackup}
- disabled={isExporting}
- className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
- >
- {isExporting ? 'Creating...' : 'Create Backup Now'}
- </button>
- </div>
-
- <p className="text-sm text-gray-600 mb-4">
+ <Card>
+ <div className="flex items-center justify-between">
+ <CardHeader>
+ <CardTitle>Manual Backup</CardTitle>
+ <CardDescription>
  Create a complete backup of all your data including tasks, projects, files, and settings.
- </p>
+ </CardDescription>
+ </CardHeader>
+ <Button onClick={handleCreateBackup} loading={isExporting} disabled={isExporting}>
+ {isExporting ? 'Creating...' : 'Create Backup Now'}
+ </Button>
+ </div>
 
- <div className="space-y-3">
- <label className="flex items-center gap-2">
+ <div className="mt-4 space-y-3">
+ <label className="flex items-center gap-2 cursor-pointer">
  <input
  type="checkbox"
  checked={preferences.includeAttachments}
@@ -283,12 +243,12 @@ export default function DataExportPage() {
  ...preferences,
  includeAttachments: e.target.checked
  })}
- className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+ className="w-4 h-4 accent-primary-600 rounded focus:ring-primary-500"
  />
- <span className="text-sm text-gray-700">Include attachments in backup</span>
+ <span className="text-sm text-slate-700 dark:text-slate-300">Include attachments in backup</span>
  </label>
 
- <label className="flex items-center gap-2">
+ <label className="flex items-center gap-2 cursor-pointer">
  <input
  type="checkbox"
  checked={preferences.compressBackup}
@@ -296,24 +256,21 @@ export default function DataExportPage() {
  ...preferences,
  compressBackup: e.target.checked
  })}
- className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+ className="w-4 h-4 accent-primary-600 rounded focus:ring-primary-500"
  />
- <span className="text-sm text-gray-700">Compress backup files</span>
+ <span className="text-sm text-slate-700 dark:text-slate-300">Compress backup files</span>
  </label>
  </div>
- </div>
+ </Card>
 
  {/* Automatic Backup Configuration */}
- <div className="bg-white rounded-lg shadow p-6">
- <div className="flex items-center gap-3 mb-4">
- <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
- <use href="#icon-cog" />
- </svg>
- <h2 className="text-lg font-semibold text-gray-900">Automatic Backup</h2>
- </div>
+ <Card>
+ <CardHeader>
+ <CardTitle>Automatic Backup</CardTitle>
+ </CardHeader>
 
- <div className="space-y-4">
- <label className="flex items-center gap-3">
+ <div className="mt-4 space-y-4">
+ <label className="flex items-center gap-3 cursor-pointer">
  <input
  type="checkbox"
  checked={preferences.autoBackup.enabled}
@@ -324,18 +281,15 @@ export default function DataExportPage() {
  enabled: e.target.checked
  }
  })}
- className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+ className="w-4 h-4 accent-primary-600 rounded focus:ring-primary-500"
  />
- <span className="text-sm font-medium text-gray-900">Enable automatic backups</span>
+ <span className="text-sm font-medium text-slate-900 dark:text-slate-100">Enable automatic backups</span>
  </label>
 
  {preferences.autoBackup.enabled && (
  <div className="ml-7 space-y-4 pt-2">
- <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
- Backup Frequency
- </label>
- <select
+ <Select
+ label="Backup Frequency"
  value={preferences.autoBackup.frequency}
  onChange={(e) => setPreferences({
  ...preferences,
@@ -344,19 +298,14 @@ export default function DataExportPage() {
  frequency: e.target.value as 'daily' | 'weekly' | 'monthly'
  }
  })}
- className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  >
  <option value="daily">Daily</option>
  <option value="weekly">Weekly</option>
  <option value="monthly">Monthly</option>
- </select>
- </div>
+ </Select>
 
- <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
- Backup Time
- </label>
- <input
+ <Input
+ label="Backup Time"
  type="time"
  value={preferences.autoBackup.time}
  onChange={(e) => setPreferences({
@@ -366,15 +315,10 @@ export default function DataExportPage() {
  time: e.target.value
  }
  })}
- className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
  />
- </div>
 
- <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
- Retention Period (days)
- </label>
- <input
+ <Input
+ label="Retention Period (days)"
  type="number"
  min="7"
  max="365"
@@ -386,102 +330,63 @@ export default function DataExportPage() {
  retention: parseInt(e.target.value)
  }
  })}
- className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ helperText="Backups older than this will be automatically deleted"
  />
- <p className="mt-1 text-xs text-gray-500">
- Backups older than this will be automatically deleted
- </p>
- </div>
  </div>
  )}
  </div>
 
  <div className="mt-6 flex justify-end">
- <button
- onClick={handleSavePreferences}
- disabled={isSaving}
- className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
- >
+ <Button onClick={handleSavePreferences} loading={isSaving} disabled={isSaving}>
  {isSaving ? 'Saving...' : 'Save Settings'}
- </button>
+ </Button>
  </div>
- </div>
+ </Card>
 
  {/* Backup History */}
- <div className="bg-white rounded-lg shadow p-6">
- <h2 className="text-lg font-semibold text-gray-900 mb-4">Backup History</h2>
- 
- <div className="overflow-x-auto">
- <table className="min-w-full divide-y divide-gray-200">
- <thead className="bg-gray-50">
- <tr>
- <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
- Date
- </th>
- <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
- Size
- </th>
- <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
- Type
- </th>
- <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
- Status
- </th>
- <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
- Actions
- </th>
- </tr>
- </thead>
- <tbody className="bg-white divide-y divide-gray-200">
- {backupHistory.map((backup) => (
- <tr key={backup.id} className="hover:bg-gray-50">
- <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
- {backup.date}
- </td>
- <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
- {backup.size}
- </td>
- <td className="px-6 py-4 whitespace-nowrap">
- <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
- backup.type === 'automatic'
- ? 'bg-blue-100 text-blue-800'
- : 'bg-gray-100 text-gray-800'
- }`}>
- {backup.type === 'automatic' ? 'Automatic' : 'Manual'}
- </span>
- </td>
- <td className="px-6 py-4 whitespace-nowrap">
- <div className="flex items-center gap-2">
- {backup.status === 'completed' ? (
- <>
- <svg className="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
- <use href="#icon-check" />
- </svg>
- <span className="text-sm text-green-700">Completed</span>
- </>
- ) : (
- <>
- <svg className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
- <use href="#icon-warning" />
- </svg>
- <span className="text-sm text-red-700">Failed</span>
- </>
- )}
+ <Card>
+ <CardHeader>
+ <CardTitle>Backup History</CardTitle>
+ </CardHeader>
+ <div className="mt-4">
+ <DataTable
+ rowKey={(row: BackupHistory) => row.id}
+ data={backupHistory}
+ emptyTitle="No backups yet"
+ columns={[
+ { key: 'date', header: 'Date' },
+ { key: 'size', header: 'Size' },
+ {
+ key: 'type',
+ header: 'Type',
+ render: (row: BackupHistory) => (
+ <Badge variant={row.type === 'automatic' ? 'info' : 'neutral'} size="sm">
+ {row.type === 'automatic' ? 'Automatic' : 'Manual'}
+ </Badge>
+ ),
+ },
+ {
+ key: 'status',
+ header: 'Status',
+ render: (row: BackupHistory) => (
+ <Badge variant={row.status === 'completed' ? 'success' : 'danger'} size="sm">
+ {row.status === 'completed' ? 'Completed' : 'Failed'}
+ </Badge>
+ ),
+ },
+ {
+ key: 'actions',
+ header: 'Actions',
+ className: 'text-right',
+ render: (row: BackupHistory) =>
+ row.status === 'completed' ? (
+ <Button variant="ghost" size="sm">Download</Button>
+ ) : null,
+ },
+ ]}
+ />
  </div>
- </td>
- <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
- {backup.status === 'completed' && (
- <button className="text-blue-600 hover:text-blue-800 font-medium">
- Download
- </button>
- )}
- </td>
- </tr>
- ))}
- </tbody>
- </table>
- </div>
- </div>
+ </Card>
  </div>
  );
 }

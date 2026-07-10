@@ -23,6 +23,20 @@ import { toast } from "react-toastify";
 import {
  FiHardDrive, FiRefreshCw, FiAlertTriangle, FiEdit3, FiSave, FiX,
 } from "react-icons/fi";
+import {
+ PageHeader,
+ Button,
+ Badge,
+ StatCard,
+ Card,
+ CardHeader,
+ CardTitle,
+ CardDescription,
+ DataTable,
+ Input,
+ Skeleton,
+ type Column,
+} from "@/components/ui";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -90,10 +104,10 @@ function formatMB(mb: number): string {
 }
 
 function barColor(percent: number): string {
- if (percent >= 95) return "bg-red-500";
+ if (percent >= 95) return "bg-danger-500";
  if (percent >= 80) return "bg-amber-500";
  if (percent >= 60) return "bg-yellow-500";
- return "bg-emerald-500";
+ return "bg-success-500";
 }
 
 // ─── Main page ───────────────────────────────────────────────────────────────
@@ -180,100 +194,182 @@ export default function PlatformStoragePage() {
  if (loading) {
  return (
  <Layout>
- <div className="p-6 text-center text-slate-500">
- Loading platform storage…
+ <div className="space-y-6">
+ <Skeleton className="h-20 w-full" />
+ <Skeleton className="h-40 w-full" />
+ <Skeleton className="h-64 w-full" />
  </div>
  </Layout>
  );
  }
 
+ const companyColumns: Column<CompanyRow>[] = [
+ {
+ key: "name",
+ header: "Company",
+ render: (c) => (
+ <div>
+ <div className="font-medium text-slate-900 dark:text-slate-100">{c.name}</div>
+ <div className="text-xs text-slate-500 dark:text-slate-400">
+ {c.code} · {c.status}
+ </div>
+ </div>
+ ),
+ },
+ {
+ key: "plan",
+ header: "Plan",
+ render: (c) => (
+ <span className="text-sm text-slate-600 dark:text-slate-400 capitalize">{c.plan}</span>
+ ),
+ },
+ {
+ key: "used",
+ header: "Used",
+ className: "text-right",
+ render: (c) => (
+ <span className="font-mono text-slate-900 dark:text-slate-100">{formatBytes(c.usedBytes)}</span>
+ ),
+ },
+ {
+ key: "quota",
+ header: "Quota",
+ className: "text-right",
+ render: (c) => (
+ <span className="font-mono text-sm text-slate-600 dark:text-slate-400">{formatMB(c.quotaMB)}</span>
+ ),
+ },
+ {
+ key: "files",
+ header: "Files",
+ className: "text-right",
+ render: (c) => (
+ <span className="font-mono text-sm text-slate-600 dark:text-slate-400">{c.fileCount.toLocaleString()}</span>
+ ),
+ },
+ {
+ key: "addons",
+ header: "Add-ons",
+ className: "text-right",
+ render: (c) =>
+ c.activeSubsCount > 0 ? (
+ <Badge variant="success" size="sm">{c.activeSubsCount}</Badge>
+ ) : (
+ <span className="text-slate-300 dark:text-slate-600">—</span>
+ ),
+ },
+ {
+ key: "usage",
+ header: "Usage",
+ width: "25%",
+ render: (c) => (
+ <div className="flex items-center gap-3">
+ <div className="flex-1 h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+ <div
+ className={`h-full ${barColor(c.usagePercentage)}`}
+ style={{ width: `${Math.min(100, c.usagePercentage).toFixed(1)}%` }}
+ />
+ </div>
+ <span className="text-xs text-slate-500 dark:text-slate-400 min-w-[42px] text-right">
+ {c.usagePercentage.toFixed(1)}%
+ </span>
+ </div>
+ ),
+ },
+ ];
+
  return (
  <Layout>
- <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-6">
+ <div className="space-y-6">
  {/* ─── Header ───────────────────────────────────────────── */}
- <div className="flex flex-wrap items-center justify-between gap-3">
- <div className="flex items-center gap-3">
- <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-600 text-white flex items-center justify-center shadow-md">
- <FiHardDrive className="w-5 h-5" />
- </div>
- <div>
- <h1 className="text-2xl font-bold text-slate-900">
- Platform Storage
- </h1>
- <p className="text-sm text-slate-500">
- Storage pricing & all-company usage across the platform
- </p>
- </div>
- </div>
- <button
+ <PageHeader
+ icon={<FiHardDrive className="w-5 h-5" />}
+ title="Platform Storage"
+ description="Storage pricing & all-company usage across the platform"
+ actions={
+ <Button
+ variant="outline"
  onClick={loadAll}
  disabled={refreshing}
- className="inline-flex items-center gap-2 px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-50 transition-colors"
+ leadingIcon={<FiRefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />}
  >
- <FiRefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
  Refresh
- </button>
+ </Button>
+ }
+ />
+
+ {/* ─── Platform totals ─────────────────────────────────── */}
+ {allCompanies && (
+ <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+ <StatCard label="Companies" value={allCompanies.totalCompanies} accent="primary" />
+ <StatCard label="Used" value={`${allCompanies.platformTotal.usedGB} GB`} accent="warning" />
+ <StatCard label="Allocated" value={`${allCompanies.platformTotal.quotaGB} GB`} accent="neutral" />
+ <StatCard
+ label="Total Files"
+ value={allCompanies.platformTotal.totalFiles.toLocaleString()}
+ accent="success"
+ />
  </div>
+ )}
 
  {/* ─── Pricing Management ──────────────────────────────── */}
  {pricing && (
- <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+ <Card padding="lg">
  <div className="flex items-start justify-between gap-3 mb-4">
- <div>
- <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">
+ <CardHeader>
+ <CardTitle className="text-sm uppercase tracking-wider text-slate-500 dark:text-slate-400">
  Storage Add-on Pricing
- </h2>
- <p className="text-xs text-slate-500 mt-1">
+ </CardTitle>
+ <CardDescription className="text-xs">
  Platform-wide pricing for storage subscriptions. Auto-seeded
  from env defaults on first run, then editable here. Changes
  apply immediately to NEW purchases. Existing subscriptions
  stay at their original locked-in price for life.
- </p>
- </div>
+ </CardDescription>
+ </CardHeader>
  {!editingPricing && (
- <button
+ <Button
+ variant="outline"
+ size="sm"
  onClick={startEditPricing}
- className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition-colors"
+ leadingIcon={<FiEdit3 className="w-3.5 h-3.5" />}
  >
- <FiEdit3 className="w-3.5 h-3.5" /> Edit Prices
- </button>
+ Edit Prices
+ </Button>
  )}
  </div>
 
  {!editingPricing ? (
  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
- <div className="p-4 rounded-lg bg-slate-50 border border-slate-200">
- <div className="text-xs text-slate-500 uppercase">Monthly</div>
- <div className="mt-1 text-2xl font-bold text-slate-900">
+ <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-800">
+ <div className="text-xs text-slate-500 dark:text-slate-400 uppercase">Monthly</div>
+ <div className="mt-1 text-2xl font-bold text-slate-900 dark:text-slate-100">
  {pricing.monthly?.pricePerGB} {pricing.currency}
  </div>
- <div className="text-xs text-slate-500">per GB / month</div>
+ <div className="text-xs text-slate-500 dark:text-slate-400">per GB / month</div>
  </div>
- <div className="p-4 rounded-lg bg-slate-50 border border-slate-200">
- <div className="text-xs text-slate-500 uppercase">Yearly</div>
- <div className="mt-1 text-2xl font-bold text-slate-900">
+ <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-800">
+ <div className="text-xs text-slate-500 dark:text-slate-400 uppercase">Yearly</div>
+ <div className="mt-1 text-2xl font-bold text-slate-900 dark:text-slate-100">
  {pricing.yearly?.pricePerGB} {pricing.currency}
  </div>
- <div className="text-xs text-slate-500">
+ <div className="text-xs text-slate-500 dark:text-slate-400">
  per GB / year ({pricing.yearly?.effectivePerMonth}/mo · save {pricing.yearly?.savingsPercent}%)
  </div>
  </div>
- <div className="p-4 rounded-lg bg-slate-50 border border-slate-200">
- <div className="text-xs text-slate-500 uppercase">Currency</div>
- <div className="mt-1 text-2xl font-bold text-slate-900">
+ <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-800">
+ <div className="text-xs text-slate-500 dark:text-slate-400 uppercase">Currency</div>
+ <div className="mt-1 text-2xl font-bold text-slate-900 dark:text-slate-100">
  {pricing.currency}
  </div>
- <div className="text-xs text-slate-500">platform-wide</div>
+ <div className="text-xs text-slate-500 dark:text-slate-400">platform-wide</div>
  </div>
  </div>
  ) : (
  <div className="space-y-4">
  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
- <div>
- <label className="block text-xs font-medium text-slate-600 uppercase mb-1">
- Monthly per GB
- </label>
- <input
+ <Input
+ label="Monthly per GB"
  type="number"
  min="0.01"
  step="0.01"
@@ -281,14 +377,9 @@ export default function PlatformStoragePage() {
  onChange={(e) =>
  setPricingForm((p) => ({ ...p, monthly: e.target.value }))
  }
- className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
  />
- </div>
- <div>
- <label className="block text-xs font-medium text-slate-600 uppercase mb-1">
- Yearly per GB
- </label>
- <input
+ <Input
+ label="Yearly per GB"
  type="number"
  min="0.01"
  step="0.01"
@@ -296,21 +387,14 @@ export default function PlatformStoragePage() {
  onChange={(e) =>
  setPricingForm((p) => ({ ...p, yearly: e.target.value }))
  }
- className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
- />
- <div className="mt-1 text-[11px] text-slate-500">
- Tip: keep below{" "}
- {Number(pricingForm.monthly) > 0
+ helperText={`Tip: keep below ${
+ Number(pricingForm.monthly) > 0
  ? (Number(pricingForm.monthly) * 12).toFixed(0)
- : "..."}{" "}
- for a real discount
- </div>
- </div>
- <div>
- <label className="block text-xs font-medium text-slate-600 uppercase mb-1">
- Currency
- </label>
- <input
+ : "..."
+ } for a real discount`}
+ />
+ <Input
+ label="Currency"
  type="text"
  maxLength={5}
  value={pricingForm.currency}
@@ -320,36 +404,30 @@ export default function PlatformStoragePage() {
  currency: e.target.value.toUpperCase(),
  }))
  }
- className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 uppercase"
  placeholder="INR"
+ className="uppercase"
  />
  </div>
- </div>
  <div className="flex items-center justify-end gap-2">
- <button
+ <Button
+ variant="outline"
  onClick={cancelEditPricing}
  disabled={savingPricing}
- className="inline-flex items-center gap-1 px-4 py-2 text-sm rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-50 transition-colors"
+ leadingIcon={<FiX className="w-4 h-4" />}
  >
- <FiX className="w-4 h-4" /> Cancel
- </button>
- <button
+ Cancel
+ </Button>
+ <Button
+ variant="primary"
  onClick={savePricing}
  disabled={savingPricing}
- className="inline-flex items-center gap-2 px-4 py-2 text-sm rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium disabled:opacity-50 transition-colors"
+ loading={savingPricing}
+ leadingIcon={<FiSave className="w-4 h-4" />}
  >
- {savingPricing ? (
- <>
- <FiRefreshCw className="w-4 h-4 animate-spin" /> Saving…
- </>
- ) : (
- <>
- <FiSave className="w-4 h-4" /> Save Pricing
- </>
- )}
- </button>
+ {savingPricing ? "Saving…" : "Save Pricing"}
+ </Button>
  </div>
- <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-2">
+ <div className="text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 flex items-start gap-2">
  <FiAlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
  <span>
  New prices apply only to <strong>future purchases</strong>.
@@ -359,91 +437,32 @@ export default function PlatformStoragePage() {
  </div>
  </div>
  )}
- </div>
+ </Card>
  )}
 
  {/* ─── All Companies table ─────────────────────────────── */}
  {allCompanies && (
- <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
- <div className="p-6 pb-4 border-b border-slate-200">
- <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">
+ <div className="space-y-3">
+ <div>
+ <h2 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
  All Companies — Storage Usage
  </h2>
- <p className="text-xs text-slate-500 mt-1">
+ <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
  {allCompanies.totalCompanies} companies · Platform total:{" "}
- <span className="font-semibold text-slate-700">
+ <span className="font-semibold text-slate-700 dark:text-slate-300">
  {allCompanies.platformTotal.usedGB} GB used
  </span>{" "}
  of {allCompanies.platformTotal.quotaGB} GB allocated ·{" "}
  {allCompanies.platformTotal.totalFiles.toLocaleString()} files
  </p>
  </div>
- <div className="overflow-x-auto">
- <table className="w-full text-left">
- <thead>
- <tr className="bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider">
- <th className="px-6 py-3">Company</th>
- <th className="px-6 py-3">Plan</th>
- <th className="px-6 py-3 text-right">Used</th>
- <th className="px-6 py-3 text-right">Quota</th>
- <th className="px-6 py-3 text-right">Files</th>
- <th className="px-6 py-3 text-right">Add-ons</th>
- <th className="px-6 py-3 w-1/4">Usage</th>
- </tr>
- </thead>
- <tbody className="divide-y divide-slate-200">
- {allCompanies.companies.map((c, i) => (
- <tr
- key={c.companyId}
- className={i % 2 === 0 ? "bg-white" : "bg-slate-50/50"}
- >
- <td className="px-6 py-3">
- <div className="font-medium text-slate-900">{c.name}</div>
- <div className="text-xs text-slate-500">
- {c.code} · {c.status}
- </div>
- </td>
- <td className="px-6 py-3 text-sm text-slate-600 capitalize">
- {c.plan}
- </td>
- <td className="px-6 py-3 text-right font-mono text-slate-900">
- {formatBytes(c.usedBytes)}
- </td>
- <td className="px-6 py-3 text-right font-mono text-sm text-slate-600">
- {formatMB(c.quotaMB)}
- </td>
- <td className="px-6 py-3 text-right font-mono text-sm text-slate-600">
- {c.fileCount.toLocaleString()}
- </td>
- <td className="px-6 py-3 text-right text-xs text-slate-500">
- {c.activeSubsCount > 0 ? (
- <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 font-semibold">
- {c.activeSubsCount}
- </span>
- ) : (
- <span className="text-slate-300">—</span>
- )}
- </td>
- <td className="px-6 py-3">
- <div className="flex items-center gap-3">
- <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
- <div
- className={`h-full ${barColor(c.usagePercentage)}`}
- style={{
- width: `${Math.min(100, c.usagePercentage).toFixed(1)}%`,
- }}
+ <DataTable
+ columns={companyColumns}
+ data={allCompanies.companies}
+ rowKey={(c) => c.companyId}
+ emptyTitle="No companies"
+ emptyDescription="No company storage usage to display yet."
  />
- </div>
- <span className="text-xs text-slate-500 min-w-[42px] text-right">
- {c.usagePercentage.toFixed(1)}%
- </span>
- </div>
- </td>
- </tr>
- ))}
- </tbody>
- </table>
- </div>
  </div>
  )}
  </div>

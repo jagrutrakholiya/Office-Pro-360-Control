@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import Layout from "../../../../../components/Layout";
 import FirebaseImageUpload from "../../../../../components/FirebaseImageUpload";
 import { useToast } from "../../../../../components/ui/Toast";
+import { Button, Card, CardHeader, CardTitle, PageHeader, Input, Textarea, Select, Skeleton } from "../../../../../components/ui";
 import { whitepaperAPI, Whitepaper } from "@/lib/marketingAPI";
 import { FaSave, FaArrowLeft, FaPlus, FaTrash } from "react-icons/fa";
 
@@ -105,8 +106,9 @@ export default function EditWhitepaper() {
   if (loading) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="space-y-4">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-64 w-full" />
         </div>
       </Layout>
     );
@@ -114,79 +116,67 @@ export default function EditWhitepaper() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-6">
-          <button
-            onClick={() => router.push("/marketing/whitepapers")}
-            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-4"
-          >
-            <FaArrowLeft /> Back to Whitepapers
-          </button>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Edit Whitepaper</h1>
-        </div>
+      <div className="space-y-6">
+        <PageHeader
+          title="Edit Whitepaper"
+          breadcrumbs={[{ label: 'Whitepapers', href: '/marketing/whitepapers' }, { label: 'Edit' }]}
+          actions={
+            <Button
+              type="button"
+              variant="outline"
+              leadingIcon={<FaArrowLeft />}
+              onClick={() => router.push("/marketing/whitepapers")}
+            >
+              Back to Whitepapers
+            </Button>
+          }
+        />
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Basic Information</h2>
+          <Card>
+            <CardHeader>
+              <CardTitle>Basic Information</CardTitle>
+            </CardHeader>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                  Title <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  required
-                />
-              </div>
+            <div className="mt-4 space-y-4">
+              <Input
+                label={<>Title <span className="text-red-500">*</span></>}
+                type="text"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                required
+              />
 
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Description</label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
+              <Textarea
+                label="Description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={3}
+              />
 
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                    Category <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Pages</label>
-                  <input
-                    type="number"
-                    value={formData.pages}
-                    onChange={(e) => setFormData({ ...formData, pages: parseInt(e.target.value) || 0 })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    min="0"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Publish Date</label>
-                <input
-                  type="date"
-                  value={formData.publishDate}
-                  onChange={(e) => setFormData({ ...formData, publishDate: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                <Input
+                  label={<>Category <span className="text-red-500">*</span></>}
+                  type="text"
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  required
+                />
+                <Input
+                  label="Pages"
+                  type="number"
+                  value={formData.pages}
+                  onChange={(e) => setFormData({ ...formData, pages: parseInt(e.target.value) || 0 })}
+                  min="0"
                 />
               </div>
+
+              <Input
+                label="Publish Date"
+                type="date"
+                value={formData.publishDate}
+                onChange={(e) => setFormData({ ...formData, publishDate: e.target.value })}
+              />
 
               <FirebaseImageUpload
                 label="Cover Image"
@@ -195,20 +185,17 @@ export default function EditWhitepaper() {
                 folder="whitepapers/covers"
               />
 
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">File URL (PDF)</label>
-                <input
-                  type="url"
-                  value={formData.fileUrl}
-                  onChange={(e) => setFormData({ ...formData, fileUrl: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="https://storage.example.com/whitepaper.pdf"
-                />
-              </div>
+              <Input
+                label="File URL (PDF)"
+                type="url"
+                value={formData.fileUrl}
+                onChange={(e) => setFormData({ ...formData, fileUrl: e.target.value })}
+                placeholder="https://storage.example.com/whitepaper.pdf"
+              />
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
                     <input
                       type="checkbox"
                       checked={formData.gated}
@@ -219,7 +206,7 @@ export default function EditWhitepaper() {
                   </label>
                 </div>
                 <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
                     <input
                       type="checkbox"
                       checked={formData.featured}
@@ -231,42 +218,40 @@ export default function EditWhitepaper() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Status</label>
-                <select
-                  value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >
-                  <option value="draft">Draft</option>
-                  <option value="published">Published</option>
-                  <option value="archived">Archived</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Authors</h2>
-              <button
-                type="button"
-                onClick={addAuthor}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              <Select
+                label="Status"
+                value={formData.status}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
               >
-                <FaPlus /> Add Author
-              </button>
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+                <option value="archived">Archived</option>
+              </Select>
+            </div>
+          </Card>
+
+          <Card>
+            <div className="flex items-center justify-between">
+              <CardTitle>Authors</CardTitle>
+              <Button
+                type="button"
+                variant="primary"
+                leadingIcon={<FaPlus />}
+                onClick={addAuthor}
+              >
+                Add Author
+              </Button>
             </div>
 
-            <div className="space-y-3">
+            <div className="mt-4 space-y-3">
               {formData.authors.map((author, index) => (
-                <div key={index} className="flex gap-3">
-                  <input
+                <div key={index} className="flex gap-3 items-start">
+                  <Input
+                    wrapperClassName="flex-1"
                     type="text"
                     value={author}
                     onChange={(e) => updateAuthor(index, e.target.value)}
                     placeholder="Author name"
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                   {formData.authors.length > 1 && (
                     <button
@@ -280,64 +265,56 @@ export default function EditWhitepaper() {
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">SEO Settings</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">SEO Title</label>
-                <input
-                  type="text"
-                  value={formData.seo.title}
-                  onChange={(e) => setFormData({ ...formData, seo: { ...formData.seo, title: e.target.value } })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">SEO Description</label>
-                <textarea
-                  value={formData.seo.description}
-                  onChange={(e) => setFormData({ ...formData, seo: { ...formData.seo, description: e.target.value } })}
-                  rows={2}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                  Keywords (comma-separated)
-                </label>
-                <input
-                  type="text"
-                  value={formData.seo.keywords.join(", ")}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      seo: { ...formData.seo, keywords: e.target.value.split(",").map((k) => k.trim()) },
-                    })
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="keyword1, keyword2, keyword3"
-                />
-              </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>SEO Settings</CardTitle>
+            </CardHeader>
+            <div className="mt-4 space-y-4">
+              <Input
+                label="SEO Title"
+                type="text"
+                value={formData.seo.title}
+                onChange={(e) => setFormData({ ...formData, seo: { ...formData.seo, title: e.target.value } })}
+              />
+              <Textarea
+                label="SEO Description"
+                value={formData.seo.description}
+                onChange={(e) => setFormData({ ...formData, seo: { ...formData.seo, description: e.target.value } })}
+                rows={2}
+              />
+              <Input
+                label="Keywords (comma-separated)"
+                type="text"
+                value={formData.seo.keywords.join(", ")}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    seo: { ...formData.seo, keywords: e.target.value.split(",").map((k) => k.trim()) },
+                  })
+                }
+                placeholder="keyword1, keyword2, keyword3"
+              />
             </div>
-          </div>
+          </Card>
 
           <div className="flex gap-4">
-            <button
+            <Button
               type="submit"
-              disabled={saving}
-              className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+              variant="primary"
+              loading={saving}
+              leadingIcon={<FaSave />}
             >
-              <FaSave /> {saving ? "Saving..." : "Save Changes"}
-            </button>
-            <button
+              {saving ? "Saving..." : "Save Changes"}
+            </Button>
+            <Button
               type="button"
+              variant="outline"
               onClick={() => router.push("/marketing/whitepapers")}
-              className="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       </div>

@@ -3,6 +3,17 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import Layout from "../../components/Layout";
 import api from "../../lib/api";
 import { getSocket } from "../../lib/socket";
+import {
+  PageHeader,
+  Button,
+  Badge,
+  StatCard,
+  Card,
+  CardHeader,
+  CardTitle,
+  EmptyState,
+  Skeleton,
+} from "@/components/ui";
 
 type OnlineUser = {
   userId: string;
@@ -104,10 +115,10 @@ export default function RealtimeDashboard() {
   });
 
   const roleColor = (role: string) => {
-    if (role === "admin") return "text-red-600";
-    if (role === "hr") return "text-purple-600";
-    if (role === "manager") return "text-blue-600";
-    return "text-slate-600";
+    if (role === "admin") return "text-danger-600 dark:text-danger-400";
+    if (role === "hr") return "text-purple-600 dark:text-purple-400";
+    if (role === "manager") return "text-primary-600 dark:text-primary-400";
+    return "text-slate-600 dark:text-slate-400";
   };
 
   const formatTime = (ts: string) => {
@@ -125,107 +136,126 @@ export default function RealtimeDashboard() {
       .replace(/\b\w/g, (c) => c.toUpperCase());
   };
 
+  const companyCount = Object.keys(byCompany).length;
+
   return (
     <Layout>
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Real-Time Dashboard</h1>
-          <p className="text-sm text-slate-600 mt-1">Live platform activity and online users across all companies.</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${connected ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`}>
-            <div className={`w-2 h-2 rounded-full ${connected ? "bg-emerald-500 animate-pulse" : "bg-red-500"}`} />
-            {connected ? "Live" : "Disconnected"}
-          </div>
-          <button onClick={loadOnlineUsers} className="px-3 py-1.5 text-xs font-medium rounded-md border border-slate-300 hover:bg-slate-50">
-            Refresh
-          </button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Online Users */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg border border-slate-200">
-            <div className="px-5 py-3 border-b border-slate-200 flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-slate-900">Online Users</h3>
-              <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
-                {onlineUsers.length}
-              </span>
+      <div className="space-y-6">
+        <PageHeader
+          title="Real-Time Dashboard"
+          description="Live platform activity and online users across all companies."
+          actions={
+            <div className="flex items-center gap-3">
+              <Badge variant={connected ? "success" : "danger"}>
+                <span
+                  className={`w-2 h-2 rounded-full ${
+                    connected ? "bg-success-500 animate-pulse" : "bg-danger-500"
+                  }`}
+                />
+                {connected ? "Live" : "Disconnected"}
+              </Badge>
+              <Button variant="outline" size="sm" onClick={loadOnlineUsers}>
+                Refresh
+              </Button>
             </div>
+          }
+        />
 
-            {loading ? (
-              <div className="p-6 text-center text-sm text-slate-400">Loading...</div>
-            ) : onlineUsers.length === 0 ? (
-              <div className="p-6 text-center text-sm text-slate-400">No users online right now.</div>
-            ) : (
-              <div className="divide-y divide-slate-100 max-h-[600px] overflow-y-auto">
-                {Object.entries(byCompany)
-                  .sort((a, b) => b[1].length - a[1].length)
-                  .map(([company, users]) => (
-                    <div key={company}>
-                      <div className="px-4 py-2 bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider flex justify-between">
-                        <span>{company}</span>
-                        <span>{users.length}</span>
-                      </div>
-                      {users.map((u) => (
-                        <div key={u.userId} className="px-4 py-2.5 flex items-center gap-3 hover:bg-slate-50">
-                          <div className="relative">
-                            <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-semibold">
-                              {u.name?.charAt(0)?.toUpperCase() || "?"}
-                            </div>
-                            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="text-sm font-medium text-slate-900 truncate">{u.name}</div>
-                            <div className={`text-[11px] ${roleColor(u.role)} capitalize`}>{u.role || "employee"}</div>
-                          </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard label="Online Users" value={onlineUsers.length} accent="success" />
+          <StatCard label="Active Companies" value={companyCount} accent="primary" />
+          <StatCard label="Live Events" value={activities.length} accent="warning" />
+          <StatCard
+            label="Connection"
+            value={connected ? "Live" : "Down"}
+            accent={connected ? "success" : "danger"}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Online Users */}
+          <div className="lg:col-span-1">
+            <Card padding="none">
+              <CardHeader className="flex-row items-center justify-between px-5 py-3 border-b border-slate-200 dark:border-slate-800">
+                <CardTitle className="text-sm">Online Users</CardTitle>
+                <Badge variant="success" size="sm">{onlineUsers.length}</Badge>
+              </CardHeader>
+
+              {loading ? (
+                <div className="p-5 space-y-3">
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              ) : onlineUsers.length === 0 ? (
+                <EmptyState title="No users online" description="No users online right now." size="compact" />
+              ) : (
+                <div className="divide-y divide-slate-100 dark:divide-slate-800 max-h-[600px] overflow-y-auto">
+                  {Object.entries(byCompany)
+                    .sort((a, b) => b[1].length - a[1].length)
+                    .map(([company, users]) => (
+                      <div key={company}>
+                        <div className="px-4 py-2 bg-slate-50 dark:bg-slate-800 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex justify-between">
+                          <span>{company}</span>
+                          <span>{users.length}</span>
                         </div>
-                      ))}
+                        {users.map((u) => (
+                          <div key={u.userId} className="px-4 py-2.5 flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800/60">
+                            <div className="relative">
+                              <div className="w-8 h-8 rounded-full bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 flex items-center justify-center text-xs font-semibold">
+                                {u.name?.charAt(0)?.toUpperCase() || "?"}
+                              </div>
+                              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-success-500 border-2 border-white dark:border-slate-900" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">{u.name}</div>
+                              <div className={`text-[11px] ${roleColor(u.role)} capitalize`}>{u.role || "employee"}</div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                </div>
+              )}
+            </Card>
+          </div>
+
+          {/* Live Activity Feed */}
+          <div className="lg:col-span-2">
+            <Card padding="none">
+              <CardHeader className="flex-row items-center justify-between px-5 py-3 border-b border-slate-200 dark:border-slate-800">
+                <CardTitle className="text-sm">Live Activity</CardTitle>
+                <span className="text-xs text-slate-500 dark:text-slate-400">{activities.length} events</span>
+              </CardHeader>
+
+              {activities.length === 0 ? (
+                <EmptyState
+                  title="Waiting for activity…"
+                  description="Events will appear here in real-time as users perform actions across the platform."
+                />
+              ) : (
+                <div className="divide-y divide-slate-100 dark:divide-slate-800 max-h-[600px] overflow-y-auto">
+                  {activities.map((a, i) => (
+                    <div key={`${a._ts}-${i}`} className="px-5 py-3 flex items-start gap-3 hover:bg-slate-50 dark:hover:bg-slate-800/60">
+                      <div className="w-2 h-2 rounded-full bg-primary-500 mt-2 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm text-slate-900 dark:text-slate-100">
+                          <span className="font-medium">{a.userName || "System"}</span>
+                          {" "}
+                          <span className="text-slate-600 dark:text-slate-400">{eventLabel(a.event)}</span>
+                        </div>
+                        {a.summary && (
+                          <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{a.summary}</div>
+                        )}
+                      </div>
+                      <div className="text-[11px] text-slate-400 dark:text-slate-500 whitespace-nowrap flex-shrink-0">
+                        {formatTime(a._ts)}
+                      </div>
                     </div>
                   ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Live Activity Feed */}
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-lg border border-slate-200">
-            <div className="px-5 py-3 border-b border-slate-200 flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-slate-900">Live Activity</h3>
-              <span className="text-xs text-slate-500">{activities.length} events</span>
-            </div>
-
-            {activities.length === 0 ? (
-              <div className="p-12 text-center">
-                <div className="text-sm text-slate-400 mb-2">Waiting for activity...</div>
-                <p className="text-xs text-slate-400">
-                  Events will appear here in real-time as users perform actions across the platform.
-                </p>
-              </div>
-            ) : (
-              <div className="divide-y divide-slate-100 max-h-[600px] overflow-y-auto">
-                {activities.map((a, i) => (
-                  <div key={`${a._ts}-${i}`} className="px-5 py-3 flex items-start gap-3 hover:bg-slate-50">
-                    <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm text-slate-900">
-                        <span className="font-medium">{a.userName || "System"}</span>
-                        {" "}
-                        <span className="text-slate-600">{eventLabel(a.event)}</span>
-                      </div>
-                      {a.summary && (
-                        <div className="text-xs text-slate-500 mt-0.5">{a.summary}</div>
-                      )}
-                    </div>
-                    <div className="text-[11px] text-slate-400 whitespace-nowrap flex-shrink-0">
-                      {formatTime(a._ts)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                </div>
+              )}
+            </Card>
           </div>
         </div>
       </div>

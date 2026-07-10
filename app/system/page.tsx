@@ -3,6 +3,16 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Layout from "../../components/Layout";
 import api from "../../lib/api";
+import {
+ PageHeader,
+ Button,
+ Badge,
+ StatCard,
+ Card,
+ CardTitle,
+ EmptyState,
+ Skeleton,
+} from "@/components/ui";
 
 type HealthData = {
  status?: string;
@@ -90,173 +100,141 @@ export default function SystemPage() {
  }
 
  const dbStatus = health?.database?.status || "unknown";
- const dbColor =
- dbStatus === "connected" || dbStatus === "ok"
- ? "bg-green-100 text-green-700"
- : "bg-red-100 text-red-700";
+ const dbOk = dbStatus === "connected" || dbStatus === "ok";
 
- const serverColor =
+ const serverBadge: "success" | "warning" | "danger" =
  health?.status === "ok" || health?.status === "healthy"
- ? "bg-green-100 text-green-700"
+ ? "success"
  : health
- ? "bg-yellow-100 text-yellow-700"
- : "bg-red-100 text-red-700";
+ ? "warning"
+ : "danger";
 
  return (
  <Layout>
- <div className="section-header">
- <div className="section-actions">
- <div>
- <h2 className="section-title">System Health</h2>
- <p className="section-subtitle">
- Monitor server status, database, and configuration
- </p>
- </div>
- <button onClick={loadHealth} className="btn-secondary">
+ <div className="space-y-6">
+ <PageHeader
+ title="System Health"
+ description="Monitor server status, database, and configuration"
+ actions={
+ <Button variant="secondary" onClick={loadHealth}>
  Refresh
- </button>
- </div>
- </div>
+ </Button>
+ }
+ />
 
  {loading ? (
- <div className="flex items-center justify-center py-24">
- <div className="flex flex-col items-center gap-4">
- <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
- <div className="text-slate-600 font-medium">Checking system health...</div>
+ <div className="space-y-6">
+ <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+ <Skeleton className="h-24 w-full" />
+ <Skeleton className="h-24 w-full" />
+ <Skeleton className="h-24 w-full" />
+ <Skeleton className="h-24 w-full" />
  </div>
+ <Skeleton className="h-40 w-full" />
  </div>
  ) : (
  <div className="space-y-6">
  {/* Server Status */}
- <div className="bg-white rounded-xl border border-slate-200 p-6">
- <h3 className="text-lg font-bold text-slate-900 mb-4">Server Status</h3>
- <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
- <div className="p-4 bg-slate-50 rounded-lg">
- <div className="text-xs text-slate-500 uppercase font-semibold mb-1">Status</div>
- <span className={`px-2.5 py-1 rounded-full text-sm font-semibold ${serverColor}`}>
- {health?.status || "Unknown"}
- </span>
+ <Card padding="lg">
+ <CardTitle className="text-lg mb-4">Server Status</CardTitle>
+ <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+ <StatCard
+ label="Status"
+ accent={serverBadge === "success" ? "success" : serverBadge === "warning" ? "warning" : "danger"}
+ value={
+ <Badge variant={serverBadge}>{health?.status || "Unknown"}</Badge>
+ }
+ />
+ <StatCard label="Uptime" value={formatUptime(health?.uptime)} accent="primary" />
+ <StatCard label="Version" value={health?.version || "N/A"} accent="neutral" />
+ <StatCard label="Environment" value={health?.environment || "N/A"} accent="neutral" />
  </div>
- <div className="p-4 bg-slate-50 rounded-lg">
- <div className="text-xs text-slate-500 uppercase font-semibold mb-1">Uptime</div>
- <div className="text-lg font-bold text-slate-900">
- {formatUptime(health?.uptime)}
- </div>
- </div>
- <div className="p-4 bg-slate-50 rounded-lg">
- <div className="text-xs text-slate-500 uppercase font-semibold mb-1">Version</div>
- <div className="text-lg font-bold text-slate-900">
- {health?.version || "N/A"}
- </div>
- </div>
- <div className="p-4 bg-slate-50 rounded-lg">
- <div className="text-xs text-slate-500 uppercase font-semibold mb-1">Environment</div>
- <div className="text-lg font-bold text-slate-900">
- {health?.environment || "N/A"}
- </div>
- </div>
- </div>
- </div>
+ </Card>
 
  {/* Database Status */}
- <div className="bg-white rounded-xl border border-slate-200 p-6">
- <h3 className="text-lg font-bold text-slate-900 mb-4">Database</h3>
+ <Card padding="lg">
+ <CardTitle className="text-lg mb-4">Database</CardTitle>
  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
- <div className="p-4 bg-slate-50 rounded-lg">
- <div className="text-xs text-slate-500 uppercase font-semibold mb-1">MongoDB Status</div>
- <span className={`px-2.5 py-1 rounded-full text-sm font-semibold ${dbColor}`}>
- {dbStatus}
- </span>
- </div>
- <div className="p-4 bg-slate-50 rounded-lg">
- <div className="text-xs text-slate-500 uppercase font-semibold mb-1">Database Name</div>
- <div className="text-lg font-bold text-slate-900">
- {health?.database?.name || "N/A"}
- </div>
- </div>
+ <StatCard
+ label="MongoDB Status"
+ accent={dbOk ? "success" : "danger"}
+ value={<Badge variant={dbOk ? "success" : "danger"}>{dbStatus}</Badge>}
+ />
+ <StatCard label="Database Name" value={health?.database?.name || "N/A"} accent="neutral" />
  {health?.memory && (
- <div className="p-4 bg-slate-50 rounded-lg">
- <div className="text-xs text-slate-500 uppercase font-semibold mb-1">Memory Usage</div>
- <div className="text-lg font-bold text-slate-900">
- {formatBytes(health.memory.heapUsed)} / {formatBytes(health.memory.heapTotal)}
- </div>
- </div>
+ <StatCard
+ label="Memory Usage"
+ value={`${formatBytes(health.memory.heapUsed)} / ${formatBytes(health.memory.heapTotal)}`}
+ accent="primary"
+ />
  )}
  </div>
- </div>
+ </Card>
 
  {/* Configuration */}
- <div className="bg-white rounded-xl border border-slate-200 p-6">
- <h3 className="text-lg font-bold text-slate-900 mb-4">Configuration</h3>
- <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
- <div className="p-4 bg-slate-50 rounded-lg">
- <div className="text-xs text-slate-500 uppercase font-semibold mb-1">NODE_ENV</div>
- <div className="text-sm font-bold text-slate-900">
- {health?.environment || "N/A"}
- </div>
- </div>
- <div className="p-4 bg-slate-50 rounded-lg">
- <div className="text-xs text-slate-500 uppercase font-semibold mb-1">Razorpay</div>
- <span
- className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
- paymentConfig?.configured
- ? "bg-green-100 text-green-700"
- : "bg-red-100 text-red-700"
- }`}
- >
+ <Card padding="lg">
+ <CardTitle className="text-lg mb-4">Configuration</CardTitle>
+ <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+ <StatCard label="NODE_ENV" value={health?.environment || "N/A"} accent="neutral" />
+ <StatCard
+ label="Razorpay"
+ accent={paymentConfig?.configured ? "success" : "danger"}
+ value={
+ <Badge variant={paymentConfig?.configured ? "success" : "danger"}>
  {paymentConfig?.configured ? "Configured" : "Not Configured"}
- </span>
+ </Badge>
+ }
+ />
+ <StatCard
+ label="Email"
+ accent="neutral"
+ value={<Badge variant="neutral">Check Server Logs</Badge>}
+ />
+ <StatCard
+ label="Firebase"
+ accent="neutral"
+ value={<Badge variant="neutral">Check Server Logs</Badge>}
+ />
  </div>
- <div className="p-4 bg-slate-50 rounded-lg">
- <div className="text-xs text-slate-500 uppercase font-semibold mb-1">Email</div>
- <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-200 text-slate-600">
- Check Server Logs
- </span>
- </div>
- <div className="p-4 bg-slate-50 rounded-lg">
- <div className="text-xs text-slate-500 uppercase font-semibold mb-1">Firebase</div>
- <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-200 text-slate-600">
- Check Server Logs
- </span>
- </div>
- </div>
- </div>
+ </Card>
 
  {/* Quick Actions */}
- <div className="bg-white rounded-xl border border-slate-200 p-6">
- <h3 className="text-lg font-bold text-slate-900 mb-4">Quick Actions</h3>
+ <Card padding="lg">
+ <CardTitle className="text-lg mb-4">Quick Actions</CardTitle>
  <div className="flex flex-wrap gap-3">
- <button
+ <Button
+ variant="primary"
  onClick={seedPlans}
  disabled={seedingPlans}
- className="btn-primary"
+ loading={seedingPlans}
  >
  {seedingPlans ? "Seeding..." : "Seed Default Plans"}
- </button>
- <button
+ </Button>
+ <Button
+ variant="secondary"
  onClick={() => alert("API cache clearing is not yet implemented.")}
- className="btn-secondary"
  >
  Clear API Cache
- </button>
+ </Button>
  </div>
- </div>
+ </Card>
 
  {/* Recent Errors */}
- <div className="bg-white rounded-xl border border-slate-200 p-6">
- <h3 className="text-lg font-bold text-slate-900 mb-4">Recent Errors</h3>
- <div className="text-center py-8 text-slate-400">
- <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-100 flex items-center justify-center">
- <svg className="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <Card padding="lg">
+ <CardTitle className="text-lg mb-4">Recent Errors</CardTitle>
+ <EmptyState
+ title="Coming Soon"
+ description="Error tracking will be available in a future update."
+ icon={
+ <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
  </svg>
- </div>
- <p className="text-lg font-medium">Coming Soon</p>
- <p className="text-sm mt-1">Error tracking will be available in a future update.</p>
- </div>
- </div>
+ }
+ />
+ </Card>
  </div>
  )}
+ </div>
  </Layout>
  );
 }

@@ -2,9 +2,15 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Layout from "../../components/Layout";
-import PageHeader from "../../components/ui/PageHeader";
-import EmptyState from "../../components/ui/EmptyState";
-import DataTable, { Column } from "../../components/ui/DataTable";
+import {
+  PageHeader,
+  EmptyState,
+  DataTable,
+  Column,
+  Badge,
+  Button,
+  IconButton,
+} from "@/components/ui";
 import { useToast } from "../../components/ui/Toast";
 import api from "../../lib/api";
 import { FaPlus, FaPencilAlt, FaTrash, FaStar, FaRegStar, FaCommentDots } from "react-icons/fa";
@@ -97,11 +103,11 @@ export default function ReviewsPage() {
       key: "status",
       header: "Status",
       render: (r) => (
-        <span
-          className={`badge ${r.status === "published" ? "badge-active" : r.status === "pending" ? "badge-pending" : "badge-view-only"}`}
+        <Badge
+          variant={r.status === "published" ? "success" : r.status === "pending" ? "warning" : "neutral"}
         >
           {r.status}
-        </span>
+        </Badge>
       ),
     },
     {
@@ -110,25 +116,29 @@ export default function ReviewsPage() {
       width: "160px",
       render: (r) => (
         <div className="flex gap-2">
-          <button
+          <Button
+            size="sm"
+            variant="outline"
+            leadingIcon={<FaPencilAlt className="text-[10px]" />}
             onClick={(e) => {
               e.stopPropagation();
               router.push(`/reviews/edit/${r._id}`);
             }}
-            className="flex items-center gap-1 px-3 py-1.5 text-xs border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
           >
-            <FaPencilAlt className="text-[10px]" /> Edit
-          </button>
-          <button
+            Edit
+          </Button>
+          <IconButton
+            size="sm"
+            variant="outline"
+            aria-label="Delete"
+            className="text-danger-600"
             onClick={(e) => {
               e.stopPropagation();
               deleteReview(r._id, r.author);
             }}
-            className="p-1.5 text-red-600 border border-red-200 dark:border-red-900/30 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-            aria-label="Delete"
           >
             <FaTrash className="text-[11px]" />
-          </button>
+          </IconButton>
         </div>
       ),
     },

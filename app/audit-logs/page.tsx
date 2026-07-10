@@ -3,6 +3,16 @@ import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Layout from "../../components/Layout";
 import api from "../../lib/api";
+import {
+ PageHeader,
+ StatCard,
+ Card,
+ DataTable,
+ Badge,
+ Button,
+ Input,
+ Select,
+} from "@/components/ui";
 
 type AuditLog = {
  _id: string;
@@ -116,46 +126,24 @@ export default function AuditLogsPage() {
 
  return (
  <Layout>
- <div className="section-header">
- <div className="section-actions">
- <div>
- <h2 className="section-title">Audit Logs</h2>
- <p className="section-subtitle">
- Track all system activity and user actions
- </p>
- </div>
- <button onClick={exportLogs} className="btn-primary">
- Export Excel
- </button>
- </div>
- </div>
+ <div className="space-y-6">
+ <PageHeader
+ title="Audit Logs"
+ description="Track all system activity and user actions"
+ actions={<Button onClick={exportLogs}>Export Excel</Button>}
+ />
 
  {/* Stats Cards */}
- <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
- <div className="bg-white rounded-xl border border-slate-200 p-5">
- <div className="text-sm text-slate-500 font-medium">Actions Today</div>
- <div className="text-3xl font-bold text-blue-600 mt-1">
- {stats.today ?? 0}
- </div>
- </div>
- <div className="bg-white rounded-xl border border-slate-200 p-5">
- <div className="text-sm text-slate-500 font-medium">This Week</div>
- <div className="text-3xl font-bold text-green-600 mt-1">
- {stats.thisWeek ?? 0}
- </div>
- </div>
- <div className="bg-white rounded-xl border border-slate-200 p-5">
- <div className="text-sm text-slate-500 font-medium">This Month</div>
- <div className="text-3xl font-bold text-purple-600 mt-1">
- {stats.thisMonth ?? 0}
- </div>
- </div>
+ <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+ <StatCard label="Actions Today" value={stats.today ?? 0} accent="primary" />
+ <StatCard label="This Week" value={stats.thisWeek ?? 0} accent="success" />
+ <StatCard label="This Month" value={stats.thisMonth ?? 0} accent="neutral" />
  </div>
 
  {/* Filters */}
- <div className="bg-white rounded-xl border border-slate-200 p-4 mb-6">
- <div className="flex flex-col sm:flex-row gap-3">
- <input
+ <Card padding="md">
+ <div className="flex flex-col sm:flex-row flex-wrap gap-3">
+ <Input
  type="search"
  placeholder="Search logs..."
  value={search}
@@ -163,15 +151,14 @@ export default function AuditLogsPage() {
  setSearch(e.target.value);
  setPage(1);
  }}
- className="input-small flex-1"
+ className="flex-1 min-w-[180px]"
  />
- <select
+ <Select
  value={actionFilter}
  onChange={(e) => {
  setActionFilter(e.target.value);
  setPage(1);
  }}
- className="select-small"
  >
  <option value="">All Actions</option>
  {actionTypes.map((a) => (
@@ -179,187 +166,139 @@ export default function AuditLogsPage() {
  {a}
  </option>
  ))}
- </select>
- <div className="flex gap-2 items-center">
- <label className="text-sm text-slate-600">From:</label>
- <input
+ </Select>
+ <Input
+ label="From"
  type="date"
  value={dateFrom}
  onChange={(e) => {
  setDateFrom(e.target.value);
  setPage(1);
  }}
- className="input-small"
  />
- </div>
- <div className="flex gap-2 items-center">
- <label className="text-sm text-slate-600">To:</label>
- <input
+ <Input
+ label="To"
  type="date"
  value={dateTo}
  onChange={(e) => {
  setDateTo(e.target.value);
  setPage(1);
  }}
- className="input-small"
  />
- </div>
- <button
+ <div className="flex items-end">
+ <Button
+ variant="secondary"
  onClick={() => {
  loadLogs();
  setPage(1);
  }}
- className="btn-secondary-small"
  >
  Apply
- </button>
+ </Button>
  </div>
  </div>
+ </Card>
 
  {/* Table */}
- <section className="table-wrapper">
- <div className="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100">
+ <div className="space-y-3">
  <div className="flex items-center gap-2">
- <div className="w-2 h-6 bg-gradient-to-b from-indigo-500 to-indigo-600 rounded-full"></div>
- <h3 className="text-lg font-bold text-slate-900">Log Entries</h3>
- <span className="badge badge-pending">{filtered.length} total</span>
- </div>
- </div>
-
- {loading ? (
- <div className="flex items-center justify-center py-12">
- <div className="flex flex-col items-center gap-4">
- <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
- <div className="text-slate-600 font-medium">Loading logs...</div>
- </div>
- </div>
- ) : (
- <>
- <div className="hidden lg:block table-responsive">
- <table className="w-full">
- <thead className="table-header">
- <tr>
- <th className="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">
- Timestamp
- </th>
- <th className="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">
- User
- </th>
- <th className="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">
- Action
- </th>
- <th className="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">
- Resource
- </th>
- <th className="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">
- Details
- </th>
- <th className="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">
- IP Address
- </th>
- </tr>
- </thead>
- <tbody className="divide-y divide-slate-100">
- {paged.map((l) => (
- <tr key={l._id} className="table-row">
- <td className="px-6 py-4 text-sm text-slate-500">
- {new Date(
- l.timestamp || l.createdAt || ""
- ).toLocaleString()}
- </td>
- <td className="px-6 py-4 text-sm font-medium text-slate-900">
- {l.userName || "System"}
- </td>
- <td className="px-6 py-4">
- <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
- {l.action}
- </span>
- </td>
- <td className="px-6 py-4 text-sm text-slate-600">
- {l.resourceType || "N/A"}
- </td>
- <td className="px-6 py-4 text-sm text-slate-600 max-w-xs truncate">
- {l.details || "N/A"}
- </td>
- <td className="px-6 py-4 text-sm font-mono text-slate-500">
- {l.ipAddress || "N/A"}
- </td>
- </tr>
- ))}
- </tbody>
- </table>
+ <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+ Log Entries
+ </h3>
+ <Badge variant="neutral">{filtered.length} total</Badge>
  </div>
 
- {/* Mobile Cards */}
- <div className="lg:hidden p-4 space-y-4">
- {paged.map((l) => (
- <div key={l._id} className="mobile-card">
- <div className="mobile-card-header">
- <span className="text-sm font-medium text-slate-900">
- {l.userName || "System"}
- </span>
- <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
- {l.action}
- </span>
- </div>
- <div className="mobile-card-content">
- <div className="mobile-card-row">
- <span className="mobile-card-label">Time</span>
- <span className="mobile-card-value text-xs">
+ <DataTable
+ loading={loading}
+ data={paged}
+ rowKey={(l: AuditLog) => l._id}
+ emptyTitle="No logs found"
+ emptyDescription="Try adjusting your filters."
+ columns={[
+ {
+ key: "timestamp",
+ header: "Timestamp",
+ render: (l: AuditLog) => (
+ <span className="text-slate-500 dark:text-slate-400">
  {new Date(l.timestamp || l.createdAt || "").toLocaleString()}
  </span>
- </div>
- <div className="mobile-card-row">
- <span className="mobile-card-label">Resource</span>
- <span className="mobile-card-value">{l.resourceType || "N/A"}</span>
- </div>
- {l.details && (
- <div className="mobile-card-row">
- <span className="mobile-card-label">Details</span>
- <span className="mobile-card-value text-xs truncate max-w-[200px]">{l.details}</span>
- </div>
- )}
- </div>
- </div>
- ))}
- </div>
+ ),
+ },
+ {
+ key: "user",
+ header: "User",
+ render: (l: AuditLog) => (
+ <span className="font-medium text-slate-900 dark:text-slate-100">
+ {l.userName || "System"}
+ </span>
+ ),
+ },
+ {
+ key: "action",
+ header: "Action",
+ render: (l: AuditLog) => <Badge variant="info">{l.action}</Badge>,
+ },
+ {
+ key: "resource",
+ header: "Resource",
+ render: (l: AuditLog) => l.resourceType || "N/A",
+ },
+ {
+ key: "details",
+ header: "Details",
+ render: (l: AuditLog) => (
+ <span className="max-w-xs truncate block">{l.details || "N/A"}</span>
+ ),
+ },
+ {
+ key: "ip",
+ header: "IP Address",
+ render: (l: AuditLog) => (
+ <span className="font-mono text-slate-500 dark:text-slate-400">
+ {l.ipAddress || "N/A"}
+ </span>
+ ),
+ },
+ ]}
+ />
 
  {/* Pagination */}
  {totalPages > 1 && (
- <div className="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
- <p className="text-sm text-slate-600">
+ <div className="flex items-center justify-between">
+ <p className="text-sm text-slate-600 dark:text-slate-400">
  Showing {(page - 1) * perPage + 1} -{" "}
  {Math.min(page * perPage, filtered.length)} of {filtered.length}
  </p>
- <div className="flex gap-2">
- <button
+ <div className="flex items-center gap-2">
+ <Button
+ variant="secondary"
+ size="sm"
  disabled={page <= 1}
  onClick={() => setPage((p) => p - 1)}
- className="btn-secondary-small disabled:opacity-50"
  >
  Previous
- </button>
- <span className="px-3 py-1.5 text-sm font-medium text-slate-700">
+ </Button>
+ <span className="px-3 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-300">
  {page} / {totalPages}
  </span>
- <button
+ <Button
+ variant="secondary"
+ size="sm"
  disabled={page >= totalPages}
  onClick={() => setPage((p) => p + 1)}
- className="btn-secondary-small disabled:opacity-50"
  >
  Next
- </button>
+ </Button>
  </div>
  </div>
  )}
- </>
- )}
- </section>
+ </div>
 
  {/* Note */}
- <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
+ <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/40 rounded-xl text-sm text-amber-800 dark:text-amber-300">
  <strong>Note:</strong> The audit dashboard API filters by the company of the logged-in user.
  For super_admin accounts, all company logs should be visible if the backend supports it.
+ </div>
  </div>
  </Layout>
  );

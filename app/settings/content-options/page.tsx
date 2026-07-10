@@ -8,6 +8,17 @@ import {
  initializeGlobalDefaults,
  type OptionItem,
 } from "@/lib/contentOptionsAPI";
+import {
+ PageHeader,
+ Card,
+ Button,
+ IconButton,
+ Badge,
+ Tabs,
+ Input,
+ EmptyState,
+ Skeleton,
+} from "@/components/ui";
 
 export default function ContentOptionsPage() {
  const router = useRouter();
@@ -148,196 +159,144 @@ export default function ContentOptionsPage() {
 
  if (loading) {
  return (
- <div className="flex items-center justify-center min-h-screen">
- <div className="text-center">
- <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
- <p className="text-gray-600">Loading options...</p>
- </div>
+ <div className="p-6 space-y-6">
+ <PageHeader
+ title="Content Options Manager"
+ description="Manage global default options for marketing content."
+ breadcrumbs={[
+ { label: "Settings", href: "/settings" },
+ { label: "Content Options" },
+ ]}
+ />
+ <Skeleton className="h-10 w-full rounded-lg" />
+ <Skeleton className="h-64 w-full rounded-xl" />
  </div>
  );
  }
 
  const currentOptions = options?.[activeTab] || [];
+ const currentLabel = optionTypes.find((t) => t.key === activeTab)?.label;
 
  return (
- <div className="min-h-screen bg-gray-50">
- {/* Header */}
- <div className="bg-white border-b sticky top-0 z-10">
- <div className="max-w-7xl mx-auto px-6 py-4">
- <div className="flex items-center justify-between">
- <div>
- <h1 className="text-2xl font-bold text-gray-900">
- Content Options Manager
- </h1>
- <p className="text-sm text-gray-600 mt-1">
- Manage global default options for marketing content. Companies
- can override these with their own values.
- </p>
- </div>
- <div className="flex gap-3">
- <button
- onClick={handleReset}
- disabled={saving}
- className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 flex items-center gap-2"
- >
+ <div className="p-6 space-y-6">
+ <PageHeader
+ title="Content Options Manager"
+ description="Manage global default options for marketing content. Companies can override these with their own values."
+ breadcrumbs={[
+ { label: "Settings", href: "/settings" },
+ { label: "Content Options" },
+ ]}
+ actions={
+ <>
+ <Button variant="outline" onClick={handleReset} disabled={saving}>
  Reset to Defaults
- </button>
- <button
- onClick={handleSave}
- disabled={saving}
- className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
- >
+ </Button>
+ <Button onClick={handleSave} loading={saving} disabled={saving}>
  {saving ? "Saving..." : "Save Changes"}
- </button>
- </div>
- </div>
- </div>
- </div>
+ </Button>
+ </>
+ }
+ />
 
- <div className="max-w-7xl mx-auto px-6 py-6">
- <div className="flex gap-6">
- {/* Sidebar Tabs */}
- <div className="w-64 flex-shrink-0">
- <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
- {optionTypes.map((type) => (
- <button
- key={type.key}
- onClick={() => setActiveTab(type.key)}
- className={`w-full px-4 py-3 text-left flex items-center gap-3 border-b last:border-b-0 transition-colors ${
- activeTab === type.key
- ? "bg-blue-50 border-l-4 border-l-blue-600 text-blue-900"
- : "hover:bg-gray-50 text-gray-700 border-l-4 border-l-transparent"
- }`}
- >
- <span className="text-xl">{type.icon}</span>
- <div className="flex-1">
- <div className="font-medium">{type.label}</div>
- <div className="text-xs text-gray-500">
- {(options?.[type.key] || []).length} options
- </div>
- </div>
- </button>
- ))}
- </div>
- </div>
+ <Tabs
+ tabs={optionTypes.map((t) => ({
+ key: t.key,
+ label: t.label,
+ badge: (options?.[t.key] || []).length,
+ }))}
+ activeKey={activeTab}
+ onChange={setActiveTab}
+ />
 
- {/* Content Area */}
- <div className="flex-1">
- <div className="bg-white rounded-lg shadow-sm border">
- <div className="px-6 py-4 border-b flex items-center justify-between">
- <h2 className="text-lg font-semibold text-gray-900">
- {
- optionTypes.find((t) => t.key === activeTab)?.label
- }{" "}
- Options
+ <Card>
+ <div className="flex items-center justify-between mb-4">
+ <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+ {currentLabel} Options
  </h2>
- <button
- onClick={() => addOption(activeTab)}
- className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 text-sm"
- >
+ <Button size="sm" onClick={() => addOption(activeTab)}>
  Add Option
- </button>
+ </Button>
  </div>
 
- <div className="p-6">
  {currentOptions.length === 0 ? (
- <div className="text-center py-12 text-gray-500">
- <p>No options yet. Click "Add Option" to create one.</p>
- </div>
+ <EmptyState
+ size="compact"
+ title="No options yet"
+ description='Click "Add Option" to create one.'
+ action={<Button size="sm" onClick={() => addOption(activeTab)}>Add Option</Button>}
+ />
  ) : (
  <div className="space-y-3">
  {currentOptions.map((option: OptionItem, index: number) => (
  <div
  key={index}
- className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border"
+ className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700"
  >
- {/* Drag Handle */}
- <div className="flex flex-col gap-1">
+ {/* Reorder controls */}
+ <div className="flex flex-col gap-1 text-slate-400 dark:text-slate-500">
  <button
+ type="button"
  onClick={() => moveOption(activeTab, index, "up")}
  disabled={index === 0}
- className="text-gray-400 hover:text-gray-600 disabled:opacity-30"
+ className="hover:text-slate-600 dark:hover:text-slate-300 disabled:opacity-30"
+ aria-label="Move up"
  >
  ▲
  </button>
- <span className="text-gray-400">⋮⋮</span>
  <button
+ type="button"
  onClick={() => moveOption(activeTab, index, "down")}
  disabled={index === currentOptions.length - 1}
- className="text-gray-400 hover:text-gray-600 disabled:opacity-30"
+ className="hover:text-slate-600 dark:hover:text-slate-300 disabled:opacity-30"
+ aria-label="Move down"
  >
  ▼
  </button>
  </div>
 
  {/* Value Input */}
- <div className="flex-1">
- <input
+ <Input
  type="text"
  value={option.value}
- onChange={(e) =>
- updateOption(
- activeTab,
- index,
- "value",
- e.target.value
- )
- }
+ onChange={(e) => updateOption(activeTab, index, "value", e.target.value)}
  placeholder="Value (e.g., engineering)"
- className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ wrapperClassName="flex-1"
  />
- </div>
 
  {/* Label Input */}
- <div className="flex-1">
- <input
+ <Input
  type="text"
  value={option.label}
- onChange={(e) =>
- updateOption(
- activeTab,
- index,
- "label",
- e.target.value
- )
- }
+ onChange={(e) => updateOption(activeTab, index, "label", e.target.value)}
  placeholder="Label (e.g., Engineering)"
- className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+ wrapperClassName="flex-1"
  />
- </div>
 
  {/* Active Toggle */}
  <button
- onClick={() =>
- updateOption(activeTab, index, "active", !option.active)
- }
- className={`p-2 rounded-lg border-2 transition-colors text-lg ${
- option.active
- ? "bg-green-50 border-green-500 text-green-600"
- : "bg-gray-100 border-gray-300 text-gray-400"
- }`}
+ type="button"
+ onClick={() => updateOption(activeTab, index, "active", !option.active)}
  title={option.active ? "Active" : "Inactive"}
  >
- {option.active ? "" : ""}
+ <Badge variant={option.active ? "success" : "neutral"}>
+ {option.active ? "Active" : "Inactive"}
+ </Badge>
  </button>
 
  {/* Delete Button */}
- <button
+ <IconButton
+ variant="danger"
+ size="sm"
+ aria-label="Delete option"
  onClick={() => removeOption(activeTab, index)}
- className="p-2 text-red-600 hover:bg-red-50 rounded-lg text-lg"
- title="Delete"
  >
- 
- </button>
+ ✕
+ </IconButton>
  </div>
  ))}
  </div>
  )}
- </div>
- </div>
- </div>
- </div>
- </div>
+ </Card>
  </div>
  );
 }

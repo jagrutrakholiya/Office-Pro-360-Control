@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Layout from "../../../../components/Layout";
 import FirebaseImageUpload from "../../../../components/FirebaseImageUpload";
 import { useToast } from "../../../../components/ui/Toast";
+import { Button, Card, CardHeader, CardTitle, PageHeader, Input, Textarea, Select } from "../../../../components/ui";
 import { whitepaperAPI, Whitepaper } from "@/lib/marketingAPI";
 import { FaSave, FaArrowLeft, FaPlus, FaTrash } from "react-icons/fa";
 
@@ -68,86 +69,72 @@ export default function NewWhitepaper() {
 
  return (
  <Layout>
- <div className="max-w-4xl mx-auto">
- <div className="mb-6">
- <button
+ <div className="space-y-6">
+ <PageHeader
+ title="Create Whitepaper"
+ breadcrumbs={[{ label: 'Whitepapers', href: '/marketing/whitepapers' }, { label: 'New' }]}
+ actions={
+ <Button
+ type="button"
+ variant="outline"
+ leadingIcon={<FaArrowLeft />}
  onClick={() => router.push("/marketing/whitepapers")}
- className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-4"
  >
- <FaArrowLeft /> Back to Whitepapers
- </button>
- <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Create Whitepaper</h1>
- </div>
+ Back to Whitepapers
+ </Button>
+ }
+ />
 
  <form onSubmit={handleSubmit} className="space-y-6">
  {/* Basic Info */}
- <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
- <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Basic Information</h2>
- 
- <div className="space-y-4">
- <div>
- <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
- Title <span className="text-red-500">*</span>
- </label>
- <input
+ <Card>
+ <CardHeader>
+ <CardTitle>Basic Information</CardTitle>
+ </CardHeader>
+
+ <div className="mt-4 space-y-4">
+ <Input
+ label={<>Title <span className="text-red-500">*</span></>}
  type="text"
  value={formData.title}
  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
- className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
  placeholder="e.g., The Ultimate Guide to SaaS Marketing"
  required
  />
- </div>
 
- <div>
- <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
- Description
- </label>
- <textarea
+ <Textarea
+ label="Description"
  value={formData.description}
  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
  rows={3}
- className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
  placeholder="Brief overview of the whitepaper..."
  />
- </div>
 
  <div className="grid grid-cols-2 gap-4">
- <div>
- <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
- Category <span className="text-red-500">*</span>
- </label>
- <input
+ <Input
+ label={<>Category <span className="text-red-500">*</span></>}
  type="text"
  value={formData.category}
  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
- className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
  placeholder="e.g., Marketing, Sales, Product"
  required
  />
- </div>
 
- <div>
- <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Pages</label>
- <input
+ <Input
+ label="Pages"
  type="number"
  value={formData.pages}
  onChange={(e) => setFormData({ ...formData, pages: parseInt(e.target.value) })}
- className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
  min="0"
  />
  </div>
- </div>
 
- <div>
- <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Publish Date</label>
- <input
+ <Input
+ label="Publish Date"
  type="date"
  value={formData.publishDate}
  onChange={(e) => setFormData({ ...formData, publishDate: e.target.value })}
- className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
  />
- </div>
 
  <FirebaseImageUpload
  label="Cover Image"
@@ -156,20 +143,17 @@ export default function NewWhitepaper() {
  folder="whitepapers/covers"
  />
 
- <div>
- <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">File URL (PDF)</label>
- <input
+ <Input
+ label="File URL (PDF)"
  type="url"
  value={formData.fileUrl}
  onChange={(e) => setFormData({ ...formData, fileUrl: e.target.value })}
- className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
  placeholder="https://storage.example.com/whitepaper.pdf"
  />
- </div>
 
  <div className="grid grid-cols-2 gap-4">
  <div>
- <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+ <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
  <input
  type="checkbox"
  checked={formData.gated}
@@ -180,7 +164,7 @@ export default function NewWhitepaper() {
  </label>
  </div>
  <div>
- <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+ <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
  <input
  type="checkbox"
  checked={formData.featured}
@@ -192,43 +176,41 @@ export default function NewWhitepaper() {
  </div>
  </div>
 
- <div>
- <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Status</label>
- <select
+ <Select
+ label="Status"
  value={formData.status}
  onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
- className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
  >
  <option value="draft">Draft</option>
  <option value="published">Published</option>
  <option value="archived">Archived</option>
- </select>
+ </Select>
  </div>
- </div>
- </div>
+ </Card>
 
  {/* Authors */}
- <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
- <div className="flex items-center justify-between mb-4">
- <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Authors</h2>
- <button
+ <Card>
+ <div className="flex items-center justify-between">
+ <CardTitle>Authors</CardTitle>
+ <Button
  type="button"
+ variant="primary"
+ leadingIcon={<FaPlus />}
  onClick={addAuthor}
- className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
  >
- <FaPlus /> Add Author
- </button>
+ Add Author
+ </Button>
  </div>
 
- <div className="space-y-3">
+ <div className="mt-4 space-y-3">
  {formData.authors.map((author, index) => (
- <div key={index} className="flex gap-3">
- <input
+ <div key={index} className="flex gap-3 items-start">
+ <Input
+ wrapperClassName="flex-1"
  type="text"
  value={author}
  onChange={(e) => updateAuthor(index, e.target.value)}
  placeholder="Author name"
- className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
  />
  {formData.authors.length > 1 && (
  <button
@@ -242,64 +224,58 @@ export default function NewWhitepaper() {
  </div>
  ))}
  </div>
- </div>
+ </Card>
 
  {/* SEO */}
- <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
- <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">SEO Settings</h2>
- 
- <div className="space-y-4">
- <div>
- <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">SEO Title</label>
- <input
+ <Card>
+ <CardHeader>
+ <CardTitle>SEO Settings</CardTitle>
+ </CardHeader>
+
+ <div className="mt-4 space-y-4">
+ <Input
+ label="SEO Title"
  type="text"
  value={formData.seo.title}
  onChange={(e) => setFormData({ ...formData, seo: { ...formData.seo, title: e.target.value } })}
- className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
  placeholder="SEO optimized title"
  />
- </div>
 
- <div>
- <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">SEO Description</label>
- <textarea
+ <Textarea
+ label="SEO Description"
  value={formData.seo.description}
  onChange={(e) => setFormData({ ...formData, seo: { ...formData.seo, description: e.target.value } })}
  rows={2}
- className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
  placeholder="SEO meta description"
  />
- </div>
 
- <div>
- <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Keywords (comma-separated)</label>
- <input
+ <Input
+ label="Keywords (comma-separated)"
  type="text"
  value={formData.seo.keywords.join(", ")}
  onChange={(e) => setFormData({ ...formData, seo: { ...formData.seo, keywords: e.target.value.split(",").map(k => k.trim()) } })}
- className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
  placeholder="keyword1, keyword2, keyword3"
  />
  </div>
- </div>
- </div>
+ </Card>
 
  {/* Submit */}
  <div className="flex gap-4">
- <button
+ <Button
  type="submit"
- disabled={loading}
- className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+ variant="primary"
+ loading={loading}
+ leadingIcon={<FaSave />}
  >
- <FaSave /> {loading ? "Creating..." : "Create Whitepaper"}
- </button>
- <button
+ {loading ? "Creating..." : "Create Whitepaper"}
+ </Button>
+ <Button
  type="button"
+ variant="outline"
  onClick={() => router.push("/marketing/whitepapers")}
- className="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
  >
  Cancel
- </button>
+ </Button>
  </div>
  </form>
  </div>

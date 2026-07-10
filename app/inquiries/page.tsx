@@ -1,9 +1,16 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
 import Layout from "../../components/Layout";
-import PageHeader from "../../components/ui/PageHeader";
-import EmptyState from "../../components/ui/EmptyState";
-import DataTable, { Column } from "../../components/ui/DataTable";
+import {
+ PageHeader,
+ StatCard,
+ EmptyState,
+ DataTable,
+ Column,
+ Badge,
+ Button,
+ Select,
+} from "@/components/ui";
 import { useToast } from "../../components/ui/Toast";
 import api from "../../lib/api";
 import { FaInbox, FaEnvelope } from "react-icons/fa";
@@ -87,13 +94,7 @@ export default function InquiriesPage() {
       key: "plan",
       header: "Plan",
       render: (inq) =>
-        inq.planCode ? (
-          <span className="inline-flex px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-md text-xs font-medium">
-            {inq.planCode}
-          </span>
-        ) : (
-          "—"
-        ),
+        inq.planCode ? <Badge variant="info">{inq.planCode}</Badge> : "—",
     },
     {
       key: "message",
@@ -109,82 +110,65 @@ export default function InquiriesPage() {
       header: "Status",
       width: "160px",
       render: (inq) => (
-        <select
+        <Select
           defaultValue={inq.status}
           onChange={(e) => changeStatus(inq._id, e.target.value)}
-          className="px-3 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/40"
         >
           <option value="new">New</option>
           <option value="in_progress">In Progress</option>
           <option value="closed">Closed</option>
-        </select>
+        </Select>
       ),
     },
   ];
 
   return (
     <Layout>
-      <PageHeader title="Inquiries" description="Leads and contact submissions from the marketing site" />
+      <div className="space-y-6">
+        <PageHeader title="Inquiries" description="Leads and contact submissions from the marketing site" />
 
-      {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Total" value={inquiries.length} color="slate" />
-        <StatCard label="New" value={newCount} color="blue" />
-        <StatCard label="In Progress" value={inProgressCount} color="amber" />
-        <StatCard label="Closed" value={closedCount} color="green" />
+        {/* Stat cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard label="Total" value={inquiries.length} accent="neutral" />
+          <StatCard label="New" value={newCount} accent="primary" />
+          <StatCard label="In Progress" value={inProgressCount} accent="warning" />
+          <StatCard label="Closed" value={closedCount} accent="success" />
+        </div>
+
+        {/* Filter pills */}
+        <div className="flex gap-2 flex-wrap">
+          {FILTERS.map((f) => (
+            <Button
+              key={f.value}
+              size="sm"
+              variant={filter === f.value ? "primary" : "outline"}
+              className="rounded-full"
+              onClick={() => setFilter(f.value)}
+            >
+              {f.label}
+            </Button>
+          ))}
+        </div>
+
+        {!loading && filtered.length === 0 ? (
+          <EmptyState
+            icon={filter === "all" ? <FaInbox className="w-6 h-6" /> : <FaEnvelope className="w-6 h-6" />}
+            title={filter === "all" ? "No inquiries yet" : `No ${filter.replace("_", " ")} inquiries`}
+            description={
+              filter === "all"
+                ? "Demo requests and contact form submissions from the marketing site will appear here."
+                : "Try a different filter to see more inquiries."
+            }
+          />
+        ) : (
+          <DataTable<Inquiry>
+            columns={columns}
+            data={filtered}
+            loading={loading}
+            rowKey={(i) => i._id}
+          />
+        )}
       </div>
-
-      {/* Filter pills */}
-      <div className="mb-4 flex gap-2 flex-wrap">
-        {FILTERS.map((f) => (
-          <button
-            key={f.value}
-            onClick={() => setFilter(f.value)}
-            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-              filter === f.value
-                ? "bg-blue-600 text-white border border-blue-600"
-                : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700"
-            }`}
-          >
-            {f.label}
-          </button>
-        ))}
-      </div>
-
-      {!loading && filtered.length === 0 ? (
-        <EmptyState
-          icon={filter === "all" ? <FaInbox className="w-6 h-6" /> : <FaEnvelope className="w-6 h-6" />}
-          title={filter === "all" ? "No inquiries yet" : `No ${filter.replace("_", " ")} inquiries`}
-          description={
-            filter === "all"
-              ? "Demo requests and contact form submissions from the marketing site will appear here."
-              : "Try a different filter to see more inquiries."
-          }
-        />
-      ) : (
-        <DataTable<Inquiry>
-          columns={columns}
-          data={filtered}
-          loading={loading}
-          rowKey={(i) => i._id}
-        />
-      )}
     </Layout>
-  );
-}
-
-function StatCard({ label, value, color }: { label: string; value: number; color: "slate" | "blue" | "amber" | "green" }) {
-  const valueColor = {
-    slate: "text-slate-900 dark:text-white",
-    blue: "text-blue-600 dark:text-blue-400",
-    amber: "text-amber-600 dark:text-amber-400",
-    green: "text-green-600 dark:text-green-400",
-  }[color];
-
-  return (
-    <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5">
-      <div className="text-sm font-medium text-slate-600 dark:text-slate-400">{label}</div>
-      <div className={`text-3xl font-bold mt-1 tabular-nums ${valueColor}`}>{value}</div>
-    </div>
   );
 }

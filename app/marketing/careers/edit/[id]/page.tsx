@@ -6,7 +6,8 @@ import Layout from "../../../../../components/Layout";
 import { useToast } from "../../../../../components/ui/Toast";
 import { careerAPI, JobOpening } from "@/lib/marketingAPI";
 import { getMergedOptions, type OptionItem } from "@/lib/contentOptionsAPI";
-import { FaSave, FaArrowLeft, FaPlus, FaTrash } from "react-icons/fa";
+import { PageHeader, Button, Card, Input, Textarea, Select } from "@/components/ui";
+import { FaSave, FaPlus, FaTrash } from "react-icons/fa";
 
 export default function EditCareer() {
   const router = useRouter();
@@ -119,7 +120,7 @@ export default function EditCareer() {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
         </div>
       </Layout>
     );
@@ -127,45 +128,32 @@ export default function EditCareer() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-6">
-          <button
-            onClick={() => router.push("/marketing/careers")}
-            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-4"
-          >
-            <FaArrowLeft /> Back to Careers
-          </button>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Edit Job Opening</h1>
-        </div>
+      <div className="space-y-6">
+        <PageHeader
+          title="Edit Job Opening"
+          breadcrumbs={[{ label: "Careers", href: "/marketing/careers" }, { label: "Edit" }]}
+        />
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Job Details</h2>
+          <Card padding="md">
+            <h2 className="text-lg font-semibold mb-4 text-slate-900 dark:text-slate-100">Job Details</h2>
 
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                  Job Title <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  required
-                />
-              </div>
+              <Input
+                label="Job Title *"
+                type="text"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                required
+              />
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                    Department <span className="text-red-500">*</span>
-                  </label>
-                  <input
+                  <Input
+                    label="Department *"
                     list="department-options"
                     value={formData.department}
                     onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     required
                   />
                   <datalist id="department-options">
@@ -178,12 +166,11 @@ export default function EditCareer() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Location</label>
-                  <input
+                  <Input
+                    label="Location"
                     list="location-options"
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                   <datalist id="location-options">
                     {locationOptions.map((loc) => (
@@ -197,12 +184,11 @@ export default function EditCareer() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Employment Type</label>
-                  <input
+                  <Input
+                    label="Employment Type"
                     list="employment-type-options"
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                   <datalist id="employment-type-options">
                     {typeOptions.map((t) => (
@@ -213,22 +199,19 @@ export default function EditCareer() {
                   </datalist>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Status</label>
-                  <select
-                    value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  >
-                    <option value="open">Open</option>
-                    <option value="closed">Closed</option>
-                    <option value="draft">Draft</option>
-                  </select>
-                </div>
+                <Select
+                  label="Status"
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                >
+                  <option value="open">Open</option>
+                  <option value="closed">Closed</option>
+                  <option value="draft">Draft</option>
+                </Select>
               </div>
 
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
                   <input
                     type="checkbox"
                     checked={formData.featured}
@@ -239,56 +222,44 @@ export default function EditCareer() {
                 </label>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Job Description</label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={5}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
+              <Textarea
+                label="Job Description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={5}
+              />
             </div>
-          </div>
+          </Card>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Salary Range (Optional)</h2>
+          <Card padding="md">
+            <h2 className="text-lg font-semibold mb-4 text-slate-900 dark:text-slate-100">Salary Range (Optional)</h2>
             <div className="grid grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Min</label>
-                <input
-                  type="number"
-                  value={formData.salaryRange?.min || 0}
-                  onChange={(e) => setFormData({ ...formData, salaryRange: { ...formData.salaryRange!, min: parseInt(e.target.value) || 0 } })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  min="0"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Max</label>
-                <input
-                  type="number"
-                  value={formData.salaryRange?.max || 0}
-                  onChange={(e) => setFormData({ ...formData, salaryRange: { ...formData.salaryRange!, max: parseInt(e.target.value) || 0 } })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  min="0"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Currency</label>
-                <select
-                  value={formData.salaryRange?.currency || "USD"}
-                  onChange={(e) => setFormData({ ...formData, salaryRange: { ...formData.salaryRange!, currency: e.target.value } })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >
-                  <option value="USD">USD</option>
-                  <option value="EUR">EUR</option>
-                  <option value="GBP">GBP</option>
-                  <option value="INR">INR</option>
-                </select>
-              </div>
+              <Input
+                label="Min"
+                type="number"
+                value={formData.salaryRange?.min || 0}
+                onChange={(e) => setFormData({ ...formData, salaryRange: { ...formData.salaryRange!, min: parseInt(e.target.value) || 0 } })}
+                min="0"
+              />
+              <Input
+                label="Max"
+                type="number"
+                value={formData.salaryRange?.max || 0}
+                onChange={(e) => setFormData({ ...formData, salaryRange: { ...formData.salaryRange!, max: parseInt(e.target.value) || 0 } })}
+                min="0"
+              />
+              <Select
+                label="Currency"
+                value={formData.salaryRange?.currency || "USD"}
+                onChange={(e) => setFormData({ ...formData, salaryRange: { ...formData.salaryRange!, currency: e.target.value } })}
+              >
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+                <option value="INR">INR</option>
+              </Select>
             </div>
-          </div>
+          </Card>
 
           {(["responsibilities", "requirements", "benefits"] as const).map((field) => {
             const labels: Record<string, string> = {
@@ -303,58 +274,43 @@ export default function EditCareer() {
             };
             const items = (formData[field] as string[]) || [];
             return (
-              <div key={field} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+              <Card key={field} padding="md">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{labels[field]}</h2>
-                  <button
-                    type="button"
-                    onClick={() => addItem(field)}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                  >
-                    <FaPlus /> Add
-                  </button>
+                  <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{labels[field]}</h2>
+                  <Button type="button" size="sm" variant="secondary" leadingIcon={<FaPlus />} onClick={() => addItem(field)}>
+                    Add
+                  </Button>
                 </div>
                 <div className="space-y-3">
                   {items.map((item, index) => (
                     <div key={index} className="flex gap-3">
-                      <input
-                        type="text"
-                        value={item}
-                        onChange={(e) => updateItem(field, index, e.target.value)}
-                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                        placeholder={placeholders[field]}
-                      />
+                      <div className="flex-1">
+                        <Input
+                          type="text"
+                          value={item}
+                          onChange={(e) => updateItem(field, index, e.target.value)}
+                          placeholder={placeholders[field]}
+                        />
+                      </div>
                       {items.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removeItem(field, index)}
-                          className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
-                        >
+                        <Button type="button" variant="ghost" size="sm" onClick={() => removeItem(field, index)}>
                           <FaTrash />
-                        </button>
+                        </Button>
                       )}
                     </div>
                   ))}
                 </div>
-              </div>
+              </Card>
             );
           })}
 
           <div className="flex gap-4">
-            <button
-              type="submit"
-              disabled={saving}
-              className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
-            >
-              <FaSave /> {saving ? "Saving..." : "Save Changes"}
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push("/marketing/careers")}
-              className="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
-            >
+            <Button type="submit" variant="primary" loading={saving} leadingIcon={<FaSave />}>
+              {saving ? "Saving..." : "Save Changes"}
+            </Button>
+            <Button type="button" variant="outline" onClick={() => router.push("/marketing/careers")}>
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       </div>

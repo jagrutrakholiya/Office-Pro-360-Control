@@ -2,6 +2,14 @@
 import { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
 import api from "../../lib/api";
+import {
+ PageHeader,
+ Card,
+ DataTable,
+ Badge,
+ Button,
+ Select,
+} from "@/components/ui";
 
 type AuditLog = {
  _id: string;
@@ -47,51 +55,48 @@ export default function BotAuditLogsPage() {
  }
  }
 
- const actionColors: Record<string, string> = {
- bot_installed: "bg-green-100 text-green-800",
- installation_approved: "bg-blue-100 text-blue-800",
- installation_rejected: "bg-red-100 text-red-800",
- message_sent: "bg-indigo-100 text-indigo-800",
- tenant_mismatch: "bg-orange-100 text-orange-800",
- service_url_mismatch: "bg-orange-100 text-orange-800",
- security_violation: "bg-red-100 text-red-800",
- rate_limit_exceeded: "bg-yellow-100 text-yellow-800",
- message_failed: "bg-red-100 text-red-800",
+ const actionVariants: Record<
+ string,
+ "success" | "info" | "danger" | "warning" | "neutral"
+ > = {
+ bot_installed: "success",
+ installation_approved: "info",
+ installation_rejected: "danger",
+ message_sent: "info",
+ tenant_mismatch: "warning",
+ service_url_mismatch: "warning",
+ security_violation: "danger",
+ rate_limit_exceeded: "warning",
+ message_failed: "danger",
  };
 
- const statusIcons: Record<string, string> = {
- success: "",
- failure: "",
- warning: "",
+ const statusVariants: Record<
+ string,
+ "success" | "danger" | "warning" | "neutral"
+ > = {
+ success: "success",
+ failure: "danger",
+ warning: "warning",
  };
 
  return (
  <Layout>
- <div className="section-header">
- <div className="section-actions">
- <div>
- <h2 className="section-title"> Bot Audit Logs</h2>
- <p className="section-subtitle">
- View all Microsoft Teams bot activities and security events
- </p>
- </div>
- </div>
- </div>
+ <div className="space-y-6">
+ <PageHeader
+ title="Bot Audit Logs"
+ description="View all Microsoft Teams bot activities and security events"
+ />
 
  {/* Filters */}
- <div className="mb-6 p-4 bg-white rounded-xl border border-slate-200">
+ <Card padding="md">
  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
- <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">
- Filter by Action
- </label>
- <select
+ <Select
+ label="Filter by Action"
  value={filterAction}
  onChange={(e) => {
  setFilterAction(e.target.value);
  setPage(1);
  }}
- className="select-small w-full"
  >
  <option value="">All Actions</option>
  <option value="bot_installed">Bot Installed</option>
@@ -103,234 +108,208 @@ export default function BotAuditLogsPage() {
  <option value="service_url_mismatch">Service URL Mismatch</option>
  <option value="security_violation">Security Violation</option>
  <option value="rate_limit_exceeded">Rate Limit Exceeded</option>
- </select>
- </div>
- <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">
- Filter by Status
- </label>
- <select
+ </Select>
+ <Select
+ label="Filter by Status"
  value={filterStatus}
  onChange={(e) => {
  setFilterStatus(e.target.value);
  setPage(1);
  }}
- className="select-small w-full"
  >
  <option value="">All Statuses</option>
  <option value="success">Success</option>
  <option value="failure">Failure</option>
  <option value="warning">Warning</option>
- </select>
- </div>
+ </Select>
  <div className="flex items-end">
- <button
+ <Button
+ variant="secondary"
+ fullWidth
  onClick={() => {
  setFilterAction("");
  setFilterStatus("");
  setPage(1);
  loadLogs();
  }}
- className="btn-secondary w-full"
  >
  Reset Filters
- </button>
+ </Button>
  </div>
  </div>
- </div>
+ </Card>
 
- <section className="table-wrapper">
- <div className="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100">
+ <div className="space-y-3">
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-2">
- <div className="w-2 h-6 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full"></div>
- <h3 className="text-lg font-bold text-slate-900">Audit Logs</h3>
- <span className="badge badge-pending">{total} total</span>
+ <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+ Audit Logs
+ </h3>
+ <Badge variant="neutral">{total} total</Badge>
  </div>
- <button
- onClick={loadLogs}
- className="btn-secondary-small"
- >
+ <Button variant="secondary" size="sm" onClick={loadLogs}>
  Refresh
- </button>
- </div>
+ </Button>
  </div>
 
- <div className="table-responsive">
- {loading ? (
- <div className="flex items-center justify-center py-12">
- <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
- </div>
- ) : logs.length === 0 ? (
- <div className="text-center py-12">
- <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-100 flex items-center justify-center">
- <span className="text-2xl"></span>
- </div>
- <p className="text-lg font-medium text-slate-900">No Logs Found</p>
- <p className="text-sm text-slate-500 mt-2">
- Try adjusting your filters
- </p>
- </div>
- ) : (
- <table className="w-full">
- <thead className="table-header">
- <tr>
- <th className="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase">
- Timestamp
- </th>
- <th className="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase">
- Company
- </th>
- <th className="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase">
- Action
- </th>
- <th className="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase">
- Status
- </th>
- <th className="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase">
- User
- </th>
- <th className="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase">
- Details
- </th>
- </tr>
- </thead>
- <tbody className="divide-y divide-slate-100">
- {logs.map((log) => (
- <tr key={log._id} className="table-row">
- <td className="px-6 py-4">
- <div className="text-sm text-slate-900">
+ <DataTable
+ loading={loading}
+ data={logs}
+ rowKey={(log: AuditLog) => log._id}
+ emptyTitle="No Logs Found"
+ emptyDescription="Try adjusting your filters"
+ columns={[
+ {
+ key: "timestamp",
+ header: "Timestamp",
+ render: (log: AuditLog) => (
+ <div>
+ <div className="text-sm text-slate-900 dark:text-slate-100">
  {new Date(log.createdAt).toLocaleDateString()}
  </div>
- <div className="text-xs text-slate-500">
+ <div className="text-xs text-slate-500 dark:text-slate-400">
  {new Date(log.createdAt).toLocaleTimeString()}
  </div>
- </td>
- <td className="px-6 py-4">
- {log.companyId ? (
+ </div>
+ ),
+ },
+ {
+ key: "company",
+ header: "Company",
+ render: (log: AuditLog) =>
+ log.companyId ? (
  <div>
- <div className="text-sm font-medium text-slate-900">
+ <div className="text-sm font-medium text-slate-900 dark:text-slate-100">
  {log.companyId.name}
  </div>
- <code className="text-xs bg-slate-100 px-2 py-0.5 rounded">
+ <code className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded">
  {log.companyId.code}
  </code>
  </div>
  ) : (
- <span className="text-sm text-slate-400">-</span>
- )}
- </td>
- <td className="px-6 py-4">
- <span
- className={`px-3 py-1 rounded-full text-xs font-medium ${
- actionColors[log.action] ||
- "bg-slate-100 text-slate-800"
- }`}
- >
+ <span className="text-sm text-slate-400 dark:text-slate-500">-</span>
+ ),
+ },
+ {
+ key: "action",
+ header: "Action",
+ render: (log: AuditLog) => (
+ <Badge variant={actionVariants[log.action] || "neutral"}>
  {log.action.replace(/_/g, " ")}
- </span>
- </td>
- <td className="px-6 py-4">
- <div className="flex items-center gap-2">
- <span className="text-lg">
- {statusIcons[log.status] || ""}
- </span>
- <span className="text-sm capitalize">{log.status}</span>
- </div>
- </td>
- <td className="px-6 py-4">
- {log.userName ? (
+ </Badge>
+ ),
+ },
+ {
+ key: "status",
+ header: "Status",
+ render: (log: AuditLog) => (
+ <Badge variant={statusVariants[log.status] || "neutral"}>
+ <span className="capitalize">{log.status}</span>
+ </Badge>
+ ),
+ },
+ {
+ key: "user",
+ header: "User",
+ render: (log: AuditLog) =>
+ log.userName ? (
  <div>
- <div className="text-sm text-slate-900">
+ <div className="text-sm text-slate-900 dark:text-slate-100">
  {log.userName}
  </div>
  {log.userEmail && (
- <div className="text-xs text-slate-500">
+ <div className="text-xs text-slate-500 dark:text-slate-400">
  {log.userEmail}
  </div>
  )}
  </div>
  ) : (
- <span className="text-sm text-slate-400">System</span>
- )}
- </td>
- <td className="px-6 py-4">
- <div className="text-sm text-slate-600 max-w-md truncate">
+ <span className="text-sm text-slate-400 dark:text-slate-500">
+ System
+ </span>
+ ),
+ },
+ {
+ key: "details",
+ header: "Details",
+ render: (log: AuditLog) => (
+ <div className="text-sm text-slate-600 dark:text-slate-400 max-w-md truncate">
  {log.details || "-"}
  </div>
- </td>
- </tr>
- ))}
- </tbody>
- </table>
- )}
- </div>
+ ),
+ },
+ ]}
+ />
 
  {/* Pagination */}
  {!loading && total > 50 && (
- <div className="px-6 py-4 border-t border-slate-200 bg-slate-50">
  <div className="flex items-center justify-between">
- <div className="text-sm text-slate-600">
+ <div className="text-sm text-slate-600 dark:text-slate-400">
  Showing {(page - 1) * 50 + 1}-{Math.min(page * 50, total)} of{" "}
  {total} logs
  </div>
- <div className="flex gap-2">
- <button
+ <div className="flex items-center gap-2">
+ <Button
+ variant="secondary"
+ size="sm"
  onClick={() => setPage((p) => Math.max(1, p - 1))}
  disabled={page === 1}
- className="btn-secondary-small disabled:opacity-50 disabled:cursor-not-allowed"
  >
- ← Previous
- </button>
- <span className="px-4 py-2 text-sm font-medium text-slate-700">
+ Previous
+ </Button>
+ <span className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300">
  Page {page}
  </span>
- <button
+ <Button
+ variant="secondary"
+ size="sm"
  onClick={() => setPage((p) => p + 1)}
  disabled={page * 50 >= total}
- className="btn-secondary-small disabled:opacity-50 disabled:cursor-not-allowed"
  >
- Next →
- </button>
- </div>
+ Next
+ </Button>
  </div>
  </div>
  )}
- </section>
+ </div>
 
  {/* Security Alerts */}
- <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
- <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
- <div className="flex items-center gap-2 mb-2">
- <span className="text-xl"></span>
- <h4 className="font-semibold text-red-900">Security Violations</h4>
- </div>
- <p className="text-2xl font-bold text-red-600">
+ <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+ <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/40 rounded-lg">
+ <h4 className="font-semibold text-red-900 dark:text-red-300 mb-2">
+ Security Violations
+ </h4>
+ <p className="text-2xl font-bold text-red-600 dark:text-red-400">
  {logs.filter((l) => l.action === "security_violation").length}
  </p>
- <p className="text-xs text-red-700 mt-1">In current view</p>
+ <p className="text-xs text-red-700 dark:text-red-400/80 mt-1">
+ In current view
+ </p>
  </div>
 
- <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
- <div className="flex items-center gap-2 mb-2">
- <span className="text-xl"></span>
- <h4 className="font-semibold text-orange-900">Failed Actions</h4>
- </div>
- <p className="text-2xl font-bold text-orange-600">
+ <div className="p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-900/40 rounded-lg">
+ <h4 className="font-semibold text-orange-900 dark:text-orange-300 mb-2">
+ Failed Actions
+ </h4>
+ <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
  {logs.filter((l) => l.status === "failure").length}
  </p>
- <p className="text-xs text-orange-700 mt-1">In current view</p>
+ <p className="text-xs text-orange-700 dark:text-orange-400/80 mt-1">
+ In current view
+ </p>
  </div>
 
- <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
- <div className="flex items-center gap-2 mb-2">
- <span className="text-xl"></span>
- <h4 className="font-semibold text-green-900">Successful Actions</h4>
- </div>
- <p className="text-2xl font-bold text-green-600">
+ <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-900/40 rounded-lg">
+ <h4 className="font-semibold text-green-900 dark:text-green-300 mb-2">
+ Successful Actions
+ </h4>
+ <p className="text-2xl font-bold text-green-600 dark:text-green-400">
  {logs.filter((l) => l.status === "success").length}
  </p>
- <p className="text-xs text-green-700 mt-1">In current view</p>
+ <p className="text-xs text-green-700 dark:text-green-400/80 mt-1">
+ In current view
+ </p>
+ </div>
  </div>
  </div>
  </Layout>

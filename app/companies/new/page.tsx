@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Layout from '../../../components/Layout'
 import api from '../../../lib/api'
+import { PageHeader, Card, Button, Input, Select } from '@/components/ui'
 
 type Plan = { _id: string; name: string; code: string }
 type Service = { key: string; label: string; description: string }
@@ -227,73 +228,55 @@ export default function NewCompanyPage() {
 
  return (
  <Layout>
- <div className="mb-8">
- <div className="flex items-center justify-between">
- <div>
- <h2 className="text-3xl font-bold text-slate-900 mb-2">Create New Company</h2>
- <p className="text-slate-600">Add a new company and configure its features</p>
- </div>
- <button 
- onClick={() => router.push('/companies')}
- className="btn-secondary"
- >
+ <div className="space-y-6">
+ <PageHeader
+ title="Create New Company"
+ description="Add a new company and configure its features"
+ breadcrumbs={[{ label: 'Companies', href: '/companies' }, { label: 'New' }]}
+ actions={
+ <Button variant="secondary" onClick={() => router.push('/companies')}>
  ← Back to Companies
- </button>
- </div>
- </div>
+ </Button>
+ }
+ />
 
- <section className="card mb-8">
+ <Card>
  <form onSubmit={submit} className="space-y-6">
  {/* Basic Info */}
- <div className="grid grid-cols-2 gap-4">
- <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">Company Name *</label>
- <input 
- placeholder="e.g. Acme Corporation" 
- value={form.name} 
- onChange={e => setForm({ ...form, name: e.target.value })} 
- className="input" 
- required 
+ <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+ <Input
+ label="Company Name *"
+ placeholder="e.g. Acme Corporation"
+ value={form.name}
+ onChange={e => setForm({ ...form, name: e.target.value })}
+ required
  />
- </div>
- <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">Company Code *</label>
- <input 
- placeholder="e.g. acme" 
- value={form.code} 
- onChange={e => setForm({ ...form, code: e.target.value.toLowerCase().trim() })} 
- className="input" 
- required 
+ <Input
+ label="Company Code *"
+ placeholder="e.g. acme"
+ value={form.code}
+ onChange={e => setForm({ ...form, code: e.target.value.toLowerCase().trim() })}
+ required
+ helperText="Unique identifier (lowercase, no spaces)"
  />
- <p className="mt-1 text-xs text-slate-500">Unique identifier (lowercase, no spaces)</p>
- </div>
  </div>
 
- <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">
- Custom Login Domain
- <span className="ml-2 text-xs font-normal text-slate-500">(Optional)</span>
- </label>
- <input 
- placeholder="e.g. acme.employee.com or acme.yourdomain.com" 
- value={form.domain} 
- onChange={e => setForm({ ...form, domain: e.target.value.toLowerCase().trim() })} 
- className="input" 
+ <Input
+ label={<>Custom Login Domain <span className="ml-1 text-xs font-normal text-slate-500 dark:text-slate-400">(Optional)</span></>}
+ placeholder="e.g. acme.employee.com or acme.yourdomain.com"
+ value={form.domain}
+ onChange={e => setForm({ ...form, domain: e.target.value.toLowerCase().trim() })}
  type="text"
+ helperText="Custom subdomain for employee login portal. If set, all emails will include this domain instead of the default login URL."
  />
- <p className="mt-1 text-xs text-slate-500">
- Custom subdomain for employee login portal. If set, all emails will include this domain instead of the default login URL.
- </p>
- </div>
 
- <div className="grid grid-cols-2 gap-4">
- <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">Plan</label>
- <select 
- value={form.plan} 
- onChange={e => setForm({ ...form, plan: e.target.value })} 
- className="input"
+ <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+ <Select
+ label="Plan"
+ value={form.plan}
+ onChange={e => setForm({ ...form, plan: e.target.value })}
  disabled={plansLoading}
+ error={plansError || undefined}
  >
  {plansLoading && (
  <option value="">Loading plans...</option>
@@ -305,51 +288,44 @@ export default function NewCompanyPage() {
  {!plansLoading && plans.length === 0 && (
  <option value={form.plan}>{form.plan || 'No plans available'}</option>
  )}
- </select>
- {plansError && (
- <p className="mt-1 text-xs text-red-600">{plansError}</p>
- )}
- </div>
- <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">Admin Email *</label>
- <input 
+ </Select>
+ <Input
+ label="Admin Email *"
  type="email"
- placeholder="admin@company.com" 
- value={form.adminEmail} 
- onChange={e => setForm({ ...form, adminEmail: e.target.value })} 
- className="input" 
- required 
+ placeholder="admin@company.com"
+ value={form.adminEmail}
+ onChange={e => setForm({ ...form, adminEmail: e.target.value })}
+ required
  />
- </div>
  </div>
 
  {/* Password */}
  <div className="space-y-3">
  <label className="flex items-center gap-2 text-sm">
- <input 
- type="checkbox" 
- checked={form.autoGenPass} 
- onChange={e => setForm({ ...form, autoGenPass: e.target.checked })} 
- className="w-4 h-4" 
+ <input
+ type="checkbox"
+ checked={form.autoGenPass}
+ onChange={e => setForm({ ...form, autoGenPass: e.target.checked })}
+ className="w-4 h-4"
  />
- <span className="text-slate-700">Auto-generate password and email to admin</span>
+ <span className="text-slate-700 dark:text-slate-300">Auto-generate password and email to admin</span>
  </label>
  {!form.autoGenPass && (
  <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">Admin Password *</label>
+ <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Admin Password *</label>
  <div className="relative">
- <input 
+ <input
  type={form.showPassword ? 'text' : 'password'}
- placeholder="Enter password" 
- value={form.adminPassword} 
- onChange={e => setForm({ ...form, adminPassword: e.target.value })} 
- className="input pr-10" 
- required 
+ placeholder="Enter password"
+ value={form.adminPassword}
+ onChange={e => setForm({ ...form, adminPassword: e.target.value })}
+ className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-primary-500/40 focus:border-primary-500"
+ required
  />
  <button
  type="button"
  onClick={() => setForm({ ...form, showPassword: !form.showPassword })}
- className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+ className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
  aria-label={form.showPassword ? 'Hide password' : 'Show password'}
  >
  {form.showPassword ? (
@@ -369,149 +345,113 @@ export default function NewCompanyPage() {
  </div>
 
  {/* Branch/Office Section */}
- <div className="border-t pt-6">
+ <div className="border-t border-slate-200 dark:border-slate-800 pt-6">
  <div className="flex items-center gap-2 mb-4">
- <input 
- type="checkbox" 
- checked={form.createBranch} 
- onChange={e => setForm({ ...form, createBranch: e.target.checked })} 
- className="w-4 h-4" 
+ <input
+ type="checkbox"
+ checked={form.createBranch}
+ onChange={e => setForm({ ...form, createBranch: e.target.checked })}
+ className="w-4 h-4"
  id="createBranch"
  />
- <label htmlFor="createBranch" className="text-sm font-medium text-slate-700 cursor-pointer">
+ <label htmlFor="createBranch" className="text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
  Create Branch/Office for this company
  </label>
  </div>
 
  {form.createBranch && (
- <div className="ml-6 space-y-4 p-4 border border-slate-200 rounded-md bg-slate-50">
- <div className="grid grid-cols-2 gap-4">
- <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">Branch Name *</label>
- <input 
- placeholder="e.g. Head Office" 
- value={form.branch.name} 
- onChange={e => setForm({ ...form, branch: { ...form.branch, name: e.target.value } })} 
- className="input" 
+ <div className="sm:ml-6 space-y-4 p-4 border border-slate-200 dark:border-slate-800 rounded-lg bg-slate-50 dark:bg-slate-800/40">
+ <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+ <Input
+ label="Branch Name *"
+ placeholder="e.g. Head Office"
+ value={form.branch.name}
+ onChange={e => setForm({ ...form, branch: { ...form.branch, name: e.target.value } })}
  required={form.createBranch}
  />
- </div>
- <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">Branch Code *</label>
- <input 
- placeholder="e.g. HO" 
- value={form.branch.code} 
- onChange={e => setForm({ ...form, branch: { ...form.branch, code: e.target.value.toUpperCase().trim() } })} 
- className="input" 
+ <Input
+ label="Branch Code *"
+ placeholder="e.g. HO"
+ value={form.branch.code}
+ onChange={e => setForm({ ...form, branch: { ...form.branch, code: e.target.value.toUpperCase().trim() } })}
  required={form.createBranch}
+ helperText="Unique code (uppercase)"
  />
- <p className="mt-1 text-xs text-slate-500">Unique code (uppercase)</p>
- </div>
  </div>
 
- <div className="grid grid-cols-2 gap-4">
- <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">Street Address</label>
- <input 
- placeholder="Street address" 
- value={form.branch.address.street} 
- onChange={e => setForm({ ...form, branch: { ...form.branch, address: { ...form.branch.address, street: e.target.value } } })} 
- className="input"
+ <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+ <Input
+ label="Street Address"
+ placeholder="Street address"
+ value={form.branch.address.street}
+ onChange={e => setForm({ ...form, branch: { ...form.branch, address: { ...form.branch.address, street: e.target.value } } })}
  />
- </div>
- <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">City</label>
- <input 
- placeholder="City" 
- value={form.branch.address.city} 
- onChange={e => setForm({ ...form, branch: { ...form.branch, address: { ...form.branch.address, city: e.target.value } } })} 
- className="input"
+ <Input
+ label="City"
+ placeholder="City"
+ value={form.branch.address.city}
+ onChange={e => setForm({ ...form, branch: { ...form.branch, address: { ...form.branch.address, city: e.target.value } } })}
  />
- </div>
  </div>
 
- <div className="grid grid-cols-3 gap-4">
- <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">State</label>
- <input 
- placeholder="State" 
- value={form.branch.address.state} 
- onChange={e => setForm({ ...form, branch: { ...form.branch, address: { ...form.branch.address, state: e.target.value } } })} 
- className="input"
+ <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+ <Input
+ label="State"
+ placeholder="State"
+ value={form.branch.address.state}
+ onChange={e => setForm({ ...form, branch: { ...form.branch, address: { ...form.branch.address, state: e.target.value } } })}
  />
- </div>
- <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">Zip Code</label>
- <input 
- placeholder="Zip Code" 
- value={form.branch.address.zipCode} 
- onChange={e => setForm({ ...form, branch: { ...form.branch, address: { ...form.branch.address, zipCode: e.target.value } } })} 
- className="input"
+ <Input
+ label="Zip Code"
+ placeholder="Zip Code"
+ value={form.branch.address.zipCode}
+ onChange={e => setForm({ ...form, branch: { ...form.branch, address: { ...form.branch.address, zipCode: e.target.value } } })}
  />
- </div>
- <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">Country</label>
- <input 
- placeholder="Country" 
- value={form.branch.address.country} 
- onChange={e => setForm({ ...form, branch: { ...form.branch, address: { ...form.branch.address, country: e.target.value } } })} 
- className="input"
+ <Input
+ label="Country"
+ placeholder="Country"
+ value={form.branch.address.country}
+ onChange={e => setForm({ ...form, branch: { ...form.branch, address: { ...form.branch.address, country: e.target.value } } })}
  />
- </div>
  </div>
 
- <div className="grid grid-cols-2 gap-4">
- <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">Phone</label>
- <input 
+ <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+ <Input
+ label="Phone"
  type="tel"
- placeholder="Phone number" 
- value={form.branch.contact.phone} 
- onChange={e => setForm({ ...form, branch: { ...form.branch, contact: { ...form.branch.contact, phone: e.target.value } } })} 
- className="input"
+ placeholder="Phone number"
+ value={form.branch.contact.phone}
+ onChange={e => setForm({ ...form, branch: { ...form.branch, contact: { ...form.branch.contact, phone: e.target.value } } })}
  />
- </div>
- <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
- <input 
+ <Input
+ label="Email"
  type="email"
- placeholder="office@company.com" 
- value={form.branch.contact.email} 
- onChange={e => setForm({ ...form, branch: { ...form.branch, contact: { ...form.branch.contact, email: e.target.value } } })} 
- className="input"
+ placeholder="office@company.com"
+ value={form.branch.contact.email}
+ onChange={e => setForm({ ...form, branch: { ...form.branch, contact: { ...form.branch.contact, email: e.target.value } } })}
  />
- </div>
  </div>
 
- <div className="grid grid-cols-3 gap-4">
- <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">Start Time</label>
- <input 
+ <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+ <Input
+ label="Start Time"
  type="time"
- value={form.branch.defaultOfficeHours.startTime} 
- onChange={e => setForm({ ...form, branch: { ...form.branch, defaultOfficeHours: { ...form.branch.defaultOfficeHours, startTime: e.target.value } } })} 
- className="input"
+ value={form.branch.defaultOfficeHours.startTime}
+ onChange={e => setForm({ ...form, branch: { ...form.branch, defaultOfficeHours: { ...form.branch.defaultOfficeHours, startTime: e.target.value } } })}
  />
- </div>
- <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">End Time</label>
- <input 
+ <Input
+ label="End Time"
  type="time"
- value={form.branch.defaultOfficeHours.endTime} 
- onChange={e => setForm({ ...form, branch: { ...form.branch, defaultOfficeHours: { ...form.branch.defaultOfficeHours, endTime: e.target.value } } })} 
- className="input"
+ value={form.branch.defaultOfficeHours.endTime}
+ onChange={e => setForm({ ...form, branch: { ...form.branch, defaultOfficeHours: { ...form.branch.defaultOfficeHours, endTime: e.target.value } } })}
  />
- </div>
- <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">Break Duration (minutes)</label>
- <input 
+ <Input
+ label="Break Duration (minutes)"
  type="number"
  min="0"
- value={form.branch.defaultOfficeHours.breakDuration} 
- onChange={e => setForm({ ...form, branch: { ...form.branch, defaultOfficeHours: { ...form.branch.defaultOfficeHours, breakDuration: parseInt(e.target.value) || 60 } } })} 
- className="input"
+ value={form.branch.defaultOfficeHours.breakDuration}
+ onChange={e => setForm({ ...form, branch: { ...form.branch, defaultOfficeHours: { ...form.branch.defaultOfficeHours, breakDuration: parseInt(e.target.value) || 60 } } })}
  />
- </div>
  </div>
  </div>
  )}
@@ -520,35 +460,36 @@ export default function NewCompanyPage() {
  {/* Services by Category */}
  <div>
  <div className="flex items-center justify-between mb-3">
- <label className="block text-sm font-medium text-slate-700">
+ <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
  Services / Features
- <span className="ml-2 text-xs font-normal text-slate-500">
+ <span className="ml-2 text-xs font-normal text-slate-500 dark:text-slate-400">
  ({selectedCount} selected)
  </span>
  </label>
- <button
+ <Button
  type="button"
+ variant="ghost"
+ size="sm"
  onClick={() => {
  const allEnabled = Object.fromEntries(availableServices.map(s => [s.key, true]))
  setForm({ ...form, services: allEnabled })
  }}
- className="text-xs text-blue-600 hover:text-blue-700"
  >
  Select All
- </button>
+ </Button>
  </div>
- 
- <div className="space-y-4 p-4 border border-slate-200 rounded-md bg-slate-50 max-h-96 overflow-y-auto">
+
+ <div className="space-y-4 p-4 border border-slate-200 dark:border-slate-800 rounded-lg bg-slate-50 dark:bg-slate-800/40 max-h-96 overflow-y-auto">
  {Object.entries(categorizedServices).map(([category, services]) => (
  <div key={category} className="space-y-2">
- <h4 className="text-sm font-semibold text-slate-800 border-b border-slate-200 pb-1">
+ <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700 pb-1">
  {category}
  </h4>
- <div className="grid grid-cols-3 gap-2">
+ <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
  {services.map(svc => (
- <label 
- key={svc.key} 
- className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer hover:bg-white p-2 rounded transition-colors"
+ <label
+ key={svc.key}
+ className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 cursor-pointer hover:bg-white dark:hover:bg-slate-800 p-2 rounded-lg transition-colors"
  >
  <input
  type="checkbox"
@@ -563,7 +504,7 @@ export default function NewCompanyPage() {
  </div>
  ))}
  </div>
- <p className="mt-2 text-xs text-slate-500">
+ <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
  Select features to enable for this company. These control what appears in the sidebar.
  </p>
  </div>
@@ -599,30 +540,31 @@ export default function NewCompanyPage() {
  )}
  
  {success && (
- <div className="p-3 bg-green-50 border border-green-200 rounded-md text-green-700 text-sm">
+ <div className="p-3 bg-success-50 dark:bg-success-900/20 border border-success-200 dark:border-success-800 rounded-lg text-success-700 dark:text-success-300 text-sm">
  Company created successfully! Redirecting...
  </div>
  )}
 
  {/* Submit */}
- <div className="flex gap-3 pt-4 border-t">
- <button 
- type="submit" 
- disabled={loading || success} 
- className="btn-primary"
+ <div className="flex gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
+ <Button
+ type="submit"
+ disabled={loading || success}
+ loading={loading}
  >
  {loading ? 'Creating...' : success ? 'Created!' : 'Create Company'}
- </button>
- <button 
+ </Button>
+ <Button
  type="button"
+ variant="secondary"
  onClick={() => router.push('/companies')}
- className="btn-secondary"
  >
  Cancel
- </button>
+ </Button>
  </div>
  </form>
- </section>
+ </Card>
+ </div>
  </Layout>
  )
 }

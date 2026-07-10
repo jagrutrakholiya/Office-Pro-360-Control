@@ -1,6 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import {
+ PageHeader,
+ Card,
+ CardHeader,
+ CardTitle,
+ CardDescription,
+ CardFooter,
+ Button,
+ Badge,
+ Input,
+ Textarea,
+ Select,
+} from "@/components/ui";
 
 interface ProfileData {
  bio?: string;
@@ -81,39 +94,40 @@ export default function ProfileSettingsPage() {
  };
 
  return (
- <div className="p-8">
- <div className="mb-8">
- <h2 className="text-2xl font-bold text-gray-900">Profile Settings</h2>
- <p className="text-gray-600 mt-1">
- Manage your personal information and preferences
- </p>
- </div>
+ <div className="p-6 space-y-6">
+ <PageHeader
+ title="Profile Settings"
+ description="Manage your personal information and preferences"
+ breadcrumbs={[
+ { label: "Settings", href: "/settings" },
+ { label: "Profile" },
+ ]}
+ />
 
- <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
+ <form onSubmit={handleSubmit}>
+ <Card className="max-w-2xl">
+ <CardHeader>
+ <CardTitle>Personal Information</CardTitle>
+ <CardDescription>
+ This information may be displayed on your profile.
+ </CardDescription>
+ </CardHeader>
+
+ <div className="mt-6 space-y-5">
  {/* Bio */}
- <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
- Bio
- </label>
- <textarea
+ <Textarea
+ label="Bio"
  value={profile.bio || ""}
  onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
  rows={4}
  maxLength={500}
  placeholder="Tell us about yourself..."
- className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+ helperText={`${profile.bio?.length || 0}/500 characters`}
  />
- <div className="text-xs text-gray-500 mt-1 text-right">
- {profile.bio?.length || 0}/500 characters
- </div>
- </div>
 
  {/* Signature */}
- <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
- Email Signature
- </label>
- <input
+ <Input
+ label="Email Signature"
  type="text"
  value={profile.signature || ""}
  onChange={(e) =>
@@ -121,37 +135,26 @@ export default function ProfileSettingsPage() {
  }
  maxLength={200}
  placeholder="Best regards, John Doe"
- className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
  />
- </div>
 
  {/* Phone Number */}
- <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
- Phone Number
- </label>
- <input
+ <Input
+ label="Phone Number"
  type="tel"
  value={profile.phoneNumber || ""}
  onChange={(e) =>
  setProfile({ ...profile, phoneNumber: e.target.value })
  }
  placeholder="+1 (555) 123-4567"
- className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
  />
- </div>
 
  {/* Timezone */}
- <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
- Timezone
- </label>
- <select
+ <Select
+ label="Timezone"
  value={profile.timezone}
  onChange={(e) =>
  setProfile({ ...profile, timezone: e.target.value })
  }
- className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
  >
  <option value="UTC">UTC (Coordinated Universal Time)</option>
  <option value="America/New_York">Eastern Time (ET)</option>
@@ -163,20 +166,15 @@ export default function ProfileSettingsPage() {
  <option value="Asia/Tokyo">Tokyo (JST)</option>
  <option value="Asia/Kolkata">India (IST)</option>
  <option value="Australia/Sydney">Sydney (AEDT)</option>
- </select>
- </div>
+ </Select>
 
  {/* Language */}
- <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
- Language
- </label>
- <select
+ <Select
+ label="Language"
  value={profile.language}
  onChange={(e) =>
  setProfile({ ...profile, language: e.target.value })
  }
- className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
  >
  <option value="en">English</option>
  <option value="es">Español</option>
@@ -186,61 +184,45 @@ export default function ProfileSettingsPage() {
  <option value="pt">Português</option>
  <option value="ja">日本語</option>
  <option value="zh">中文</option>
- </select>
- </div>
+ </Select>
 
  {/* Date Format */}
- <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
- Date Format
- </label>
- <select
+ <Select
+ label="Date Format"
  value={profile.dateFormat}
  onChange={(e) =>
  setProfile({ ...profile, dateFormat: e.target.value })
  }
- className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
  >
  <option value="MM/DD/YYYY">MM/DD/YYYY (12/31/2024)</option>
  <option value="DD/MM/YYYY">DD/MM/YYYY (31/12/2024)</option>
  <option value="YYYY-MM-DD">YYYY-MM-DD (2024-12-31)</option>
- </select>
- </div>
+ </Select>
 
  {/* Time Format */}
- <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
- Time Format
- </label>
- <select
+ <Select
+ label="Time Format"
  value={profile.timeFormat}
  onChange={(e) =>
  setProfile({ ...profile, timeFormat: e.target.value })
  }
- className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
  >
  <option value="12h">12-hour (2:30 PM)</option>
  <option value="24h">24-hour (14:30)</option>
- </select>
+ </Select>
  </div>
 
  {/* Actions */}
- <div className="flex items-center gap-4 pt-4 border-t border-gray-200">
- <button
- type="submit"
- disabled={loading}
- className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
- >
+ <CardFooter>
+ <Button type="submit" loading={loading} disabled={loading}>
  {loading ? "Saving..." : "Save Changes"}
- </button>
- 
+ </Button>
+
  {saved && (
- <div className="text-green-600 flex items-center gap-2">
- <span></span>
- <span>Profile updated successfully</span>
- </div>
+ <Badge variant="success">Profile updated successfully</Badge>
  )}
- </div>
+ </CardFooter>
+ </Card>
  </form>
  </div>
  );

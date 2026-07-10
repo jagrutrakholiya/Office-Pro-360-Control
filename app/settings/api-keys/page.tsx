@@ -1,6 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import {
+ PageHeader,
+ StatCard,
+ Card,
+ Button,
+ Badge,
+ Input,
+ Textarea,
+ Select,
+ EmptyState,
+ Skeleton,
+} from "@/components/ui";
 
 interface ApiKey {
  _id: string;
@@ -109,254 +121,190 @@ export default function ApiKeysPage() {
  alert("API key copied to clipboard!");
  };
 
- const getStatusColor = (status: string) => {
- const colors: Record<string, string> = {
- active: "bg-green-500",
- inactive: "bg-gray-500",
- revoked: "bg-red-500",
+ const statusVariant = (status: string): "success" | "neutral" | "danger" => {
+ const variants: Record<string, "success" | "neutral" | "danger"> = {
+ active: "success",
+ inactive: "neutral",
+ revoked: "danger",
  };
- return colors[status] || "bg-gray-500";
+ return variants[status] || "neutral";
  };
 
  return (
- <div className="p-8">
- <div className="flex justify-between items-start mb-8">
- <div>
- <h2 className="text-2xl font-bold text-gray-900">API Keys</h2>
- <p className="text-gray-600 mt-1">
- Manage API keys for programmatic access to your account
- </p>
- </div>
- <button
- onClick={() => setShowCreateModal(true)}
- className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
- >
- Create API Key
- </button>
- </div>
+ <div className="p-6 space-y-6">
+ <PageHeader
+ title="API Keys"
+ description="Manage API keys for programmatic access to your account"
+ breadcrumbs={[
+ { label: "Settings", href: "/settings" },
+ { label: "API Keys" },
+ ]}
+ actions={
+ <Button onClick={() => setShowCreateModal(true)}>Create API Key</Button>
+ }
+ />
 
  {/* Security Notice */}
- <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-8">
- <div className="flex items-start gap-3">
- <span className="text-2xl"></span>
- <div>
- <h4 className="font-semibold text-yellow-900">Security Notice</h4>
- <p className="text-sm text-yellow-800 mt-1">
+ <Card className="border-warning-200 dark:border-warning-900/50 bg-warning-50 dark:bg-warning-900/20">
+ <h4 className="font-semibold text-warning-900 dark:text-warning-200">Security Notice</h4>
+ <p className="text-sm text-warning-800 dark:text-warning-300 mt-1">
  API keys provide full access to your account. Keep them secret and never share them publicly. Store them securely and rotate them regularly.
  </p>
- </div>
- </div>
- </div>
+ </Card>
 
  {/* Stats */}
- <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
- <div className="bg-white border border-gray-200 rounded-lg p-4">
- <div className="text-sm text-gray-600">Total Keys</div>
- <div className="text-2xl font-bold text-gray-900 mt-1">{apiKeys.length}</div>
- </div>
- <div className="bg-white border border-gray-200 rounded-lg p-4">
- <div className="text-sm text-gray-600">Active</div>
- <div className="text-2xl font-bold text-green-600 mt-1">
- {apiKeys.filter((k) => k.status === "active").length}
- </div>
- </div>
- <div className="bg-white border border-gray-200 rounded-lg p-4">
- <div className="text-sm text-gray-600">Revoked</div>
- <div className="text-2xl font-bold text-red-600 mt-1">
- {apiKeys.filter((k) => k.status === "revoked").length}
- </div>
- </div>
- <div className="bg-white border border-gray-200 rounded-lg p-4">
- <div className="text-sm text-gray-600">Total Requests</div>
- <div className="text-2xl font-bold text-blue-600 mt-1">
- {apiKeys.reduce((sum, k) => sum + k.usage.totalRequests, 0)}
- </div>
- </div>
+ <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+ <StatCard label="Total Keys" value={apiKeys.length} accent="neutral" />
+ <StatCard
+ label="Active"
+ value={apiKeys.filter((k) => k.status === "active").length}
+ accent="success"
+ />
+ <StatCard
+ label="Revoked"
+ value={apiKeys.filter((k) => k.status === "revoked").length}
+ accent="danger"
+ />
+ <StatCard
+ label="Total Requests"
+ value={apiKeys.reduce((sum, k) => sum + k.usage.totalRequests, 0)}
+ accent="primary"
+ />
  </div>
 
  {/* API Keys List */}
  {loading ? (
- <div className="text-center py-8 text-gray-500">Loading API keys...</div>
- ) : apiKeys.length === 0 ? (
- <div className="text-center py-12 bg-gray-50 rounded-lg">
- <div className="text-4xl mb-4"></div>
- <h3 className="text-lg font-semibold text-gray-900 mb-2">No API keys yet</h3>
- <p className="text-gray-600 mb-4">Create your first API key to get started</p>
- <button
- onClick={() => setShowCreateModal(true)}
- className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
- >
- Create API Key
- </button>
+ <div className="space-y-4">
+ <Skeleton className="h-40 w-full rounded-xl" />
+ <Skeleton className="h-40 w-full rounded-xl" />
  </div>
+ ) : apiKeys.length === 0 ? (
+ <EmptyState
+ title="No API keys yet"
+ description="Create your first API key to get started"
+ action={<Button onClick={() => setShowCreateModal(true)}>Create API Key</Button>}
+ />
  ) : (
  <div className="space-y-4">
  {apiKeys.map((key) => (
- <div
- key={key._id}
- className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
- >
+ <Card key={key._id} variant="interactive">
  <div className="flex items-start justify-between mb-4">
- <div className="flex-1">
- <div className="flex items-center gap-3 mb-2">
- <h3 className="font-semibold text-gray-900">{key.name}</h3>
- <span
- className={`${getStatusColor(key.status)} text-white text-xs px-2 py-1 rounded-full`}
- >
- {key.status}
- </span>
- <span className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">
- {key.environment}
- </span>
+ <div className="flex-1 min-w-0">
+ <div className="flex items-center gap-3 mb-2 flex-wrap">
+ <h3 className="font-semibold text-slate-900 dark:text-slate-100">{key.name}</h3>
+ <Badge variant={statusVariant(key.status)} size="sm">{key.status}</Badge>
+ <Badge variant="neutral" size="sm">{key.environment}</Badge>
  </div>
- <p className="text-sm text-gray-600 mb-3">{key.description}</p>
- <div className="flex items-center gap-2 font-mono text-sm bg-gray-50 px-3 py-2 rounded">
+ <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">{key.description}</p>
+ <div className="flex items-center gap-2 font-mono text-sm bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-3 py-2 rounded">
  <span>{key.prefix}••••••••••••••••</span>
  </div>
  </div>
  </div>
 
- <div className="grid grid-cols-3 gap-4 mb-4 pb-4 border-b border-gray-200">
+ <div className="grid grid-cols-3 gap-4 mb-4 pb-4 border-b border-slate-200 dark:border-slate-800">
  <div>
- <div className="text-xs text-gray-600">Total Requests</div>
- <div className="text-lg font-semibold text-gray-900">
+ <div className="text-xs text-slate-500 dark:text-slate-400">Total Requests</div>
+ <div className="text-lg font-semibold text-slate-900 dark:text-slate-100">
  {key.usage.totalRequests}
  </div>
  </div>
  <div>
- <div className="text-xs text-gray-600">Permissions</div>
- <div className="text-lg font-semibold text-gray-900">
+ <div className="text-xs text-slate-500 dark:text-slate-400">Permissions</div>
+ <div className="text-lg font-semibold text-slate-900 dark:text-slate-100">
  {key.permissions.length}
  </div>
  </div>
  <div>
- <div className="text-xs text-gray-600">Created</div>
- <div className="text-sm text-gray-900">
+ <div className="text-xs text-slate-500 dark:text-slate-400">Created</div>
+ <div className="text-sm text-slate-900 dark:text-slate-100">
  {new Date(key.createdAt).toLocaleDateString()}
  </div>
  </div>
  </div>
 
  <div className="flex gap-2">
- <button className="px-3 py-2 border border-gray-300 rounded hover:bg-gray-50 text-sm">
- Configure
- </button>
- <button className="px-3 py-2 border border-gray-300 rounded hover:bg-gray-50 text-sm">
- Rotate
- </button>
+ <Button variant="outline" size="sm">Configure</Button>
+ <Button variant="outline" size="sm">Rotate</Button>
  {key.status === "active" && (
- <button
- onClick={() => revokeApiKey(key._id)}
- className="px-3 py-2 border border-red-300 text-red-600 rounded hover:bg-red-50 text-sm"
- >
+ <Button variant="danger" size="sm" onClick={() => revokeApiKey(key._id)}>
  Revoke
- </button>
+ </Button>
  )}
  </div>
- </div>
+ </Card>
  ))}
  </div>
  )}
 
  {/* Create Modal */}
  {showCreateModal && (
- <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
- <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
- <h3 className="text-xl font-bold mb-4">Create API Key</h3>
- 
+ <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+ <Card className="max-w-md w-full shadow-xl">
+ <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">Create API Key</h3>
+
  {generatedKey ? (
  <div>
- <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
- <div className="flex items-start gap-2 mb-2">
- <span className="text-xl"></span>
- <div>
- <h4 className="font-semibold text-green-900">API Key Created</h4>
- <p className="text-sm text-green-800 mt-1">
+ <div className="bg-success-50 dark:bg-success-900/20 border border-success-200 dark:border-success-900/50 rounded-lg p-4 mb-4">
+ <h4 className="font-semibold text-success-900 dark:text-success-200">API Key Created</h4>
+ <p className="text-sm text-success-800 dark:text-success-300 mt-1">
  Please copy your API key now. You won't be able to see it again!
  </p>
  </div>
- </div>
- </div>
- <div className="bg-gray-50 p-3 rounded mb-4 font-mono text-sm break-all">
+ <div className="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 p-3 rounded mb-4 font-mono text-sm break-all">
  {generatedKey}
  </div>
  <div className="flex gap-2">
- <button
- onClick={() => copyToClipboard(generatedKey)}
- className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
- >
+ <Button fullWidth onClick={() => copyToClipboard(generatedKey)}>
  Copy Key
- </button>
- <button
+ </Button>
+ <Button
+ variant="outline"
  onClick={() => {
  setGeneratedKey(null);
  setShowCreateModal(false);
  }}
- className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
  >
  Done
- </button>
+ </Button>
  </div>
  </div>
  ) : (
  <div>
  <div className="space-y-4 mb-4">
- <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
- Name *
- </label>
- <input
+ <Input
+ label="Name *"
  type="text"
  value={newKey.name}
  onChange={(e) => setNewKey({ ...newKey, name: e.target.value })}
  placeholder="My API Key"
- className="w-full px-3 py-2 border border-gray-300 rounded-lg"
  />
- </div>
- <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
- Description
- </label>
- <textarea
+ <Textarea
+ label="Description"
  value={newKey.description}
  onChange={(e) => setNewKey({ ...newKey, description: e.target.value })}
  placeholder="Purpose of this API key"
  rows={3}
- className="w-full px-3 py-2 border border-gray-300 rounded-lg"
  />
- </div>
- <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">
- Environment
- </label>
- <select
+ <Select
+ label="Environment"
  value={newKey.environment}
  onChange={(e) => setNewKey({ ...newKey, environment: e.target.value })}
- className="w-full px-3 py-2 border border-gray-300 rounded-lg"
  >
  <option value="development">Development</option>
  <option value="staging">Staging</option>
  <option value="production">Production</option>
- </select>
- </div>
+ </Select>
  </div>
  <div className="flex gap-2">
- <button
- onClick={createApiKey}
- className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
- >
- Create Key
- </button>
- <button
- onClick={() => setShowCreateModal(false)}
- className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
- >
+ <Button fullWidth onClick={createApiKey}>Create Key</Button>
+ <Button variant="outline" onClick={() => setShowCreateModal(false)}>
  Cancel
- </button>
+ </Button>
  </div>
  </div>
  )}
- </div>
+ </Card>
  </div>
  )}
  </div>

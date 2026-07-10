@@ -3,6 +3,19 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Layout from "../../../components/Layout";
 import api from "../../../lib/api";
+import {
+ PageHeader,
+ Card,
+ CardTitle,
+ Button,
+ Badge,
+ StatCard,
+ Tabs,
+ Input,
+ Select,
+ EmptyState,
+ Skeleton,
+} from "@/components/ui";
 
 type Company = {
  _id: string;
@@ -182,32 +195,32 @@ export default function CompanyDetailPage() {
  }
 
  function getStatusBadge(status: string) {
- const styles: Record<string, string> = {
- active: "bg-emerald-100 text-emerald-700",
- trial: "bg-blue-100 text-blue-700",
- suspended: "bg-red-100 text-red-700",
- expired: "bg-slate-100 text-slate-600",
- lifetime: "bg-purple-100 text-purple-700",
+ const variants: Record<string, "success" | "info" | "danger" | "neutral" | "default"> = {
+ active: "success",
+ trial: "info",
+ suspended: "danger",
+ expired: "neutral",
+ lifetime: "default",
  };
  return (
- <span
- className={`px-2.5 py-1 text-xs font-semibold rounded-full capitalize ${
- styles[status] || styles.expired
- }`}
- >
+ <Badge variant={variants[status] || "neutral"} className="capitalize">
  {status}
- </span>
+ </Badge>
  );
  }
 
  if (loading) {
  return (
  <Layout>
- <div className="flex items-center justify-center py-32">
- <div className="flex flex-col items-center gap-4">
- <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
- <div className="text-slate-600 font-medium">Loading company...</div>
+ <div className="space-y-6">
+ <Skeleton className="h-8 w-64" />
+ <Skeleton variant="rounded" className="h-10 w-full max-w-md" />
+ <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+ {[0, 1, 2, 3].map((i) => (
+ <Skeleton key={i} variant="rounded" className="h-24" />
+ ))}
  </div>
+ <Skeleton variant="rounded" className="h-48" />
  </div>
  </Layout>
  );
@@ -216,17 +229,14 @@ export default function CompanyDetailPage() {
  if (!company) {
  return (
  <Layout>
- <div className="text-center py-32">
- <h2 className="text-xl font-bold text-slate-900 mb-2">
- Company not found
- </h2>
- <button
- onClick={() => router.push("/companies")}
- className="btn-primary mt-4"
- >
- Back to Companies
- </button>
- </div>
+ <EmptyState
+ size="large"
+ title="Company not found"
+ description="This company may have been deleted or the link is incorrect."
+ action={
+ <Button onClick={() => router.push("/companies")}>Back to Companies</Button>
+ }
+ />
  </Layout>
  );
  }
@@ -245,56 +255,39 @@ export default function CompanyDetailPage() {
 
  return (
  <Layout>
+ <div className="space-y-6">
  {/* Header */}
- <div className="mb-8">
- <button
- onClick={() => router.push("/companies")}
- className="text-sm text-slate-500 hover:text-slate-700 mb-4 inline-flex items-center gap-1 transition-colors"
- >
- &larr; Back to Companies
- </button>
- <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
- <div className="flex items-center gap-4">
- <div className="w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center text-white font-bold text-xl">
+ <PageHeader
+ breadcrumbs={[{ label: "Companies", href: "/companies" }, { label: company.name }]}
+ icon={
+ <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center text-white font-bold">
  {company.name.charAt(0).toUpperCase()}
  </div>
- <div>
- <div className="flex items-center gap-3">
- <h2 className="text-3xl font-bold text-slate-900">
+ }
+ title={
+ <span className="inline-flex items-center gap-3">
  {company.name}
- </h2>
  {getStatusBadge(subStatus)}
- </div>
- <p className="text-slate-500 mt-1">
- <code className="text-xs bg-slate-100 px-2 py-0.5 rounded">
+ </span>
+ }
+ description={
+ <span className="inline-flex items-center gap-2">
+ <code className="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
  {company.code}
  </code>
- <span className="mx-2">|</span>
+ <span className="text-slate-300 dark:text-slate-600">|</span>
  {planName} Plan
- </p>
- </div>
- </div>
- </div>
- </div>
+ </span>
+ }
+ actions={
+ <Button variant="secondary" onClick={() => router.push("/companies")}>
+ ← Back to Companies
+ </Button>
+ }
+ />
 
  {/* Tabs */}
- <div className="border-b border-slate-200 mb-8">
- <nav className="flex gap-0 -mb-px">
- {tabs.map((tab) => (
- <button
- key={tab.key}
- onClick={() => setActiveTab(tab.key)}
- className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
- activeTab === tab.key
- ? "border-blue-600 text-blue-600"
- : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
- }`}
- >
- {tab.label}
- </button>
- ))}
- </nav>
- </div>
+ <Tabs tabs={tabs} activeKey={activeTab} onChange={setActiveTab} />
 
  {/* Tab Content */}
 
@@ -302,10 +295,8 @@ export default function CompanyDetailPage() {
  {activeTab === "overview" && (
  <div className="space-y-6">
  {/* Company Info */}
- <section className="table-wrapper p-6">
- <h3 className="text-lg font-semibold text-slate-900 mb-4">
- Company Information
- </h3>
+ <Card>
+ <CardTitle className="mb-4">Company Information</CardTitle>
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
  {[
  { label: "Name", value: company.name },
@@ -321,23 +312,23 @@ export default function CompanyDetailPage() {
  },
  ].map((item) => (
  <div key={item.label}>
- <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+ <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">
  {item.label}
  </div>
- <div className="text-sm font-medium text-slate-900">
+ <div className="text-sm font-medium text-slate-900 dark:text-slate-100">
  {item.value}
  </div>
  </div>
  ))}
  </div>
- </section>
+ </Card>
 
  {/* Usage Stats */}
- <section className="table-wrapper p-6">
- <h3 className="text-lg font-semibold text-slate-900 mb-4">
+ <div>
+ <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 mb-4">
  Usage Statistics
  </h3>
- <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+ <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
  {[
  {
  label: "Users",
@@ -345,7 +336,7 @@ export default function CompanyDetailPage() {
  company.usage?.users ??
  company.analytics?.totalUsers ??
  0,
- color: "from-blue-500 to-blue-600",
+ accent: "primary" as const,
  },
  {
  label: "Projects",
@@ -353,7 +344,7 @@ export default function CompanyDetailPage() {
  company.usage?.projects ??
  company.analytics?.totalProjects ??
  0,
- color: "from-purple-500 to-purple-600",
+ accent: "primary" as const,
  },
  {
  label: "Tasks",
@@ -361,28 +352,23 @@ export default function CompanyDetailPage() {
  company.usage?.tasks ??
  company.analytics?.totalTasks ??
  0,
- color: "from-emerald-500 to-emerald-600",
+ accent: "success" as const,
  },
  {
  label: "Storage",
  value: `${company.usage?.storage ?? 0} GB`,
- color: "from-amber-500 to-amber-600",
+ accent: "warning" as const,
  },
  ].map((stat) => (
- <div
+ <StatCard
  key={stat.label}
- className="bg-gradient-to-br from-slate-50 to-white border border-slate-200 rounded-xl p-5"
- >
- <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
- {stat.label}
- </div>
- <div className="text-2xl font-bold text-slate-900">
- {stat.value}
- </div>
- </div>
+ label={stat.label}
+ value={stat.value}
+ accent={stat.accent}
+ />
  ))}
  </div>
- </section>
+ </div>
  </div>
  )}
 
@@ -390,39 +376,32 @@ export default function CompanyDetailPage() {
  {activeTab === "subscription" && (
  <div className="space-y-6">
  {/* Current Plan */}
- <section className="table-wrapper p-6">
- <h3 className="text-lg font-semibold text-slate-900 mb-4">
- Current Plan
- </h3>
- <div className="flex items-center gap-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
- <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white text-lg font-bold">
+ <Card>
+ <CardTitle className="mb-4">Current Plan</CardTitle>
+ <div className="flex items-center gap-4 p-4 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-xl">
+ <div className="w-12 h-12 bg-primary-600 rounded-xl flex items-center justify-center text-white text-lg font-bold">
  {planName.charAt(0)}
  </div>
  <div>
- <div className="text-lg font-bold text-slate-900">
+ <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
  {planName}
  </div>
- <div className="text-sm text-slate-600">
+ <div className="text-sm text-slate-500 dark:text-slate-400">
  Status: {subStatus}
  </div>
  </div>
  </div>
- </section>
+ </Card>
 
  {/* Change Plan */}
- <section className="table-wrapper p-6">
- <h3 className="text-lg font-semibold text-slate-900 mb-4">
- Change Plan
- </h3>
+ <Card>
+ <CardTitle className="mb-4">Change Plan</CardTitle>
  <div className="flex flex-col sm:flex-row gap-4">
- <div className="flex-1">
- <label className="block text-sm font-medium text-slate-700 mb-1">
- Plan
- </label>
- <select
+ <Select
+ label="Plan"
  value={selectedPlan}
  onChange={(e) => setSelectedPlan(e.target.value)}
- className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+ wrapperClassName="flex-1"
  >
  <option value="">Select a plan</option>
  {plans.map((p) => (
@@ -430,63 +409,50 @@ export default function CompanyDetailPage() {
  {p.name}
  </option>
  ))}
- </select>
- </div>
- <div className="w-40">
- <label className="block text-sm font-medium text-slate-700 mb-1">
- Billing Cycle
- </label>
- <select
+ </Select>
+ <Select
+ label="Billing Cycle"
  value={selectedCycle}
  onChange={(e) => setSelectedCycle(e.target.value)}
- className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+ wrapperClassName="w-full sm:w-40"
  >
  <option value="monthly">Monthly</option>
  <option value="yearly">Yearly</option>
- </select>
- </div>
+ </Select>
  <div className="flex items-end">
- <button
+ <Button
  onClick={handleChangePlan}
  disabled={changingPlan || !selectedPlan}
- className="btn-primary disabled:opacity-50"
+ loading={changingPlan}
  >
  {changingPlan ? "Applying..." : "Apply"}
- </button>
+ </Button>
  </div>
  </div>
- </section>
+ </Card>
 
  {/* Lifetime Access */}
- <section className="table-wrapper p-6">
- <h3 className="text-lg font-semibold text-slate-900 mb-4">
- Lifetime Access
- </h3>
+ <Card>
+ <CardTitle className="mb-4">Lifetime Access</CardTitle>
  {subStatus === "lifetime" ? (
  <div className="space-y-4">
- <div className="p-4 bg-purple-50 border border-purple-200 rounded-xl">
- <p className="text-sm text-purple-700 font-medium">
+ <div className="p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl">
+ <p className="text-sm text-purple-700 dark:text-purple-300 font-medium">
  This company has lifetime access.
  </p>
  </div>
- <button
- onClick={handleRevokeLifetime}
- className="px-4 py-2 text-sm font-medium bg-red-50 text-red-700 border border-red-200 rounded-lg hover:bg-red-100 transition-colors"
- >
+ <Button variant="danger" onClick={handleRevokeLifetime}>
  Revoke Lifetime Access
- </button>
+ </Button>
  </div>
  ) : (
  <div className="space-y-4">
  <div className="flex flex-col sm:flex-row gap-4">
- <div className="flex-1">
- <label className="block text-sm font-medium text-slate-700 mb-1">
- Plan
- </label>
- <select
+ <Select
+ label="Plan"
  value={lifetimePlan}
  onChange={(e) => setLifetimePlan(e.target.value)}
- className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+ wrapperClassName="flex-1"
  >
  <option value="">Select a plan</option>
  {plans.map((p) => (
@@ -494,59 +460,50 @@ export default function CompanyDetailPage() {
  {p.name}
  </option>
  ))}
- </select>
- </div>
- <div className="flex-1">
- <label className="block text-sm font-medium text-slate-700 mb-1">
- Reason
- </label>
- <input
+ </Select>
+ <Input
+ label="Reason"
  type="text"
  value={lifetimeReason}
  onChange={(e) => setLifetimeReason(e.target.value)}
  placeholder="Reason for granting lifetime access..."
- className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+ wrapperClassName="flex-1"
  />
  </div>
- </div>
- <button
+ <Button
  onClick={handleGrantLifetime}
  disabled={grantingLifetime || !lifetimePlan}
- className="px-4 py-2 text-sm font-medium bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
+ loading={grantingLifetime}
  >
- {grantingLifetime
- ? "Granting..."
- : "Grant Lifetime Access"}
- </button>
+ {grantingLifetime ? "Granting..." : "Grant Lifetime Access"}
+ </Button>
  </div>
  )}
- </section>
+ </Card>
 
  {/* Subscription History */}
  {company.subscription?.history &&
  company.subscription.history.length > 0 && (
- <section className="table-wrapper p-6">
- <h3 className="text-lg font-semibold text-slate-900 mb-4">
- Subscription History
- </h3>
+ <Card>
+ <CardTitle className="mb-4">Subscription History</CardTitle>
  <div className="space-y-4">
  {company.subscription.history.map(
  (entry: HistoryEntry, idx: number) => (
  <div key={entry._id || idx} className="flex items-start gap-4 relative">
  {idx <
  (company.subscription?.history?.length ?? 0) - 1 && (
- <div className="absolute left-[15px] top-8 bottom-0 w-0.5 bg-slate-200" />
+ <div className="absolute left-[15px] top-8 bottom-0 w-0.5 bg-slate-200 dark:bg-slate-700" />
  )}
- <div className="relative z-10 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
- <div className="w-2.5 h-2.5 rounded-full bg-blue-600" />
+ <div className="relative z-10 w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/40 flex items-center justify-center flex-shrink-0">
+ <div className="w-2.5 h-2.5 rounded-full bg-primary-600 dark:bg-primary-400" />
  </div>
  <div className="flex-1 pb-4">
- <p className="text-sm font-medium text-slate-900">
+ <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
  {entry.action ||
  entry.description ||
  `Changed to ${entry.planName || entry.plan}`}
  </p>
- <p className="text-xs text-slate-500 mt-0.5">
+ <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
  {new Date(
  entry.date || entry.createdAt || ""
  ).toLocaleDateString("en-IN", {
@@ -561,7 +518,7 @@ export default function CompanyDetailPage() {
  )
  )}
  </div>
- </section>
+ </Card>
  )}
  </div>
  )}
@@ -569,18 +526,16 @@ export default function CompanyDetailPage() {
  {/* ─── Features ─── */}
  {activeTab === "features" && (
  <div className="space-y-6">
- <section className="table-wrapper p-6">
+ <Card>
  <div className="flex items-center justify-between mb-6">
- <h3 className="text-lg font-semibold text-slate-900">
- Feature Toggles
- </h3>
- <button
+ <CardTitle>Feature Toggles</CardTitle>
+ <Button
  onClick={handleSaveFeatures}
  disabled={savingFeatures}
- className="btn-primary disabled:opacity-50"
+ loading={savingFeatures}
  >
  {savingFeatures ? "Saving..." : "Save Features"}
- </button>
+ </Button>
  </div>
 
  <div className="space-y-8">
@@ -593,9 +548,9 @@ export default function CompanyDetailPage() {
  }
  return Object.entries(grouped).map(([category, services]) => (
  <div key={category}>
- <div className="flex items-center gap-2 pb-3 border-b border-slate-200 mb-4">
+ <div className="flex items-center gap-2 pb-3 border-b border-slate-200 dark:border-slate-800 mb-4">
  <div className="w-1 h-5 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full" />
- <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
+ <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider">
  {category}
  </h4>
  </div>
@@ -603,15 +558,15 @@ export default function CompanyDetailPage() {
  {services.map((svc) => (
  <label
  key={svc.key}
- className="flex items-center justify-between p-3 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
+ className="flex items-center justify-between p-3 border border-slate-200 dark:border-slate-800 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors"
  title={svc.description || ""}
  >
  <div className="flex-1 min-w-0">
- <div className="text-sm font-medium text-slate-700 truncate">
+ <div className="text-sm font-medium text-slate-700 dark:text-slate-200 truncate">
  {svc.label}
  </div>
  {svc.description && (
- <div className="text-[11px] text-slate-500 truncate">
+ <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
  {svc.description}
  </div>
  )}
@@ -628,7 +583,7 @@ export default function CompanyDetailPage() {
  }
  className="sr-only peer"
  />
- <div className="w-10 h-6 bg-slate-200 rounded-full peer-checked:bg-blue-600 transition-colors" />
+ <div className="w-10 h-6 bg-slate-200 dark:bg-slate-700 rounded-full peer-checked:bg-primary-600 transition-colors" />
  <div className="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow-sm peer-checked:translate-x-4 transition-transform" />
  </div>
  </label>
@@ -638,25 +593,23 @@ export default function CompanyDetailPage() {
  ));
  })()}
  </div>
- </section>
+ </Card>
  </div>
  )}
 
  {/* ─── Limits ─── */}
  {activeTab === "limits" && (
  <div className="space-y-6">
- <section className="table-wrapper p-6">
+ <Card>
  <div className="flex items-center justify-between mb-6">
- <h3 className="text-lg font-semibold text-slate-900">
- Resource Limits
- </h3>
- <button
+ <CardTitle>Resource Limits</CardTitle>
+ <Button
  onClick={handleSaveLimits}
  disabled={savingLimits}
- className="btn-primary disabled:opacity-50"
+ loading={savingLimits}
  >
  {savingLimits ? "Saving..." : "Save Limits"}
- </button>
+ </Button>
  </div>
 
  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -685,17 +638,13 @@ export default function CompanyDetailPage() {
  ].map((field) => (
  <div
  key={field.key}
- className="p-4 border border-slate-200 rounded-xl"
+ className="p-4 border border-slate-200 dark:border-slate-800 rounded-xl"
  >
- <label className="block text-sm font-semibold text-slate-900 mb-1">
- {field.label}
- </label>
- <p className="text-xs text-slate-500 mb-3">
- {field.description}
- </p>
- <input
+ <Input
  type="number"
  min={0}
+ label={field.label}
+ helperText={field.description}
  value={limits[field.key]}
  onChange={(e) =>
  setLimits({
@@ -703,14 +652,14 @@ export default function CompanyDetailPage() {
  [field.key]: parseInt(e.target.value) || 0,
  })
  }
- className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
  />
  </div>
  ))}
  </div>
- </section>
+ </Card>
  </div>
  )}
+ </div>
  </Layout>
  );
 }

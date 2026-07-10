@@ -8,7 +8,8 @@ import RichTextEditor from "../../../../../components/RichTextEditor";
 import { useToast } from "../../../../../components/ui/Toast";
 import { caseStudyAPI, CaseStudy } from "@/lib/marketingAPI";
 import { getMergedOptions, type OptionItem } from "@/lib/contentOptionsAPI";
-import { FaSave, FaArrowLeft, FaPlus, FaTrash } from "react-icons/fa";
+import { PageHeader, Button, Card, Input, Textarea, Select } from "@/components/ui";
+import { FaSave, FaPlus, FaTrash } from "react-icons/fa";
 
 export default function EditCaseStudy() {
   const router = useRouter();
@@ -128,42 +129,34 @@ export default function EditCaseStudy() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-6">
-          <button
-            onClick={() => router.push("/marketing/case-studies")}
-            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-4"
-          >
-            <FaArrowLeft /> Back to Case Studies
-          </button>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Edit Case Study</h1>
-        </div>
+      <div className="space-y-6">
+        <PageHeader
+          title="Edit Case Study"
+          breadcrumbs={[
+            { label: "Case Studies", href: "/marketing/case-studies" },
+            { label: "Edit" },
+          ]}
+        />
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Basic Information</h2>
+          <Card padding="md">
+            <h2 className="text-lg font-semibold mb-4 text-slate-900 dark:text-slate-100">Basic Information</h2>
 
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                  Title <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  required
-                />
-              </div>
+              <Input
+                label="Title *"
+                type="text"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                required
+              />
 
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Industry</label>
-                <input
+                <Input
+                  label="Industry"
                   list="industry-options"
                   value={formData.industry}
                   onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
                 <datalist id="industry-options">
                   {industryOptions.map((ind) => (
@@ -183,7 +176,7 @@ export default function EditCaseStudy() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
                     <input
                       type="checkbox"
                       checked={formData.featured}
@@ -193,39 +186,31 @@ export default function EditCaseStudy() {
                     Featured
                   </label>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Status</label>
-                  <select
-                    value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  >
-                    <option value="draft">Draft</option>
-                    <option value="published">Published</option>
-                    <option value="archived">Archived</option>
-                  </select>
-                </div>
+                <Select
+                  label="Status"
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                >
+                  <option value="draft">Draft</option>
+                  <option value="published">Published</option>
+                  <option value="archived">Archived</option>
+                </Select>
               </div>
             </div>
-          </div>
+          </Card>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Company Details</h2>
+          <Card padding="md">
+            <h2 className="text-lg font-semibold mb-4 text-slate-900 dark:text-slate-100">Company Details</h2>
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                  Company Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.company.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, company: { ...formData.company, name: e.target.value } })
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  required
-                />
-              </div>
+              <Input
+                label="Company Name *"
+                type="text"
+                value={formData.company.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, company: { ...formData.company, name: e.target.value } })
+                }
+                required
+              />
 
               <FirebaseImageUpload
                 label="Company Logo"
@@ -239,16 +224,13 @@ export default function EditCaseStudy() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                    Company Size
-                  </label>
-                  <input
+                  <Input
+                    label="Company Size"
                     list="company-size-options"
                     value={formData.company.size || ""}
                     onChange={(e) =>
                       setFormData({ ...formData, company: { ...formData.company, size: e.target.value } })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                   <datalist id="company-size-options">
                     {companySizeOptions.map((size) => (
@@ -258,26 +240,23 @@ export default function EditCaseStudy() {
                     ))}
                   </datalist>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Website</label>
-                  <input
-                    type="url"
-                    value={formData.company.website || ""}
-                    onChange={(e) =>
-                      setFormData({ ...formData, company: { ...formData.company, website: e.target.value } })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
-                </div>
+                <Input
+                  label="Website"
+                  type="url"
+                  value={formData.company.website || ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, company: { ...formData.company, website: e.target.value } })
+                  }
+                />
               </div>
             </div>
-          </div>
+          </Card>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Case Study Content</h2>
+          <Card padding="md">
+            <h2 className="text-lg font-semibold mb-4 text-slate-900 dark:text-slate-100">Case Study Content</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Challenge</label>
+                <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">Challenge</label>
                 <RichTextEditor
                   value={formData.challenge}
                   onChange={(html) => setFormData({ ...formData, challenge: html })}
@@ -286,7 +265,7 @@ export default function EditCaseStudy() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Solution</label>
+                <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">Solution</label>
                 <RichTextEditor
                   value={formData.solution}
                   onChange={(html) => setFormData({ ...formData, solution: html })}
@@ -295,7 +274,7 @@ export default function EditCaseStudy() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Results</label>
+                <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">Results</label>
                 <RichTextEditor
                   value={formData.results}
                   onChange={(html) => setFormData({ ...formData, results: html })}
@@ -304,115 +283,90 @@ export default function EditCaseStudy() {
                 />
               </div>
             </div>
-          </div>
+          </Card>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+          <Card padding="md">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Key Metrics</h2>
-              <button
-                type="button"
-                onClick={addMetric}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                <FaPlus /> Add Metric
-              </button>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Key Metrics</h2>
+              <Button type="button" size="sm" leadingIcon={<FaPlus />} onClick={addMetric}>
+                Add Metric
+              </Button>
             </div>
             <div className="space-y-3">
               {formData.metrics.map((metric, index) => (
                 <div key={index} className="flex gap-3 items-start">
-                  <input
+                  <Input
                     type="text"
                     value={metric.label}
                     onChange={(e) => updateMetric(index, "label", e.target.value)}
                     placeholder="Label (e.g., Revenue Growth)"
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="flex-1"
                   />
-                  <input
+                  <Input
                     type="text"
                     value={metric.value}
                     onChange={(e) => updateMetric(index, "value", e.target.value)}
                     placeholder="Value (e.g., +150%)"
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="flex-1"
                   />
                   {formData.metrics.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeMetric(index)}
-                      className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
-                    >
+                    <Button type="button" variant="ghost" size="sm" onClick={() => removeMetric(index)}>
                       <FaTrash />
-                    </button>
+                    </Button>
                   )}
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Testimonial (Optional)</h2>
+          <Card padding="md">
+            <h2 className="text-lg font-semibold mb-4 text-slate-900 dark:text-slate-100">Testimonial (Optional)</h2>
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Quote</label>
-                <textarea
-                  value={formData.testimonial?.quote || ""}
+              <Textarea
+                label="Quote"
+                value={formData.testimonial?.quote || ""}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    testimonial: { ...formData.testimonial!, quote: e.target.value },
+                  })
+                }
+                rows={3}
+              />
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  label="Author"
+                  type="text"
+                  value={formData.testimonial?.author || ""}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      testimonial: { ...formData.testimonial!, quote: e.target.value },
+                      testimonial: { ...formData.testimonial!, author: e.target.value },
                     })
                   }
-                  rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+                <Input
+                  label="Position"
+                  type="text"
+                  value={formData.testimonial?.position || ""}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      testimonial: { ...formData.testimonial!, position: e.target.value },
+                    })
+                  }
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Author</label>
-                  <input
-                    type="text"
-                    value={formData.testimonial?.author || ""}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        testimonial: { ...formData.testimonial!, author: e.target.value },
-                      })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Position</label>
-                  <input
-                    type="text"
-                    value={formData.testimonial?.position || ""}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        testimonial: { ...formData.testimonial!, position: e.target.value },
-                      })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
-                </div>
-              </div>
             </div>
-          </div>
+          </Card>
 
           <div className="flex gap-4">
-            <button
-              type="submit"
-              disabled={saving}
-              className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
-            >
-              <FaSave /> {saving ? "Saving..." : "Save Changes"}
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push("/marketing/case-studies")}
-              className="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
-            >
+            <Button type="submit" variant="primary" loading={saving} leadingIcon={<FaSave />}>
+              {saving ? "Saving..." : "Save Changes"}
+            </Button>
+            <Button type="button" variant="outline" onClick={() => router.push("/marketing/case-studies")}>
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       </div>

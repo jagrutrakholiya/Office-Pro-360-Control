@@ -7,7 +7,8 @@ import FirebaseImageUpload from "../../../../../components/FirebaseImageUpload";
 import RichTextEditor from "../../../../../components/RichTextEditor";
 import { useToast } from "../../../../../components/ui/Toast";
 import { tutorialAPI, Tutorial } from "@/lib/marketingAPI";
-import { FaSave, FaArrowLeft, FaPlus, FaTrash } from "react-icons/fa";
+import { FaSave, FaPlus, FaTrash } from "react-icons/fa";
+import { PageHeader, Card, CardHeader, CardTitle, Button, IconButton, Input, Textarea, Select, Skeleton } from "../../../../../components/ui";
 
 export default function EditTutorial() {
   const router = useRouter();
@@ -114,8 +115,9 @@ export default function EditTutorial() {
   if (loading) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="space-y-4">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-64 w-full" />
         </div>
       </Layout>
     );
@@ -123,95 +125,71 @@ export default function EditTutorial() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-6">
-          <button
-            onClick={() => router.push("/marketing/tutorials")}
-            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-4"
-          >
-            <FaArrowLeft /> Back to Tutorials
-          </button>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Edit Tutorial</h1>
-        </div>
+      <div className="space-y-6">
+        <PageHeader
+          title="Edit Tutorial"
+          breadcrumbs={[
+            { label: "Tutorials", href: "/marketing/tutorials" },
+            { label: "Edit" },
+          ]}
+        />
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Basic Information</h2>
+          <Card>
+            <CardHeader>
+              <CardTitle>Basic Information</CardTitle>
+            </CardHeader>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                  Title <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            <div className="mt-4 space-y-4">
+              <Input
+                label="Title"
+                required
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              />
+
+              <Textarea
+                label="Excerpt"
+                value={formData.excerpt}
+                onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
+                rows={2}
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  label="Category"
                   required
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Excerpt</label>
-                <textarea
-                  value={formData.excerpt}
-                  onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                  rows={2}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
+                <Select
+                  label="Level"
+                  value={formData.level}
+                  onChange={(e) => setFormData({ ...formData, level: e.target.value as any })}
+                >
+                  <option value="Beginner">Beginner</option>
+                  <option value="Intermediate">Intermediate</option>
+                  <option value="Advanced">Advanced</option>
+                </Select>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                    Category <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Level</label>
-                  <select
-                    value={formData.level}
-                    onChange={(e) => setFormData({ ...formData, level: e.target.value as any })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  >
-                    <option value="Beginner">Beginner</option>
-                    <option value="Intermediate">Intermediate</option>
-                    <option value="Advanced">Advanced</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Duration (min)</label>
-                  <input
-                    type="number"
-                    value={formData.duration}
-                    onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 0 })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    min="0"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Status</label>
-                  <select
-                    value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  >
-                    <option value="draft">Draft</option>
-                    <option value="published">Published</option>
-                    <option value="archived">Archived</option>
-                  </select>
-                </div>
+                <Input
+                  label="Duration (min)"
+                  type="number"
+                  value={formData.duration}
+                  onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 0 })}
+                  min="0"
+                />
+                <Select
+                  label="Status"
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                >
+                  <option value="draft">Draft</option>
+                  <option value="published">Published</option>
+                  <option value="archived">Archived</option>
+                </Select>
               </div>
 
               <FirebaseImageUpload
@@ -222,7 +200,7 @@ export default function EditTutorial() {
               />
 
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
                   <input
                     type="checkbox"
                     checked={formData.featured}
@@ -233,60 +211,60 @@ export default function EditTutorial() {
                 </label>
               </div>
             </div>
-          </div>
+          </Card>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Full Content</h2>
-            <RichTextEditor
-              value={formData.content}
-              onChange={(html) => setFormData({ ...formData, content: html })}
-              placeholder="Write the complete tutorial content here..."
-              minHeight={300}
-            />
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Tutorial Steps</h2>
-              <button
-                type="button"
-                onClick={addStep}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                <FaPlus /> Add Step
-              </button>
+          <Card>
+            <CardHeader>
+              <CardTitle>Full Content</CardTitle>
+            </CardHeader>
+            <div className="mt-4">
+              <RichTextEditor
+                value={formData.content}
+                onChange={(html) => setFormData({ ...formData, content: html })}
+                placeholder="Write the complete tutorial content here..."
+                minHeight={300}
+              />
             </div>
+          </Card>
 
-            <div className="space-y-4">
+          <Card>
+            <CardHeader className="flex-row items-center justify-between">
+              <CardTitle>Tutorial Steps</CardTitle>
+              <Button type="button" variant="secondary" size="sm" leadingIcon={<FaPlus />} onClick={addStep}>
+                Add Step
+              </Button>
+            </CardHeader>
+
+            <div className="mt-4 space-y-4">
               {formData.steps.map((step, index) => (
-                <div key={index} className="border border-gray-300 dark:border-gray-600 rounded-lg p-4">
+                <div key={index} className="border border-slate-300 dark:border-slate-700 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-medium text-gray-900 dark:text-white">Step {index + 1}</h3>
+                    <h3 className="font-medium text-slate-900 dark:text-slate-100">Step {index + 1}</h3>
                     {formData.steps.length > 1 && (
-                      <button
+                      <IconButton
                         type="button"
+                        variant="ghost"
+                        size="sm"
+                        aria-label={`Remove step ${index + 1}`}
                         onClick={() => removeStep(index)}
-                        className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                        className="text-danger-600"
                       >
                         <FaTrash />
-                      </button>
+                      </IconButton>
                     )}
                   </div>
 
                   <div className="space-y-3">
-                    <input
-                      type="text"
+                    <Input
                       value={step.title}
                       onChange={(e) => updateStep(index, "title", e.target.value)}
                       placeholder="Step title"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
-                    <textarea
+                    <Textarea
                       value={step.content}
                       onChange={(e) => updateStep(index, "content", e.target.value)}
                       placeholder="Step description"
                       rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
                     <FirebaseImageUpload
                       label={`Step ${index + 1} Image (Optional)`}
@@ -298,59 +276,48 @@ export default function EditTutorial() {
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Tags</h2>
-              <button
-                type="button"
-                onClick={addTag}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                <FaPlus /> Add Tag
-              </button>
-            </div>
+          <Card>
+            <CardHeader className="flex-row items-center justify-between">
+              <CardTitle>Tags</CardTitle>
+              <Button type="button" variant="secondary" size="sm" leadingIcon={<FaPlus />} onClick={addTag}>
+                Add Tag
+              </Button>
+            </CardHeader>
 
-            <div className="space-y-3">
+            <div className="mt-4 space-y-3">
               {formData.tags.map((tag, index) => (
                 <div key={index} className="flex gap-3">
-                  <input
-                    type="text"
+                  <Input
+                    wrapperClassName="flex-1"
                     value={tag}
                     onChange={(e) => updateTag(index, e.target.value)}
                     placeholder="e.g., react, javascript"
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                   {formData.tags.length > 1 && (
-                    <button
+                    <IconButton
                       type="button"
+                      variant="ghost"
+                      aria-label={`Remove tag ${index + 1}`}
                       onClick={() => removeTag(index)}
-                      className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                      className="text-danger-600"
                     >
                       <FaTrash />
-                    </button>
+                    </IconButton>
                   )}
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
 
           <div className="flex gap-4">
-            <button
-              type="submit"
-              disabled={saving}
-              className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
-            >
-              <FaSave /> {saving ? "Saving..." : "Save Changes"}
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push("/marketing/tutorials")}
-              className="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
-            >
+            <Button type="submit" variant="primary" loading={saving} leadingIcon={<FaSave />}>
+              {saving ? "Saving..." : "Save Changes"}
+            </Button>
+            <Button type="button" variant="outline" onClick={() => router.push("/marketing/tutorials")}>
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       </div>

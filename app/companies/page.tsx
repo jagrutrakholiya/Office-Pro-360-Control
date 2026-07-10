@@ -3,6 +3,19 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Layout from "../../components/Layout";
 import api from "../../lib/api";
+import {
+ PageHeader,
+ Card,
+ CardTitle,
+ CardDescription,
+ Button,
+ Badge,
+ Select,
+ DataTable,
+ Modal,
+ Skeleton,
+} from "@/components/ui";
+import type { Column } from "@/components/ui";
 
 type Company = {
  _id: string;
@@ -198,101 +211,42 @@ export default function CompaniesPage() {
  ? Object.values(editServices).filter(Boolean).length
  : 0;
 
- return (
- <Layout>
- <div className="section-header">
- <div className="section-actions">
- <div>
- <h2 className="section-title">Companies</h2>
- <p className="section-subtitle">
- Manage companies, plans, and subscriptions
- </p>
- </div>
- <button
- onClick={() => router.push("/companies/new")}
- className="btn-primary"
- >
- <span className="mr-2">+</span>
- Add New Company
- </button>
- </div>
- </div>
+ function statusVariant(status: string): "success" | "warning" | "danger" | "neutral" {
+ if (status === "active") return "success";
+ if (status === "view_only") return "warning";
+ if (status === "suspended") return "danger";
+ return "neutral";
+ }
 
- <section className="table-wrapper">
- <div className="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100">
- <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
- <div className="flex items-center gap-2">
- <div className="w-2 h-6 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full"></div>
- <h3 className="text-lg font-bold text-slate-900">
- All Companies
- </h3>
- <span className="badge badge-pending">
- {companies.length} total
- </span>
- </div>
- <div className="flex items-center gap-2">
- <input
- type="search"
- placeholder="Search companies..."
- className="input-small w-full sm:w-64"
- />
- <button className="btn-secondary-small"></button>
- </div>
- </div>
- </div>
-
- {/* Desktop Table */}
- <div className="hidden lg:block table-responsive">
- <table className="w-full">
- <thead className="table-header">
- <tr>
- <th className="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">
- Company
- </th>
- <th className="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">
- Plan
- </th>
- <th className="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">
- Users
- </th>
- <th className="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">
- Storage
- </th>
- <th className="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">
- Services
- </th>
- <th className="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">
- Status
- </th>
- <th className="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">
- Actions
- </th>
- </tr>
- </thead>
- <tbody className="divide-y divide-slate-100">
- {companies.map((c) => (
- <tr key={c._id} className="table-row">
- <td className="px-6 py-4">
+ const columns: Column<Company>[] = [
+ {
+ key: "company",
+ header: "Company",
+ render: (c) => (
  <div className="flex items-center gap-3">
- <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center text-white font-bold text-sm">
+ <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0">
  {c.name.charAt(0).toUpperCase()}
  </div>
  <div>
- <div className="text-sm font-semibold text-slate-900">
+ <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">
  {c.name}
  </div>
- <code className="text-xs bg-slate-100 px-2 py-0.5 rounded text-slate-600">
+ <code className="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-400">
  {c.code}
  </code>
  </div>
  </div>
- </td>
- <td className="px-6 py-4">
- <select
+ ),
+ },
+ {
+ key: "plan",
+ header: "Plan",
+ render: (c) => (
+ <Select
  defaultValue={c.plan}
  onChange={(e) => changePlan(c._id, e.target.value)}
- className="select-small"
  disabled={plansLoading || plans.length === 0}
+ wrapperClassName="w-32"
  >
  {plans.length > 0 ? (
  plans.map((p) => (
@@ -303,31 +257,36 @@ export default function CompaniesPage() {
  ) : (
  <option value={c.plan}>{c.plan}</option>
  )}
- </select>
- </td>
- <td className="px-6 py-4">
+ </Select>
+ ),
+ },
+ {
+ key: "users",
+ header: "Users",
+ render: (c) => (
+ <div className="min-w-[90px]">
  <div className="flex items-center gap-2">
- <span className="text-sm font-semibold text-slate-900">
+ <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
  {c.analytics?.totalUsers || 0}
  </span>
- {c.limits?.maxUsers && c.limits.maxUsers !== -1 && (
+ {c.limits?.maxUsers && c.limits.maxUsers !== -1 ? (
  <>
- <span className="text-slate-400">/</span>
- <span className="text-sm text-slate-600">
+ <span className="text-slate-400 dark:text-slate-600">/</span>
+ <span className="text-sm text-slate-600 dark:text-slate-400">
  {c.limits.maxUsers}
  </span>
  </>
- )}
+ ) : null}
  </div>
- {c.limits?.maxUsers && c.limits.maxUsers !== -1 && (
- <div className="w-full bg-slate-200 rounded-full h-1.5 mt-1">
+ {c.limits?.maxUsers && c.limits.maxUsers !== -1 ? (
+ <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 mt-1">
  <div
  className={`h-1.5 rounded-full transition-all ${
- ((c.analytics?.totalUsers || 0) / c.limits.maxUsers) > 0.9
- ? 'bg-red-500'
- : ((c.analytics?.totalUsers || 0) / c.limits.maxUsers) > 0.7
- ? 'bg-yellow-500'
- : 'bg-green-500'
+ (c.analytics?.totalUsers || 0) / c.limits.maxUsers > 0.9
+ ? "bg-danger-500"
+ : (c.analytics?.totalUsers || 0) / c.limits.maxUsers > 0.7
+ ? "bg-warning-500"
+ : "bg-success-500"
  }`}
  style={{
  width: `${Math.min(
@@ -337,26 +296,32 @@ export default function CompaniesPage() {
  }}
  />
  </div>
- )}
- </td>
- <td className="px-6 py-4">
+ ) : null}
+ </div>
+ ),
+ },
+ {
+ key: "storage",
+ header: "Storage",
+ render: (c) => (
+ <div className="min-w-[110px]">
  <div className="flex items-center gap-2">
- <span className="text-sm font-semibold text-slate-900">
+ <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
  {((c.usage?.storageUsed || 0) / 1024).toFixed(1)}GB
  </span>
- <span className="text-slate-400">/</span>
- <span className="text-sm text-slate-600">
+ <span className="text-slate-400 dark:text-slate-600">/</span>
+ <span className="text-sm text-slate-600 dark:text-slate-400">
  {((c.usage?.storageQuota || 5120) / 1024).toFixed(0)}GB
  </span>
  </div>
- <div className="w-full bg-slate-200 rounded-full h-1.5 mt-1">
+ <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 mt-1">
  <div
  className={`h-1.5 rounded-full transition-all ${
- ((c.usage?.storageUsed || 0) / (c.usage?.storageQuota || 5120)) > 0.9
- ? 'bg-red-500'
- : ((c.usage?.storageUsed || 0) / (c.usage?.storageQuota || 5120)) > 0.7
- ? 'bg-yellow-500'
- : 'bg-green-500'
+ (c.usage?.storageUsed || 0) / (c.usage?.storageQuota || 5120) > 0.9
+ ? "bg-danger-500"
+ : (c.usage?.storageUsed || 0) / (c.usage?.storageQuota || 5120) > 0.7
+ ? "bg-warning-500"
+ : "bg-success-500"
  }`}
  style={{
  width: `${Math.min(
@@ -366,336 +331,143 @@ export default function CompaniesPage() {
  }}
  />
  </div>
- </td>
- <td className="px-6 py-4">
+ </div>
+ ),
+ },
+ {
+ key: "services",
+ header: "Services",
+ render: (c) => (
  <div className="flex items-center gap-2">
- <span className="text-lg font-bold text-slate-900">
- {c.features
- ? Object.values(c.features).filter(Boolean).length
- : 0}
+ <span className="text-lg font-bold text-slate-900 dark:text-slate-100">
+ {c.features ? Object.values(c.features).filter(Boolean).length : 0}
  </span>
- <span className="text-sm text-slate-500">features</span>
+ <span className="text-sm text-slate-500 dark:text-slate-400">features</span>
  </div>
- </td>
- <td className="px-6 py-4">
- <select
+ ),
+ },
+ {
+ key: "status",
+ header: "Status",
+ render: (c) => (
+ <Select
  defaultValue={c.status}
  onChange={(e) => changeStatus(c._id, e.target.value)}
- className="select-small"
+ wrapperClassName="w-32"
  >
  <option value="active">Active</option>
  <option value="view_only">View Only</option>
  <option value="suspended">Suspended</option>
- </select>
- </td>
- <td className="px-6 py-4">
+ </Select>
+ ),
+ },
+ {
+ key: "actions",
+ header: "Actions",
+ render: (c) => (
  <div className="flex gap-2">
- <button
- onClick={() => loadCompanyUsers(c._id)}
- className="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
- >
+ <Button size="sm" variant="secondary" onClick={() => loadCompanyUsers(c._id)}>
  View Users
- </button>
- <button
- onClick={() => openEditServices(c)}
- className="btn-primary-small"
- >
+ </Button>
+ <Button size="sm" onClick={() => openEditServices(c)}>
  Edit Services
- </button>
- <button
- onClick={() => deleteCompany(c._id, c.name)}
- className="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
- >
+ </Button>
+ <Button size="sm" variant="danger" onClick={() => deleteCompany(c._id, c.name)}>
  Delete
- </button>
+ </Button>
  </div>
- </td>
- </tr>
- ))}
- </tbody>
- </table>
- </div>
+ ),
+ },
+ ];
 
- {/* Mobile/Tablet Cards */}
- <div className="lg:hidden p-4 space-y-4">
- {companies.map((c) => (
- <div key={c._id} className="mobile-card">
- <div className="mobile-card-header">
- <div className="flex items-center gap-3">
- <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center text-white font-bold">
- {c.name.charAt(0).toUpperCase()}
- </div>
- <div>
- <h4 className="font-semibold text-slate-900">{c.name}</h4>
- <code className="text-xs bg-slate-100 px-2 py-0.5 rounded text-slate-600">
- {c.code}
- </code>
- </div>
- </div>
- <span
- className={`badge ${
- c.status === "active"
- ? "badge-active"
- : c.status === "view_only"
- ? "badge-view-only"
- : "badge-suspended"
- }`}
+ return (
+ <Layout>
+ <div className="space-y-6">
+ <PageHeader
+ title="Companies"
+ description="Manage companies, plans, and subscriptions"
+ actions={
+ <Button
+ onClick={() => router.push("/companies/new")}
+ leadingIcon={<span className="text-base leading-none">+</span>}
  >
- <div
- className={`status-dot ${
- c.status === "active"
- ? "status-dot-active"
- : c.status === "suspended"
- ? "status-dot-suspended"
- : "status-dot-pending"
- }`}
- ></div>
- {c.status}
- </span>
- </div>
- <div className="mobile-card-content">
- <div className="mobile-card-row">
- <span className="mobile-card-label">Plan</span>
- <select
- defaultValue={c.plan}
- onChange={(e) => changePlan(c._id, e.target.value)}
- className="select-small w-32"
- disabled={plansLoading || plans.length === 0}
- >
- {plans.length > 0 ? (
- plans.map((p) => (
- <option key={p._id} value={p.code}>
- {p.name}
- </option>
- ))
- ) : (
- <option value={c.plan}>{c.plan}</option>
- )}
- </select>
- </div>
- <div className="mobile-card-row">
- <span className="mobile-card-label">Status</span>
- <select
- defaultValue={c.status}
- onChange={(e) => changeStatus(c._id, e.target.value)}
- className="select-small w-32"
- >
- <option value="active">Active</option>
- <option value="view_only">View Only</option>
- <option value="suspended">Suspended</option>
- </select>
- </div>
- <div className="mobile-card-row">
- <span className="mobile-card-label">Services</span>
- <span className="mobile-card-value">
- {c.features
- ? Object.values(c.features).filter(Boolean).length
- : 0}{" "}
- features
- </span>
- </div>
- <div className="mt-3 pt-3 border-t border-slate-100 space-y-2">
- <button
- onClick={() => loadCompanyUsers(c._id)}
- className="w-full bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors"
- >
- View Users
- </button>
- <button
- onClick={() => openEditServices(c)}
- className="w-full btn-primary-small"
- >
- Edit Services
- </button>
- <button
- onClick={() => deleteCompany(c._id, c.name)}
- className="w-full bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors"
- >
- Delete Company
- </button>
- </div>
- </div>
- </div>
- ))}
- </div>
- </section>
-
- {/* Users Modal */}
- {viewingUsers && (
- <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
- <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
- <div className="p-6 border-b border-slate-200 bg-gradient-to-r from-indigo-50 to-blue-50">
- <div className="flex items-center justify-between">
- <div>
- <h3 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
- <span></span>
- Company Users
- </h3>
- <p className="text-sm text-slate-600 mt-1">
- {companies.find((c) => c._id === viewingUsers)?.name || ""}{" "}
- - {companyUsers.length} users
- </p>
- </div>
- <button
- onClick={() => {
- setViewingUsers(null);
- setCompanyUsers([]);
- }}
- className="text-slate-400 hover:text-slate-600 transition-colors"
- >
- <svg
- className="w-6 h-6"
- fill="none"
- stroke="currentColor"
- viewBox="0 0 24 24"
- >
- <path
- strokeLinecap="round"
- strokeLinejoin="round"
- strokeWidth={2}
- d="M6 18L18 6M6 6l12 12"
+ Add New Company
+ </Button>
+ }
  />
- </svg>
- </button>
- </div>
+
+ <div className="flex items-center gap-2">
+ <CardTitle>All Companies</CardTitle>
+ <Badge variant="neutral">{companies.length} total</Badge>
  </div>
 
- <div className="flex-1 overflow-y-auto p-6">
- {loadingUsers ? (
- <div className="flex items-center justify-center py-12">
- <div className="flex flex-col items-center gap-4">
- <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
- <div className="text-slate-600 font-medium">
- Loading users...
- </div>
- </div>
- </div>
- ) : companyUsers.length > 0 ? (
- <div className="space-y-3">
- {companyUsers.map((user) => (
- <div
- key={user._id}
- className="p-4 border border-slate-200 rounded-xl hover:shadow-md transition-shadow"
- >
- <div className="flex items-start justify-between gap-4">
- <div className="flex items-center gap-3 flex-1 min-w-0">
- <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
- {user.name.charAt(0).toUpperCase()}
- </div>
- <div className="flex-1 min-w-0">
- <div className="font-semibold text-slate-900 truncate">
- {user.name}
- </div>
- <div className="text-sm text-slate-600 truncate">
- {user.email}
- </div>
- <div className="flex flex-wrap gap-2 mt-2">
- <span className="badge badge-pending text-xs">
- {user.role}
- </span>
- <span
- className={`badge text-xs ${
- user.status === "active"
- ? "badge-active"
- : "badge-suspended"
- }`}
- >
- {user.status}
- </span>
- <span className="text-xs text-slate-500">
- Joined:{" "}
- {new Date(user.createdAt).toLocaleDateString()}
- </span>
- </div>
- </div>
- </div>
- </div>
- </div>
- ))}
- </div>
- ) : (
- <div className="text-center py-12 text-slate-500">
- <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-100 flex items-center justify-center">
- <span className="text-2xl"></span>
- </div>
- <p className="text-lg font-medium">No users found</p>
- <p className="text-sm mt-2">
- This company doesn't have any users yet
- </p>
- </div>
- )}
- </div>
-
- <div className="p-6 border-t border-slate-200 bg-slate-50">
- <button
- onClick={() => {
- setViewingUsers(null);
- setCompanyUsers([]);
- }}
- className="btn-secondary w-full sm:w-auto"
- >
- Close
- </button>
- </div>
- </div>
- </div>
- )}
+ <DataTable<Company>
+ columns={columns}
+ data={companies}
+ rowKey={(c) => c._id}
+ emptyTitle="No companies yet"
+ emptyDescription="Create your first company to get started."
+ emptyAction={
+ <Button onClick={() => router.push("/companies/new")}>
+ Add New Company
+ </Button>
+ }
+ />
 
  {/* Edit Services Section */}
  {editingId && (
- <div className="p-6 border-t border-slate-200 bg-gradient-to-r from-slate-50 to-blue-50">
+ <Card>
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
  <div>
- <h4 className="text-lg font-bold text-slate-900 flex items-center gap-2">
- <span></span>
- Edit Services / Features
- </h4>
- <p className="text-sm text-slate-600 mt-1">
+ <CardTitle>Edit Services / Features</CardTitle>
+ <CardDescription>
  {selectedCount} of {availableServices.length} services selected
- </p>
+ </CardDescription>
  </div>
  <div className="flex gap-2">
- <button
+ <Button
  type="button"
+ variant="secondary"
+ size="sm"
  onClick={() => {
  const allEnabled = Object.fromEntries(
  availableServices.map((s) => [s.key, true])
  );
  setEditServices(allEnabled);
  }}
- className="btn-secondary-small"
  >
  Select All
- </button>
- <button
+ </Button>
+ <Button
  type="button"
+ variant="secondary"
+ size="sm"
  onClick={() => setEditServices({})}
- className="btn-secondary-small"
  >
  Clear All
- </button>
+ </Button>
  </div>
  </div>
 
- <div className="bg-white rounded-xl border border-slate-200 p-6 max-h-96 overflow-y-auto">
+ <div className="rounded-xl border border-slate-200 dark:border-slate-800 p-6 max-h-96 overflow-y-auto">
  <div className="space-y-6">
  {Object.entries(categorizedServices).map(
  ([category, services]) => (
  <div key={category} className="space-y-3">
- <div className="flex items-center gap-2 pb-2 border-b border-slate-200">
+ <div className="flex items-center gap-2 pb-2 border-b border-slate-200 dark:border-slate-800">
  <div className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></div>
- <h5 className="text-sm font-bold text-slate-900">
+ <h5 className="text-sm font-bold text-slate-900 dark:text-slate-100">
  {category}
  </h5>
- <span className="badge badge-pending text-2xs">
+ <Badge variant="neutral" size="sm">
  {services.length} services
- </span>
+ </Badge>
  </div>
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
  {services.map((svc) => (
  <label
  key={svc.key}
- className="group flex items-start gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition-all duration-200 has-[:checked]:bg-blue-50 has-[:checked]:border-blue-300"
+ className="group flex items-start gap-3 p-3 border border-slate-200 dark:border-slate-800 rounded-lg cursor-pointer hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:border-primary-200 dark:hover:border-primary-800 transition-all duration-200 has-[:checked]:bg-primary-50 dark:has-[:checked]:bg-primary-900/20 has-[:checked]:border-primary-300 dark:has-[:checked]:border-primary-700"
  >
  <input
  type="checkbox"
@@ -706,14 +478,14 @@ export default function CompaniesPage() {
  [svc.key]: e.target.checked,
  })
  }
- className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500 mt-0.5"
+ className="w-4 h-4 text-primary-600 border-slate-300 dark:border-slate-600 rounded focus:ring-primary-500 mt-0.5"
  />
  <div className="flex-1 min-w-0">
- <div className="font-medium text-sm text-slate-900 group-hover:text-blue-900">
+ <div className="font-medium text-sm text-slate-900 dark:text-slate-100">
  {svc.label || svc.key}
  </div>
  {svc.description && (
- <div className="text-xs text-slate-500 mt-1 leading-relaxed">
+ <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
  {svc.description}
  </div>
  )}
@@ -728,22 +500,102 @@ export default function CompaniesPage() {
  </div>
 
  <div className="flex flex-col sm:flex-row gap-3 mt-6">
- <button onClick={saveEditServices} className="btn-primary">
- <span className="mr-2"></span>
- Save Changes
- </button>
- <button
+ <Button onClick={saveEditServices}>Save Changes</Button>
+ <Button
+ variant="secondary"
  onClick={() => {
  setEditingId(null);
  setEditServices({});
  }}
- className="btn-secondary"
  >
- <span className="mr-2"></span>
  Cancel
- </button>
+ </Button>
+ </div>
+ </Card>
+ )}
+ </div>
+
+ {/* Users Modal */}
+ {viewingUsers && (
+ <Modal
+ open
+ size="lg"
+ onClose={() => {
+ setViewingUsers(null);
+ setCompanyUsers([]);
+ }}
+ title={
+ <span>
+ Company Users
+ <span className="ml-2 text-sm font-normal text-slate-500 dark:text-slate-400">
+ {companies.find((c) => c._id === viewingUsers)?.name || ""} · {companyUsers.length} users
+ </span>
+ </span>
+ }
+ footer={
+ <Button
+ variant="secondary"
+ onClick={() => {
+ setViewingUsers(null);
+ setCompanyUsers([]);
+ }}
+ >
+ Close
+ </Button>
+ }
+ >
+ {loadingUsers ? (
+ <div className="space-y-3">
+ {[0, 1, 2].map((i) => (
+ <Skeleton key={i} variant="rounded" className="h-20" />
+ ))}
+ </div>
+ ) : companyUsers.length > 0 ? (
+ <div className="space-y-3">
+ {companyUsers.map((user) => (
+ <div
+ key={user._id}
+ className="p-4 border border-slate-200 dark:border-slate-800 rounded-xl"
+ >
+ <div className="flex items-center gap-3">
+ <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+ {user.name.charAt(0).toUpperCase()}
+ </div>
+ <div className="flex-1 min-w-0">
+ <div className="font-semibold text-slate-900 dark:text-slate-100 truncate">
+ {user.name}
+ </div>
+ <div className="text-sm text-slate-500 dark:text-slate-400 truncate">
+ {user.email}
+ </div>
+ <div className="flex flex-wrap items-center gap-2 mt-2">
+ <Badge variant="neutral" size="sm">
+ {user.role}
+ </Badge>
+ <Badge
+ variant={user.status === "active" ? "success" : "danger"}
+ size="sm"
+ >
+ {user.status}
+ </Badge>
+ <span className="text-xs text-slate-500 dark:text-slate-400">
+ Joined: {new Date(user.createdAt).toLocaleDateString()}
+ </span>
  </div>
  </div>
+ </div>
+ </div>
+ ))}
+ </div>
+ ) : (
+ <div className="text-center py-12 text-slate-500 dark:text-slate-400">
+ <p className="text-lg font-medium">No users found</p>
+ <p className="text-sm mt-2">
+ This company doesn&apos;t have any users yet
+ </p>
+ </div>
+ )}
+ </Modal>
  )}
  </Layout>
  );
