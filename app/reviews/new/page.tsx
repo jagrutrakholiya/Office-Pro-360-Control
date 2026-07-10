@@ -2,16 +2,17 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Layout from '../../../components/Layout'
+import { PageHeader, Card, Button, Input, Textarea } from '@/components/ui'
 import api from '../../../lib/api'
 
 export default function NewReviewPage() {
  const router = useRouter()
- const [form, setForm] = useState({ 
- author: '', 
- role: '', 
- company: '', 
- rating: 5, 
- quote: '' 
+ const [form, setForm] = useState({
+ author: '',
+ role: '',
+ company: '',
+ rating: 5,
+ quote: ''
  })
  const [loading, setLoading] = useState(false)
  const [error, setError] = useState<string>('')
@@ -22,7 +23,7 @@ export default function NewReviewPage() {
  setLoading(true)
  setError('')
  setSuccess(false)
- 
+
  try {
  await api.post('/marketing/admin/reviews', { ...form, status: 'published' })
  setSuccess(true)
@@ -38,135 +39,99 @@ export default function NewReviewPage() {
 
  return (
  <Layout>
- <div className="mb-8">
- <div className="flex items-center justify-between">
- <div>
- <h2 className="text-3xl font-bold text-slate-900 mb-2">Create New Review</h2>
- <p className="text-slate-600">Add a testimonial to display on the marketing site</p>
- </div>
- <button 
- onClick={() => router.push('/reviews')}
- className="btn-secondary"
- >
+ <div className="space-y-6">
+ <PageHeader
+ title="Create New Review"
+ description="Add a testimonial to display on the marketing site"
+ actions={
+ <Button variant="outline" onClick={() => router.push('/reviews')}>
  ← Back to Reviews
- </button>
- </div>
- </div>
+ </Button>
+ }
+ />
 
- <section className="card mb-8">
+ <Card className="p-6">
  <form onSubmit={submit} className="space-y-6">
- <div className="grid grid-cols-2 gap-4">
- <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">
- Author Name *
- </label>
- <input 
- placeholder="e.g. John Doe" 
- value={form.author} 
- onChange={e => setForm({ ...form, author: e.target.value })} 
- className="input" 
- required 
+ <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+ <Input
+ label="Author Name *"
+ placeholder="e.g. John Doe"
+ value={form.author}
+ onChange={e => setForm({ ...form, author: e.target.value })}
+ required
  />
- </div>
- <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">
- Role (optional)
- </label>
- <input 
- placeholder="e.g. CEO, HR Manager" 
- value={form.role} 
- onChange={e => setForm({ ...form, role: e.target.value })} 
- className="input" 
+ <Input
+ label="Role (optional)"
+ placeholder="e.g. CEO, HR Manager"
+ value={form.role}
+ onChange={e => setForm({ ...form, role: e.target.value })}
  />
- </div>
  </div>
 
- <div className="grid grid-cols-2 gap-4">
- <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">
- Company (optional)
- </label>
- <input 
- placeholder="e.g. Acme Corp" 
- value={form.company} 
- onChange={e => setForm({ ...form, company: e.target.value })} 
- className="input" 
+ <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+ <Input
+ label="Company (optional)"
+ placeholder="e.g. Acme Corp"
+ value={form.company}
+ onChange={e => setForm({ ...form, company: e.target.value })}
  />
- </div>
  <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">
- Rating (1-5) *
- </label>
- <input 
- type="number" 
- min={1} 
- max={5} 
- value={form.rating} 
- onChange={e => setForm({ ...form, rating: Number(e.target.value) || 5 })} 
- className="input" 
- required 
+ <Input
+ type="number"
+ label="Rating (1-5) *"
+ min={1}
+ max={5}
+ value={form.rating}
+ onChange={e => setForm({ ...form, rating: Number(e.target.value) || 5 })}
+ required
  />
- <div className="mt-1 flex gap-1">
+ <div className="mt-1.5 flex gap-1">
  {[1, 2, 3, 4, 5].map(n => (
- <span 
+ <span
  key={n}
- className={`text-xl cursor-pointer ${n <= form.rating ? 'text-yellow-400' : 'text-slate-300'}`}
+ className={`text-xl cursor-pointer ${n <= form.rating ? 'text-warning-400' : 'text-slate-300 dark:text-slate-600'}`}
  onClick={() => setForm({ ...form, rating: n })}
  >
- 
+ ★
  </span>
  ))}
  </div>
  </div>
  </div>
 
- <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">
- Testimonial Quote *
- </label>
- <textarea 
- placeholder="Enter the testimonial quote here..." 
- value={form.quote} 
- onChange={e => setForm({ ...form, quote: e.target.value })} 
- className="input min-h-[120px]" 
- required 
+ <Textarea
+ label="Testimonial Quote *"
+ placeholder="Enter the testimonial quote here..."
+ value={form.quote}
+ onChange={e => setForm({ ...form, quote: e.target.value })}
+ className="min-h-[120px]"
+ helperText="This will be displayed on the marketing website"
+ required
  />
- <p className="mt-1 text-xs text-slate-500">
- This will be displayed on the marketing website
- </p>
- </div>
 
  {error && (
- <div className="p-3 bg-red-50 border border-red-200 rounded-md text-red-700 text-sm">
+ <div className="p-3 bg-danger-50 dark:bg-danger-900/20 border border-danger-200 dark:border-danger-800 rounded-md text-danger-700 dark:text-danger-400 text-sm">
  {error}
  </div>
  )}
- 
+
  {success && (
- <div className="p-3 bg-green-50 border border-green-200 rounded-md text-green-700 text-sm">
+ <div className="p-3 bg-success-50 dark:bg-success-900/20 border border-success-200 dark:border-success-800 rounded-md text-success-700 dark:text-success-400 text-sm">
  Review created successfully! Redirecting...
  </div>
  )}
 
- <div className="flex gap-3 pt-4 border-t">
- <button 
- type="submit" 
- disabled={loading || success} 
- className="btn-primary"
- >
+ <div className="flex gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
+ <Button type="submit" disabled={loading || success} loading={loading}>
  {loading ? 'Creating...' : success ? 'Created!' : 'Create Review'}
- </button>
- <button 
- type="button"
- onClick={() => router.push('/reviews')}
- className="btn-secondary"
- >
+ </Button>
+ <Button type="button" variant="outline" onClick={() => router.push('/reviews')}>
  Cancel
- </button>
+ </Button>
  </div>
  </form>
- </section>
+ </Card>
+ </div>
  </Layout>
  )
 }
-

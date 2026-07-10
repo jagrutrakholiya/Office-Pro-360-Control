@@ -6,10 +6,20 @@ import { FiPlus, FiEdit2, FiTrash2, FiEye, FiSearch, FiTrendingUp } from "react-
 import api from "@/lib/api";
 import Layout from "../../components/Layout";
 import {
+ PageHeader,
+ StatCard,
+ Card,
+ Button,
+ IconButton,
+ Input,
+ Select,
+ Badge,
+ EmptyState,
+ Skeleton,
+} from "@/components/ui";
+import {
  BarChart,
  Bar,
- LineChart,
- Line,
  PieChart,
  Pie,
  Cell,
@@ -17,7 +27,6 @@ import {
  YAxis,
  CartesianGrid,
  Tooltip,
- Legend,
  ResponsiveContainer,
 } from "recharts";
 
@@ -101,11 +110,29 @@ export default function BlogManagement() {
  views: post.views,
  }));
 
+ const chartTooltipStyle = {
+ backgroundColor: "#fff",
+ border: "1px solid #e5e7eb",
+ borderRadius: "8px",
+ };
+
+ const statusVariant: Record<string, "success" | "warning" | "neutral"> = {
+ published: "success",
+ draft: "warning",
+ archived: "neutral",
+ };
+
  if (loading) {
  return (
  <Layout>
- <div className="flex items-center justify-center min-h-[60vh]">
- <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+ <div className="space-y-6">
+ <Skeleton variant="rounded" height={40} width={280} />
+ <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+ {[1, 2, 3, 4].map((i) => (
+ <Skeleton key={i} variant="rounded" height={96} />
+ ))}
+ </div>
+ <Skeleton variant="rounded" height={300} />
  </div>
  </Layout>
  );
@@ -114,80 +141,51 @@ export default function BlogManagement() {
  return (
  <Layout>
  <div className="space-y-6">
- {/* Header */}
- <div className="flex items-center justify-between mb-8">
- <div>
- <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
- Blog Management
- </h1>
- <p className="text-slate-600 dark:text-slate-400">
- Create and manage blog posts for marketing website
- </p>
- </div>
- <button
- onClick={() => router.push("/blog/new")}
- className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
- >
- <FiPlus />
+ <PageHeader
+ title="Blog Management"
+ description="Create and manage blog posts for marketing website"
+ actions={
+ <Button leadingIcon={<FiPlus />} onClick={() => router.push("/blog/new")}>
  New Post
- </button>
- </div>
+ </Button>
+ }
+ />
 
  {/* Filters and Search */}
- <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-200 dark:border-slate-700 mb-6">
+ <Card className="p-4">
  <div className="flex flex-col md:flex-row gap-4">
- {/* Search */}
- <div className="flex-1 relative">
- <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
- <input
+ <div className="flex-1">
+ <Input
+ leadingIcon={<FiSearch />}
  type="text"
  placeholder="Search posts..."
  value={search}
  onChange={(e) => setSearch(e.target.value)}
- className="w-full pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
  />
  </div>
-
- {/* Status Filter */}
- <select
- value={filter}
- onChange={(e) => setFilter(e.target.value)}
- className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
- >
+ <Select value={filter} onChange={(e) => setFilter(e.target.value)}>
  <option value="all">All Posts</option>
  <option value="published">Published</option>
  <option value="draft">Draft</option>
  <option value="archived">Archived</option>
- </select>
+ </Select>
  </div>
- </div>
+ </Card>
 
  {/* Stats */}
- <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
- <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
- <div className="text-sm text-slate-600 dark:text-slate-400">Total Posts</div>
- <div className="text-2xl font-bold text-slate-900 dark:text-white">{posts.length}</div>
- </div>
- <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
- <div className="text-sm text-slate-600 dark:text-slate-400">Published</div>
- <div className="text-2xl font-bold text-green-600">{posts.filter(p => p.status === 'published').length}</div>
- </div>
- <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
- <div className="text-sm text-slate-600 dark:text-slate-400">Drafts</div>
- <div className="text-2xl font-bold text-yellow-600">{posts.filter(p => p.status === 'draft').length}</div>
- </div>
- <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
- <div className="text-sm text-slate-600 dark:text-slate-400">Total Views</div>
- <div className="text-2xl font-bold text-blue-600">{posts.reduce((sum, p) => sum + p.views, 0)}</div>
- </div>
+ <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+ <StatCard label="Total Posts" value={posts.length} accent="neutral" />
+ <StatCard label="Published" value={posts.filter(p => p.status === 'published').length} accent="success" />
+ <StatCard label="Drafts" value={posts.filter(p => p.status === 'draft').length} accent="warning" />
+ <StatCard label="Total Views" value={posts.reduce((sum, p) => sum + p.views, 0)} accent="primary" />
  </div>
 
  {/* Analytics Charts */}
- <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+ <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
  {/* Posts by Category */}
- <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
- <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
- <FiTrendingUp className="text-blue-600" />
+ <Card className="p-6">
+ <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+ <FiTrendingUp className="text-primary-600" />
  Posts by Category
  </h3>
  {categoryData.length > 0 ? (
@@ -196,25 +194,19 @@ export default function BlogManagement() {
  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
  <XAxis dataKey="name" stroke="#64748b" />
  <YAxis stroke="#64748b" />
- <Tooltip 
- contentStyle={{ 
- backgroundColor: '#fff', 
- border: '1px solid #e5e7eb',
- borderRadius: '8px'
- }} 
- />
+ <Tooltip contentStyle={chartTooltipStyle} />
  <Bar dataKey="value" fill={COLORS[0]} radius={[8, 8, 0, 0]} />
  </BarChart>
  </ResponsiveContainer>
  ) : (
- <p className="text-slate-500 text-center py-20">No data available</p>
+ <p className="text-slate-500 dark:text-slate-400 text-center py-20">No data available</p>
  )}
- </div>
+ </Card>
 
  {/* Status Distribution */}
- <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
- <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
- <FiTrendingUp className="text-green-600" />
+ <Card className="p-6">
+ <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+ <FiTrendingUp className="text-success-600" />
  Status Distribution
  </h3>
  {statusData.some(d => d.value > 0) ? (
@@ -234,23 +226,17 @@ export default function BlogManagement() {
  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
  ))}
  </Pie>
- <Tooltip 
- contentStyle={{ 
- backgroundColor: '#fff', 
- border: '1px solid #e5e7eb',
- borderRadius: '8px'
- }} 
- />
+ <Tooltip contentStyle={chartTooltipStyle} />
  </PieChart>
  </ResponsiveContainer>
  ) : (
- <p className="text-slate-500 text-center py-20">No data available</p>
+ <p className="text-slate-500 dark:text-slate-400 text-center py-20">No data available</p>
  )}
- </div>
+ </Card>
 
  {/* Top 5 Posts by Views */}
- <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm lg:col-span-2">
- <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+ <Card className="p-6 lg:col-span-2">
+ <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
  <FiEye className="text-purple-600" />
  Top 5 Posts by Views
  </h3>
@@ -260,13 +246,7 @@ export default function BlogManagement() {
  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
  <XAxis type="number" stroke="#64748b" />
  <YAxis dataKey="title" type="category" width={150} stroke="#64748b" />
- <Tooltip 
- contentStyle={{ 
- backgroundColor: '#fff', 
- border: '1px solid #e5e7eb',
- borderRadius: '8px'
- }} 
- />
+ <Tooltip contentStyle={chartTooltipStyle} />
  <Bar dataKey="views" fill={COLORS[2]} radius={[0, 8, 8, 0]}>
  {viewsData.map((entry, index) => (
  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -275,42 +255,25 @@ export default function BlogManagement() {
  </BarChart>
  </ResponsiveContainer>
  ) : (
- <p className="text-slate-500 text-center py-20">No posts with views yet</p>
+ <p className="text-slate-500 dark:text-slate-400 text-center py-20">No posts with views yet</p>
  )}
- </div>
+ </Card>
  </div>
 
  {/* Posts List */}
  <div className="space-y-4">
  {filteredPosts.length === 0 ? (
- <div className="bg-white dark:bg-slate-800 rounded-xl p-12 text-center shadow-sm border border-slate-200 dark:border-slate-700">
- <p className="text-slate-600 dark:text-slate-400">
- No blog posts found
- </p>
- </div>
+ <EmptyState title="No blog posts found" description="Try adjusting your search or filter." />
  ) : (
  filteredPosts.map((post) => (
- <div
- key={post._id}
- className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow"
- >
+ <Card key={post._id} variant="interactive" className="p-6">
  <div className="flex items-start justify-between">
  <div className="flex-1">
  <div className="flex items-center gap-3 mb-2">
- <h3 className="text-xl font-semibold text-slate-900 dark:text-white">
+ <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
  {post.title}
  </h3>
- <span
- className={`px-3 py-1 rounded-full text-xs font-medium ${
- post.status === "published"
- ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
- : post.status === "draft"
- ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
- : "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-400"
- }`}
- >
- {post.status}
- </span>
+ <Badge variant={statusVariant[post.status] || "neutral"}>{post.status}</Badge>
  </div>
  <p className="text-slate-600 dark:text-slate-400 mb-4">
  {post.excerpt}
@@ -329,23 +292,27 @@ export default function BlogManagement() {
 
  {/* Actions */}
  <div className="flex items-center gap-2 ml-4">
- <button
+ <IconButton
+ size="sm"
+ variant="ghost"
+ aria-label="Edit"
+ className="text-primary-600"
  onClick={() => router.push(`/blog/edit/${post._id}`)}
- className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
- title="Edit"
  >
  <FiEdit2 />
- </button>
- <button
+ </IconButton>
+ <IconButton
+ size="sm"
+ variant="ghost"
+ aria-label="Delete"
+ className="text-danger-600"
  onClick={() => handleDelete(post._id)}
- className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
- title="Delete"
  >
  <FiTrash2 />
- </button>
+ </IconButton>
  </div>
  </div>
- </div>
+ </Card>
  ))
  )}
  </div>

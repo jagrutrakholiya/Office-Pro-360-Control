@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Layout from "../../../../../components/Layout";
 import SolutionForm from "../../../../../components/SolutionForm";
+import { Skeleton } from "../../../../../components/ui";
 import { useToast } from "../../../../../components/ui/Toast";
 import { solutionAPI, Solution } from "@/lib/marketingAPI";
 
@@ -40,8 +41,9 @@ export default function EditSolutionPage() {
   if (loading || !initial) {
     return (
       <Layout>
-        <div className="flex items-center justify-center py-20">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+        <div className="space-y-4">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-64 w-full" />
         </div>
       </Layout>
     );

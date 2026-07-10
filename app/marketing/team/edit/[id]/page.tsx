@@ -4,6 +4,17 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Layout from "../../../../../components/Layout";
 import FirebaseImageUpload from "../../../../../components/FirebaseImageUpload";
+import {
+  PageHeader,
+  Card,
+  CardHeader,
+  CardTitle,
+  Button,
+  Input,
+  Textarea,
+  Select,
+  Skeleton,
+} from "../../../../../components/ui";
 import { useToast } from "../../../../../components/ui/Toast";
 import { teamAPI, TeamMember } from "@/lib/marketingAPI";
 import { getMergedOptions, type OptionItem } from "@/lib/contentOptionsAPI";
@@ -96,8 +107,9 @@ export default function EditTeamMember() {
   if (loading) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="space-y-4">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-64 w-full" />
         </div>
       </Layout>
     );
@@ -105,56 +117,63 @@ export default function EditTeamMember() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-6">
-          <button
-            onClick={() => router.push("/marketing/team")}
-            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-4"
-          >
-            <FaArrowLeft /> Back to Team
-          </button>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Edit Team Member</h1>
-        </div>
+      <div className="space-y-6">
+        <PageHeader
+          title="Edit Team Member"
+          description="Update an existing company team profile"
+          breadcrumbs={[
+            { label: "Team", href: "/marketing/team" },
+            { label: "Edit" },
+          ]}
+          actions={
+            <Button
+              variant="outline"
+              leadingIcon={<FaArrowLeft />}
+              onClick={() => router.push("/marketing/team")}
+            >
+              Back to Team
+            </Button>
+          }
+        />
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Basic Information</h2>
+          <Card>
+            <CardHeader>
+              <CardTitle>Basic Information</CardTitle>
+            </CardHeader>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                  Full Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  required
-                />
-              </div>
+            <div className="mt-4 space-y-4">
+              <Input
+                label={
+                  <>
+                    Full Name <span className="text-danger-500">*</span>
+                  </>
+                }
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                required
+              />
+
+              <Input
+                label={
+                  <>
+                    Role/Title <span className="text-danger-500">*</span>
+                  </>
+                }
+                type="text"
+                value={formData.role}
+                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                placeholder="e.g., CEO, Senior Developer, Marketing Manager"
+                required
+              />
 
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                  Role/Title <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="e.g., CEO, Senior Developer, Marketing Manager"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Department</label>
-                <input
+                <Input
+                  label="Department"
                   list="team-department-options"
                   value={formData.department}
                   onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   placeholder="Type or select department"
                 />
                 <datalist id="team-department-options">
@@ -166,15 +185,12 @@ export default function EditTeamMember() {
                 </datalist>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Bio</label>
-                <textarea
-                  value={formData.bio}
-                  onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                  rows={4}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
+              <Textarea
+                label="Bio"
+                value={formData.bio}
+                onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                rows={4}
+              />
 
               <FirebaseImageUpload
                 label="Profile Photo"
@@ -185,94 +201,94 @@ export default function EditTeamMember() {
               />
 
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Display Order</label>
-                  <input
-                    type="number"
-                    value={formData.order}
-                    onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    min="0"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Status</label>
-                  <select
-                    value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value as "active" | "inactive" })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  >
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                  </select>
-                </div>
+                <Input
+                  label="Display Order"
+                  type="number"
+                  value={formData.order}
+                  onChange={(e) =>
+                    setFormData({ ...formData, order: parseInt(e.target.value) || 0 })
+                  }
+                  min="0"
+                />
+                <Select
+                  label="Status"
+                  value={formData.status}
+                  onChange={(e) =>
+                    setFormData({ ...formData, status: e.target.value as "active" | "inactive" })
+                  }
+                >
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </Select>
               </div>
 
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                  <input
-                    type="checkbox"
-                    checked={formData.featured}
-                    onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                    className="rounded"
-                  />
-                  Featured (Show on homepage)
-                </label>
-              </div>
+              <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                <input
+                  type="checkbox"
+                  checked={formData.featured}
+                  onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
+                  className="rounded"
+                />
+                Featured (Show on homepage)
+              </label>
             </div>
-          </div>
+          </Card>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Social Links (Optional)</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Email</label>
-                <input
-                  type="email"
-                  value={formData.social?.email || ""}
-                  onChange={(e) => setFormData({ ...formData, social: { ...formData.social!, email: e.target.value } })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="john@example.com"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">LinkedIn</label>
-                <input
-                  type="url"
-                  value={formData.social?.linkedin || ""}
-                  onChange={(e) => setFormData({ ...formData, social: { ...formData.social!, linkedin: e.target.value } })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="https://linkedin.com/in/username"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Twitter</label>
-                <input
-                  type="url"
-                  value={formData.social?.twitter || ""}
-                  onChange={(e) => setFormData({ ...formData, social: { ...formData.social!, twitter: e.target.value } })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="https://twitter.com/username"
-                />
-              </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Social Links (Optional)</CardTitle>
+            </CardHeader>
+
+            <div className="mt-4 space-y-4">
+              <Input
+                label="Email"
+                type="email"
+                value={formData.social?.email || ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, social: { ...formData.social!, email: e.target.value } })
+                }
+                placeholder="john@example.com"
+              />
+
+              <Input
+                label="LinkedIn"
+                type="url"
+                value={formData.social?.linkedin || ""}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    social: { ...formData.social!, linkedin: e.target.value },
+                  })
+                }
+                placeholder="https://linkedin.com/in/username"
+              />
+
+              <Input
+                label="Twitter"
+                type="url"
+                value={formData.social?.twitter || ""}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    social: { ...formData.social!, twitter: e.target.value },
+                  })
+                }
+                placeholder="https://twitter.com/username"
+              />
             </div>
-          </div>
+          </Card>
 
-          <div className="flex gap-4">
-            <button
-              type="submit"
-              disabled={saving}
-              className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
-            >
-              <FaSave /> {saving ? "Saving..." : "Save Changes"}
-            </button>
-            <button
+          <div className="flex gap-3">
+            <Button type="submit" variant="primary" loading={saving} leadingIcon={<FaSave />}>
+              {saving ? "Saving..." : "Save Changes"}
+            </Button>
+            <Button
               type="button"
+              variant="outline"
               onClick={() => router.push("/marketing/team")}
-              className="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       </div>

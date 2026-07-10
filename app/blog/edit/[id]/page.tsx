@@ -7,6 +7,7 @@ import api from "@/lib/api";
 import Layout from "@/components/Layout";
 import FirebaseImageUpload from "@/components/FirebaseImageUpload";
 import RichTextEditor from "@/components/RichTextEditor";
+import { PageHeader, Card, Button, Input, Textarea, Select, Skeleton } from "@/components/ui";
 
 export default function EditBlogPost() {
  const router = useRouter();
@@ -97,8 +98,10 @@ export default function EditBlogPost() {
  if (loading) {
  return (
  <Layout>
- <div className="flex items-center justify-center min-h-[60vh]">
- <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+ <div className="space-y-6">
+ <Skeleton variant="rounded" height={40} width={280} />
+ <Skeleton variant="rounded" height={120} />
+ <Skeleton variant="rounded" height={360} />
  </div>
  </Layout>
  );
@@ -106,83 +109,66 @@ export default function EditBlogPost() {
 
  return (
  <Layout>
- <div className="max-w-5xl mx-auto space-y-6">
- {/* Header */}
- <div className="flex items-center gap-4 mb-8">
- <button
+ <div className="space-y-6">
+ <PageHeader
+ title="Edit Blog Post"
+ description="Update existing blog post"
+ actions={
+ <Button
+ variant="outline"
+ leadingIcon={<FiArrowLeft />}
  onClick={() => router.push("/blog")}
- className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
  >
- <FiArrowLeft className="text-xl text-slate-600 dark:text-slate-400" />
- </button>
- <div>
- <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
- Edit Blog Post
- </h1>
- <p className="text-slate-600 dark:text-slate-400">
- Update existing blog post
- </p>
- </div>
- </div>
+ Back
+ </Button>
+ }
+ />
 
  <form onSubmit={handleSubmit} className="space-y-6">
  {/* Title */}
- <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
- <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
- Title *
- </label>
- <input
+ <Card className="p-6">
+ <Input
+ label="Title *"
  type="text"
  name="title"
  value={formData.title}
  onChange={handleChange}
  required
- className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
  placeholder="Enter post title"
  />
- </div>
+ </Card>
 
  {/* Slug */}
- <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
- <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
- Slug *
- </label>
- <input
+ <Card className="p-6">
+ <Input
+ label="Slug *"
  type="text"
  name="slug"
  value={formData.slug}
  onChange={handleChange}
  required
- className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
  placeholder="post-url-slug"
+ helperText={`URL: /blog/${formData.slug || "post-url-slug"}`}
  />
- <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
- URL: /blog/{formData.slug || "post-url-slug"}
- </p>
- </div>
+ </Card>
 
  {/* Excerpt */}
- <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
- <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
- Excerpt *
- </label>
- <textarea
+ <Card className="p-6">
+ <Textarea
+ label="Excerpt *"
  name="excerpt"
  value={formData.excerpt}
  onChange={handleChange}
  required
  maxLength={300}
  rows={3}
- className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
  placeholder="Brief description (max 300 characters)"
+ helperText={`${formData.excerpt.length}/300 characters`}
  />
- <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
- {formData.excerpt.length}/300 characters
- </p>
- </div>
+ </Card>
 
  {/* Content */}
- <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+ <Card className="p-6">
  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
  Content *
  </label>
@@ -192,47 +178,41 @@ export default function EditBlogPost() {
  placeholder="Write your blog post content..."
  minHeight={400}
  />
- </div>
+ </Card>
 
  {/* Category and Status */}
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
- <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
- <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
- Category
- </label>
- <select
+ <Card className="p-6">
+ <Select
+ label="Category"
  name="category"
  value={formData.category}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
  >
  <option value="Product Updates">Product Updates</option>
  <option value="HR Tips">HR Tips</option>
  <option value="Company News">Company News</option>
  <option value="Case Studies">Case Studies</option>
  <option value="Guides">Guides</option>
- </select>
- </div>
+ </Select>
+ </Card>
 
- <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
- <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
- Status
- </label>
- <select
+ <Card className="p-6">
+ <Select
+ label="Status"
  name="status"
  value={formData.status}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
  >
  <option value="draft">Draft</option>
  <option value="published">Published</option>
  <option value="archived">Archived</option>
- </select>
- </div>
+ </Select>
+ </Card>
  </div>
 
  {/* Tags */}
- <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+ <Card className="p-6">
  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
  Tags
  </label>
@@ -242,38 +222,34 @@ export default function EditBlogPost() {
  value={tagInput}
  onChange={(e) => setTagInput(e.target.value)}
  onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), handleAddTag())}
- className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+ className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40 focus:border-primary-500"
  placeholder="Add tag and press Enter"
  />
- <button
- type="button"
- onClick={handleAddTag}
- className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
- >
+ <Button type="button" onClick={handleAddTag}>
  Add
- </button>
+ </Button>
  </div>
  <div className="flex flex-wrap gap-2">
  {formData.tags.map((tag) => (
  <span
  key={tag}
- className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full text-sm flex items-center gap-2"
+ className="px-3 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 rounded-full text-sm flex items-center gap-2"
  >
  {tag}
  <button
  type="button"
  onClick={() => handleRemoveTag(tag)}
- className="hover:text-blue-900 dark:hover:text-blue-200"
+ className="hover:text-primary-900 dark:hover:text-primary-200"
  >
  ×
  </button>
  </span>
  ))}
  </div>
- </div>
+ </Card>
 
  {/* Featured Image */}
- <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+ <Card className="p-6">
  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
  Featured Image
  </label>
@@ -283,60 +259,41 @@ export default function EditBlogPost() {
  currentImage={formData.featuredImage}
  folder="blog-images"
  />
- </div>
+ </Card>
 
  {/* SEO Meta */}
- <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
- <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
+ <Card className="p-6">
+ <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">
  SEO Meta Data
  </h3>
  <div className="space-y-4">
- <div>
- <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
- Meta Title
- </label>
- <input
+ <Input
+ label="Meta Title"
  type="text"
  name="metaTitle"
  value={formData.metaTitle}
  onChange={handleChange}
- className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
  placeholder="SEO title (defaults to post title)"
  />
- </div>
- <div>
- <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
- Meta Description
- </label>
- <textarea
+ <Textarea
+ label="Meta Description"
  name="metaDescription"
  value={formData.metaDescription}
  onChange={handleChange}
  rows={3}
- className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
  placeholder="SEO description (defaults to excerpt)"
  />
  </div>
- </div>
- </div>
+ </Card>
 
  {/* Submit Button */}
  <div className="flex items-center justify-end gap-4">
- <button
- type="button"
- onClick={() => router.push("/blog")}
- className="px-6 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
- >
+ <Button type="button" variant="outline" onClick={() => router.push("/blog")}>
  Cancel
- </button>
- <button
- type="submit"
- disabled={saving}
- className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
- >
- <FiSave />
+ </Button>
+ <Button type="submit" loading={saving} leadingIcon={<FiSave />}>
  {saving ? "Saving..." : "Update Post"}
- </button>
+ </Button>
  </div>
  </form>
  </div>
