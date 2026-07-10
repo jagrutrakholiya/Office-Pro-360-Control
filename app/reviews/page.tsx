@@ -146,35 +146,37 @@ export default function ReviewsPage() {
 
   return (
     <Layout>
-      <PageHeader
-        title="Reviews"
-        description="Manage testimonials displayed on the marketing site"
-        actions={
-          <button
-            onClick={() => router.push("/reviews/new")}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-lg transition-colors"
-          >
-            <FaPlus className="text-xs" /> Add Review
-          </button>
-        }
-      />
+      <div className="space-y-6">
+        <PageHeader
+          title="Reviews"
+          description="Manage testimonials displayed on the marketing site"
+          actions={
+            <Button
+              leadingIcon={<FaPlus className="text-xs" />}
+              onClick={() => router.push("/reviews/new")}
+            >
+              Add Review
+            </Button>
+          }
+        />
 
-      {!loading && reviews.length === 0 ? (
-        <EmptyState
-          icon={<FaCommentDots className="w-6 h-6" />}
-          title="No reviews yet"
-          description="Add your first customer testimonial to build trust on the marketing site."
-          action={{ label: "+ Add Review", onClick: () => router.push("/reviews/new") }}
-        />
-      ) : (
-        <DataTable<Review>
-          columns={columns}
-          data={reviews}
-          loading={loading}
-          rowKey={(r) => r._id}
-          emptyMessage="No reviews yet"
-        />
-      )}
+        {!loading && reviews.length === 0 ? (
+          <EmptyState
+            icon={<FaCommentDots className="w-6 h-6" />}
+            title="No reviews yet"
+            description="Add your first customer testimonial to build trust on the marketing site."
+            action={{ label: "+ Add Review", onClick: () => router.push("/reviews/new") }}
+          />
+        ) : (
+          <DataTable<Review>
+            columns={columns}
+            data={reviews}
+            loading={loading}
+            rowKey={(r) => r._id}
+            emptyMessage="No reviews yet"
+          />
+        )}
+      </div>
     </Layout>
   );
 }
