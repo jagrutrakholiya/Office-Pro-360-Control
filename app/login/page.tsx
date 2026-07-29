@@ -286,7 +286,7 @@ export default function LoginPage() {
 
  {/* Additional Info */}
  <p className="mt-6 text-center text-xs text-slate-500">
- © {new Date().getFullYear()} OfficePro360. All rights reserved.
+ © {new Date().getFullYear()} Capturo Ventures LLP. All rights reserved.
  </p>
  </div>
  </div>
